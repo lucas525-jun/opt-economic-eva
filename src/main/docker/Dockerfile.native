@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native -t quarkus/pemex-ics-o-oportunities .
+# docker build -f src/main/docker/Dockerfile.native -t quarkus/pemex-ics-o-economic-evaluation .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/pemex-ics-o-oportunities
+# docker run -i --rm -p 8080:8080 quarkus/pemex-ics-o-economic-evaluation
 #
 ###
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.10
