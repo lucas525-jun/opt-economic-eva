@@ -309,7 +309,10 @@ public class EvaluacionEconomicaService {
 
 					return new EvaluacionResponse(oportunity, evaluacionEconomica, flujosContablesTotales);
 
-				});
+				}).onFailure().transform(error -> {
+					log.error(error.getMessage());
+                    return error;
+                });
 
 	}
 

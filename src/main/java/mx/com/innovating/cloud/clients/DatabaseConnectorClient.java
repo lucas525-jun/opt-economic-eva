@@ -2,6 +2,7 @@ package mx.com.innovating.cloud.clients;
 
 import java.util.List;
 
+import io.smallrye.common.annotation.Blocking;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import io.quarkus.rest.client.reactive.ClientExceptionMapper;
@@ -92,6 +93,7 @@ public interface DatabaseConnectorClient {
 	Uni<ProduccionTotalMmbpce> getProduccionTotalMmbpce(@PathParam("idOportunidad") Integer idOportunidad);
 
 	@ClientExceptionMapper
+	@Blocking
 	static RuntimeException toException(Response response) {
 
 		if (response.getStatus() == 500) {
