@@ -39,8 +39,7 @@ public class EvaluacionEconomicaService {
     @Inject
     DataBaseConnectorRepository databaseConnectorClient;
 
-
-    public EvaluacionResponse getInfoPozosService(Integer idOportunidadObjetivo) {
+    public EvaluacionResponse getInfoPozosService(Integer idOportunidadObjetivo, Integer version) {
         Log.info("  1 / 12 - getPozoPerforados");
         InformacionOportunidad oportunity = databaseConnectorClient.getInfoOportunidad(idOportunidadObjetivo);
 
@@ -51,7 +50,7 @@ public class EvaluacionEconomicaService {
 
 
         Log.info("  2 / 12 - getPozoPerforados");
-        List<EscaleraProduccion> listTerminados = databaseConnectorClient.getPozosPerforados(idOportunidadObjetivo); //getPozosTerminados(idOportunidad),
+        List<EscaleraProduccion> listTerminados = databaseConnectorClient.getPozosPerforados(idOportunidadObjetivo, version); //getPozosTerminados(idOportunidad),
 
         Log.info("  3 / 12 - getFactorInversionExploratorio");
         FactorInversionExploratorio fiExploratorio = databaseConnectorClient.getFactorInversionExploratorio(idOportunidadObjetivo);
@@ -66,20 +65,20 @@ public class EvaluacionEconomicaService {
         List<CostoOperacion> listCostoOperacion = databaseConnectorClient.getCostoOperacion(oportunity.getIdproyecto());
 
         Log.info("  7 / 12 - getProduccionTotalMmbpce");
-        ProduccionTotalMmbpce produccionTotalMmbpce = databaseConnectorClient.getProduccionTotalMmbpce(idOportunidadObjetivo);
+        ProduccionTotalMmbpce produccionTotalMmbpce = databaseConnectorClient.getProduccionTotalMmbpce(idOportunidadObjetivo, version);
 
         Log.info("  8 / 12 - getParidad");
         Paridad paridad = databaseConnectorClient.getParidad(Integer.valueOf(oportunity.getFechainicioperfexploratorio()));
 
         Log.info("  9 / 12 - getVectorProduccion");
-        List<VectorProduccion> listVectorProduccion = databaseConnectorClient.getVectorProduccion(idOportunidadObjetivo);
+        List<VectorProduccion> listVectorProduccion = databaseConnectorClient.getVectorProduccion(idOportunidadObjetivo, version);
 
         Log.info(" 10 / 12 - getPrecioHidrocarburo");
         List<PrecioHidrocarburo> listPrecios = databaseConnectorClient.getPrecioHidrocarburo(idOportunidadObjetivo, oportunity.getIdprograma());
 
 
         Log.info(" 11 / 12 - getPozosActivos");
-        List<PozosActivos> listActivos = databaseConnectorClient.getPozosActivos(idOportunidadObjetivo);
+        List<PozosActivos> listActivos = databaseConnectorClient.getPozosActivos(idOportunidadObjetivo, version);
 
         // error
         Log.warn("Consultas que no funcionan");

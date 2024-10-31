@@ -18,25 +18,24 @@ public class DataBaseConnectorRepository {
     @Inject
     EntityManager em;
 
-    public List<VectorProduccion> getVectorProduccion(Integer idOportunidad) {
-        // ToDo: pasar idVersion como parametro
+    public List<VectorProduccion> getVectorProduccion(Integer idOportunidad, Integer version) {
         try {
-            final var queryString = "SELECT * FROM calculo.spp_produccionanual(8, :idOportunidad, 2)";
+            final var queryString = "SELECT * FROM calculo.spp_produccionanual(:version, :idOportunidad, 2)";
             return em.createNativeQuery(queryString, VectorProduccion.class)
-                    .setParameter("idOportunidad", idOportunidad).getResultStream().toList();
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("version", version).getResultStream().toList();
         } catch (Exception e) {
             Log.error("JDBC: getVectorProduccion exception executing SQL",e);
             throw new SqlExecutionErrorException("JDBC: getVectorProduccion exception executing SQL");
         }
     }
 
-    public List<ProduccionPozos> getProduccionPozo(Integer idOportunidad) {
-        // ToDo: pasar idVersion como parametro
-
+    public List<ProduccionPozos> getProduccionPozo(Integer idOportunidad, Integer version) {
         try {
-            final var queryString = "SELECT * FROM calculo.spp_pozovolumen(8, :idOportunidad, 2)";
+            final var queryString = "SELECT * FROM calculo.spp_pozovolumen(:version, :idOportunidad, 2)";
             return em.createNativeQuery(queryString, ProduccionPozos.class)
-                    .setParameter("idOportunidad", idOportunidad).getResultStream().toList();
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("version", version).getResultStream().toList();
         } catch (Exception e) {
             Log.error("JDBC: getProduccionPozo exception executing SQL",e);
             throw new SqlExecutionErrorException("JDBC: getProduccionPozo exception executing SQL");
@@ -44,13 +43,12 @@ public class DataBaseConnectorRepository {
 
     }
 
-    public List<EscaleraProduccion> getEscaleraProduccion(Integer idOportunidad) {
-        // ToDo: pasar idVersion como parametro
-
+    public List<EscaleraProduccion> getEscaleraProduccion(Integer idOportunidad, Integer version) {
         try {
-            final var queryString = "SELECT * from calculo.spp_escaleraproduccion(8, :idOportunidad, 2)";
+            final var queryString = "SELECT * from calculo.spp_escaleraproduccion(:version, :idOportunidad, 2)";
             return em.createNativeQuery(queryString, EscaleraProduccion.class)
-                    .setParameter("idOportunidad", idOportunidad).getResultStream().toList();
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("version", version).getResultStream().toList();
         } catch (Exception e) {
             Log.error("JDBC: getEscaleraProduccion exception executing SQL",e);
             throw new SqlExecutionErrorException("JDBC getEscaleraProduccion exception executing SQL");
@@ -58,21 +56,21 @@ public class DataBaseConnectorRepository {
 
     }
 
-    public List<EscaleraProduccion> getPozosPerforados(Integer idOportunidad) {
-        // ToDo: pasar idVersion como parametro
+    public List<EscaleraProduccion> getPozosPerforados(Integer idOportunidad, Integer version) {
         try {
             final var queryString = """
                         SELECT *
-                        FROM calculo.spp_escaleraproduccion(8, :idOportunidad, 2) t
+                        FROM calculo.spp_escaleraproduccion(:version, :idOportunidad, 2) t
                         WHERE vidconsecutivo = (
                             SELECT MIN(vidconsecutivo)
-                            FROM calculo.spp_escaleraproduccion(8, :idOportunidad, 2) t2
+                            FROM calculo.spp_escaleraproduccion(:version, :idOportunidad, 2) t2
                             WHERE t2.vidpozo = t.vidpozo
                         )
                         ORDER BY vidpozo
                     """;
             return em.createNativeQuery(queryString, EscaleraProduccion.class)
-                    .setParameter("idOportunidad", idOportunidad).getResultStream().toList();
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("version", version).getResultStream().toList();
         } catch (Exception e) {
             Log.error("JDBC: getPozosPerforados exception executing SQL",e);
             throw new SqlExecutionErrorException("JDBC getPozosPerforados exception executing SQL");
@@ -80,17 +78,18 @@ public class DataBaseConnectorRepository {
 
     }
 
-    public List<PozosActivos> getPozosActivos(Integer idOportunidad) {
-        // ToDo: pasar idVersion como parametro
+    public List<PozosActivos> getPozosActivos(Integer idOportunidad, Integer version) {
         try {
             final var queryString = """
                     SELECT vanio, ROUND(COUNT(*) /12.0, 3) AS promedio_anual
                                   FROM (
-                                           select * from calculo.spp_escaleraproduccion(8, :idOportunidad, 2) ) t
+                                           select * from calculo.spp_escaleraproduccion(:version, :idOportunidad, 2) ) t
                                   GROUP BY vanio
                                   ORDER BY vanio;
                     """;
-            return em.createNativeQuery(queryString, PozosActivos.class).setParameter("idOportunidad", idOportunidad)
+            return em.createNativeQuery(queryString, PozosActivos.class)
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("version", version)
                     .getResultStream().toList();
         } catch (Exception e) {
             Log.error("JDBC: getPozosActivos exception executing SQL",e);
@@ -196,16 +195,15 @@ public class DataBaseConnectorRepository {
 
     }
 
-    public ProduccionTotalMmbpce getProduccionTotalMmbpce(Integer idOportunidad) {
-        // ToDo: pasar idVersion como parametro
-
+    public ProduccionTotalMmbpce getProduccionTotalMmbpce(Integer idOportunidad, Integer version) {
         try {
             final var queryString = """
                     SELECT SUM(vproduccion) AS total 
-                    FROM calculo.spp_escaleraproduccion(8, :idOportunidad, 2);
+                    FROM calculo.spp_escaleraproduccion(:version, :idOportunidad, 2);
                     """;
             Optional<ProduccionTotalMmbpce> result = em.createNativeQuery(queryString, ProduccionTotalMmbpce.class)
-                    .setParameter("idOportunidad", idOportunidad).getResultStream().findFirst();
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("version", version).getResultStream().findFirst();
 
             if(result.isEmpty()){
                 Log.error("JDBC exception: getProduccionTotalMmbpce Value no present with idOportunidad = " + idOportunidad);

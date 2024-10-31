@@ -20,10 +20,10 @@ public class EvaluacionEconomicaController {
 	EvaluacionEconomicaService evaluacionEconomicaService;
 
 	@GET
-	@Path("/getEvaluacionEconomica/{idOportunidad}")
-	public EvaluacionResponse evaluacionEconomica(@PathParam("idOportunidad") Integer idOportunidad) {
+	@Path("/getEvaluacionEconomica/{idOportunidad}/version/{version}")
+	public EvaluacionResponse evaluacionEconomica(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
 
-		return evaluacionEconomicaService.getInfoPozosService(idOportunidad);
+		return evaluacionEconomicaService.getInfoPozosService(idOportunidad, version);
 	}
 
 }

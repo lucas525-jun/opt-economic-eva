@@ -20,9 +20,9 @@ public class DataBaseConnectorController {
 	DataBaseConnectorRepository dbRepository;
 
 	@GET
-	@Path("/getVectorProduccion/{idOportunidad}")
-	public Response listVectorProduccion(@PathParam("idOportunidad") Integer idOportunidad) {
-		var result = dbRepository.getVectorProduccion(idOportunidad);
+	@Path("/getVectorProduccion/{idOportunidad}/version/{version}")
+	public Response listVectorProduccion(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
+		var result = dbRepository.getVectorProduccion(idOportunidad, version);
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("VectorProduccion: Value no present with idOportunidad = " + idOportunidad);
 		}
@@ -40,9 +40,9 @@ public class DataBaseConnectorController {
 	}
 
 	@GET
-	@Path("/getProduccionPozo/{idOportunidad}")
-	public Response listProduccionPozo(@PathParam("idOportunidad") Integer idOportunidad){
-		var result = dbRepository.getProduccionPozo(idOportunidad);
+	@Path("/getProduccionPozo/{idOportunidad}/version/{version}")
+	public Response listProduccionPozo(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version){
+		var result = dbRepository.getProduccionPozo(idOportunidad, version);
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("ProduccionPozo: Value no present");
 		}
@@ -50,9 +50,9 @@ public class DataBaseConnectorController {
 	}
 
 	@GET
-	@Path("/getEscaleraProduccion/{idOportunidad}")
-	public Response listEscaleraProduccion(@PathParam("idOportunidad") Integer idOportunidad) {
-		var result = dbRepository.getEscaleraProduccion(idOportunidad);
+	@Path("/getEscaleraProduccion/{idOportunidad}/version/{version}")
+	public Response listEscaleraProduccion(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
+		var result = dbRepository.getEscaleraProduccion(idOportunidad, version);
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("EscaleraProduccion: Value no present with idOportunidad = " + idOportunidad);
 		}
@@ -60,9 +60,9 @@ public class DataBaseConnectorController {
 	}
 
 	@GET
-	@Path("/getPozosPerforados/{idOportunidad}")
-	public Response listPozosPerforados(@PathParam("idOportunidad") Integer idOportunidad) {
-		var result = dbRepository.getPozosPerforados(idOportunidad);
+	@Path("/getPozosPerforados/{idOportunidad}/version/{version}")
+	public Response listPozosPerforados(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
+		var result = dbRepository.getPozosPerforados(idOportunidad, version);
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("PozosPerforados: Value no present with idOportunidad = " + idOportunidad);
 		}
@@ -70,9 +70,9 @@ public class DataBaseConnectorController {
 	}
 
 	@GET
-	@Path("/getPozosActivos/{idOportunidad}")
-	public Response listPozosActivos(@PathParam("idOportunidad") Integer idOportunidad) {
-		var result = dbRepository.getPozosActivos(idOportunidad);
+	@Path("/getPozosActivos/{idOportunidad}/version/{version}")
+	public Response listPozosActivos(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
+		var result = dbRepository.getPozosActivos(idOportunidad, version);
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("PozosActivos: Value no present with idOportunidad = " + idOportunidad);
 		}
@@ -155,9 +155,9 @@ public class DataBaseConnectorController {
 	}
 
 	@GET
-	@Path("/getProduccionTotalMmbpce/{idOportunidad}")
-	public Response produccionTotalMmbpce(@PathParam("idOportunidad") Integer idOportunidad) {
-		var result = dbRepository.getProduccionTotalMmbpce(idOportunidad);
+	@Path("/getProduccionTotalMmbpce/{idOportunidad}/version/{version}")
+	public Response produccionTotalMmbpce(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
+		var result = dbRepository.getProduccionTotalMmbpce(idOportunidad, version);
 		if(result != null){
 			return Response.ok(result).build();
 		} else {
