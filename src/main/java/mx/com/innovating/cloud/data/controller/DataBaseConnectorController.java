@@ -1,0 +1,176 @@
+package mx.com.innovating.cloud.data.controller;
+
+import java.io.IOException;
+
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
+import mx.com.innovating.cloud.data.exceptions.SqlNotFoundException;
+import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
+
+@Path("/api/v1/connector")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class DataBaseConnectorController {
+
+	@Inject
+	DataBaseConnectorRepository dbRepository;
+
+	@GET
+	@Path("/getVectorProduccion/{idOportunidad}")
+	public Response listVectorProduccion(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getVectorProduccion(idOportunidad);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("VectorProduccion: Value no present with idOportunidad = " + idOportunidad);
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getOportunidades")
+	public Response listOportunidadesByNombreVersion(@NotNull @QueryParam("nombreVersion") String nombreVersion) {
+		var result = dbRepository.getOportunidadesByNombreVersion(nombreVersion);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("OportunidadesByNombreVersion: Value no present with nombreVersion = " + nombreVersion);
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getProduccionPozo/{idOportunidad}")
+	public Response listProduccionPozo(@PathParam("idOportunidad") Integer idOportunidad) throws IOException {
+		var result = dbRepository.getProduccionPozo(idOportunidad);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("ProduccionPozo: Value no present");
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getEscaleraProduccion/{idOportunidad}")
+	public Response listEscaleraProduccion(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getEscaleraProduccion(idOportunidad);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("EscaleraProduccion: Value no present with idOportunidad = " + idOportunidad);
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getPozosPerforados/{idOportunidad}")
+	public Response listPozosPerforados(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getPozosPerforados(idOportunidad);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("PozosPerforados: Value no present with idOportunidad = " + idOportunidad);
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getPozosActivos/{idOportunidad}")
+	public Response listPozosActivos(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getPozosActivos(idOportunidad);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("PozosActivos: Value no present with idOportunidad = " + idOportunidad);
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getCostoOperacion/{idProyecto}")
+	public Response listCostoOperacion(@PathParam("idProyecto") Integer idProyecto) {
+		var result = dbRepository.getCostoOperacion(idProyecto);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("CostoOperacion: Value no present with idProyecto = " + idProyecto);
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getInfoOportunidad/{idOportunidad}")
+	public Response informacioOportunidad(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = InformacionOportunidad.findByIdoportunidadobjetivo(idOportunidad);
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getFactorInversion/{idOportunidad}")
+	public Response factorInversion(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getFactorInversion(idOportunidad);
+		if(result != null){
+			return Response.ok(result).build();
+		} else {
+			throw new SqlNotFoundException("FactorInversion: Value no present with idOportunidad = " + idOportunidad + ".");
+		}
+	}
+
+	@GET
+	@Path("/getPrecioHidrocarburo/{idOportunidad}/programa/{idPrograma}")
+	public Response listPrecioHidrocarburo(@PathParam("idOportunidad") Integer idOportunidad,
+										   @PathParam("idPrograma") Integer idPrograma) {
+		var result = dbRepository.getPrecioHidrocarburo(idOportunidad, idPrograma);
+		if(result.isEmpty()){
+			throw new SqlNotFoundException("PrecioHidrocarburo: Value no present with idOportunidad = " + idOportunidad);
+		}
+		return Response.ok(result).build();
+	}
+
+	@GET
+	@Path("/getParidad/{anioInicio}")
+	public Response paridad(@PathParam("anioInicio") Integer anioInicio) {
+		var result = dbRepository.getParidad(anioInicio);
+		if(result != null){
+			return Response.ok(result).build();
+		} else {
+			throw new SqlNotFoundException("Paridad: Value no present with anioInicio = " + anioInicio + ".");
+		}
+	}
+
+	@GET
+	@Path("/getFactorInversionExploratorio/{idOportunidad}")
+	public Response factorInversionExploratorio(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getFactorInversionExploratorio(idOportunidad);
+		if(result != null){
+			return Response.ok(result).build();
+		} else {
+			throw new SqlNotFoundException("FactorInversionExploratorio: Value no present with idOportunidad = " + idOportunidad + ".");
+		}
+	}
+
+	@GET
+	@Path("/getFactorInversionDesarrollo/{idOportunidad}")
+	public Response factorInversionDesarrollo(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getFactorInversionDesarrollo(idOportunidad);
+		if(result != null){
+			return Response.ok(result).build();
+		} else {
+			throw new SqlNotFoundException("FactorInversionDesarrollo: Value no present with idOportunidad = " + idOportunidad + ".");
+		}
+	}
+
+	@GET
+	@Path("/getProduccionTotalMmbpce/{idOportunidad}")
+	public Response produccionTotalMmbpce(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getProduccionTotalMmbpce(idOportunidad);
+		if(result != null){
+			return Response.ok(result).build();
+		} else {
+			throw new SqlNotFoundException("JDBC exception: Value no present with idOportunidad = " + idOportunidad + ".");
+		}
+	}
+
+	@GET
+	@Path("/getInformacionInversion/{idOportunidad}")
+	public Response informacionInversion(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getInformacionInversion(idOportunidad);
+		if(result != null){
+			return Response.ok(result).build();
+		} else {
+			throw new SqlNotFoundException("JDBC exception: Value no present with idOportunidad = " + idOportunidad + ".");
+		}
+	}
+
+}
