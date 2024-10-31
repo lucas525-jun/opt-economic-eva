@@ -1,6 +1,7 @@
 package mx.com.innovating.cloud.orchestrator.utilities;
 
 import java.math.BigDecimal;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,10 +53,12 @@ public class DataProcess {
 	}
 
 	public static Map<String, Costos> calculaCostosByAnio(Map<String, Double> costoOperacionMap,
-														  Map<String, ProduccionDiariaPromedio> pdp, int yearDays, Paridad paridad) {
+														  Map<String, ProduccionDiariaPromedio> pdp, Paridad paridad) {
 
 		Map<String, Costos> costosMap = new HashMap<>();
 		pdp.forEach((k, v) -> {
+
+			int yearDays = Year.of(Integer.parseInt(k)).length();
 
 			var operacionInicial = v.getMbpce() * yearDays * paridad.getParidad() / 1000;
 
@@ -101,11 +104,14 @@ public class DataProcess {
 	}
 
 	public static Map<String, Ingresos> calculaIngresosByAnio(Paridad paridad,
-															  Map<String, ProduccionDiariaPromedio> produccionDiariaPromedio, Map<String, Double> preciosMap,
-															  int yearDays) {
+															  Map<String, ProduccionDiariaPromedio> produccionDiariaPromedio,
+															  Map<String, Double> preciosMap) {
+
 		Map<String, Ingresos> ingresosMap = new HashMap<>();
-		var operacionConstante = paridad.getParidad() * yearDays / 1000;
 		produccionDiariaPromedio.forEach((k, v) -> {
+
+			int yearDays = Year.of(Integer.parseInt(k)).length();
+			var operacionConstante = paridad.getParidad() * yearDays / 1000;
 
 			var aceiteExtraPesado = v.getAceiteExtraPesado()
 					* (preciosMap.get(k + "-6") == null ? 0 : preciosMap.get(k + "-6")) * operacionConstante;

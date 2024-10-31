@@ -87,9 +87,6 @@ public class EvaluacionEconomicaService {
         FactorInversion factorInversion = databaseConnectorClient.getFactorInversion(idOportunidadObjetivo);
 
 
-        int yearDays = Year.of(Integer.parseInt(oportunity.getFechainicioperfexploratorio())).length();
-        //int yearDays = 365;
-
         log.info("Obteniendo la informacion de los pozos perforados");
         assert listTerminados != null;
         Map<Integer, BigDecimal> pozosPerforados = DataProcess.getPozosPerforadosByAnio(listTerminados,
@@ -129,7 +126,7 @@ public class EvaluacionEconomicaService {
         log.info("Calculando Ingresos");
         assert paridad != null;
         Map<String, Ingresos> ingresosMap = DataProcess.calculaIngresosByAnio(paridad,
-                produccionDiariaPromedio, preciosMap, yearDays);
+                produccionDiariaPromedio, preciosMap);
 
         Map<String, Double> costoOperacionMap = new HashMap<>();
         assert listCostoOperacion != null;
@@ -137,7 +134,7 @@ public class EvaluacionEconomicaService {
                 .put(element.getAnio() + "-" + element.getIdcostooperacion(), element.getGasto()));
 
         Map<String, Costos> costosMap = DataProcess.calculaCostosByAnio(costoOperacionMap,
-                produccionDiariaPromedio, yearDays, paridad);
+                produccionDiariaPromedio, paridad);
 
         log.info("Generando Respuesta");
         List<EvaluacionEconomica> evaluacionEconomica = new ArrayList<>();
@@ -145,6 +142,7 @@ public class EvaluacionEconomicaService {
         assert listActivos != null;
         listActivos.forEach(item -> {
             var anioActualInteger = Integer.parseInt(item.getAnio());
+            int yearDays = Year.of(anioActualInteger).length();
             BigDecimal perforado = null;
             BigDecimal terminado = null;
 

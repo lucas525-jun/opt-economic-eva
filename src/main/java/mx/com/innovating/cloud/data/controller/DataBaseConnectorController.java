@@ -41,7 +41,7 @@ public class DataBaseConnectorController {
 
 	@GET
 	@Path("/getProduccionPozo/{idOportunidad}")
-	public Response listProduccionPozo(@PathParam("idOportunidad") Integer idOportunidad) throws IOException {
+	public Response listProduccionPozo(@PathParam("idOportunidad") Integer idOportunidad){
 		var result = dbRepository.getProduccionPozo(idOportunidad);
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("ProduccionPozo: Value no present");
@@ -93,6 +93,9 @@ public class DataBaseConnectorController {
 	@Path("/getInfoOportunidad/{idOportunidad}")
 	public Response informacioOportunidad(@PathParam("idOportunidad") Integer idOportunidad) {
 		var result = InformacionOportunidad.findByIdoportunidadobjetivo(idOportunidad);
+		if(result == null){
+			throw new SqlNotFoundException("InformacioOportunidad: Value no present with idOportunidad = " + idOportunidad);
+		}
 		return Response.ok(result).build();
 	}
 
@@ -103,7 +106,7 @@ public class DataBaseConnectorController {
 		if(result != null){
 			return Response.ok(result).build();
 		} else {
-			throw new SqlNotFoundException("FactorInversion: Value no present with idOportunidad = " + idOportunidad + ".");
+			throw new SqlNotFoundException("FactorInversion: Value no present with idOportunidad = " + idOportunidad);
 		}
 	}
 
@@ -125,7 +128,7 @@ public class DataBaseConnectorController {
 		if(result != null){
 			return Response.ok(result).build();
 		} else {
-			throw new SqlNotFoundException("Paridad: Value no present with anioInicio = " + anioInicio + ".");
+			throw new SqlNotFoundException("Paridad: Value no present with anioInicio = " + anioInicio);
 		}
 	}
 
@@ -136,7 +139,7 @@ public class DataBaseConnectorController {
 		if(result != null){
 			return Response.ok(result).build();
 		} else {
-			throw new SqlNotFoundException("FactorInversionExploratorio: Value no present with idOportunidad = " + idOportunidad + ".");
+			throw new SqlNotFoundException("FactorInversionExploratorio: Value no present with idOportunidad = " + idOportunidad);
 		}
 	}
 
@@ -147,7 +150,7 @@ public class DataBaseConnectorController {
 		if(result != null){
 			return Response.ok(result).build();
 		} else {
-			throw new SqlNotFoundException("FactorInversionDesarrollo: Value no present with idOportunidad = " + idOportunidad + ".");
+			throw new SqlNotFoundException("FactorInversionDesarrollo: Value no present with idOportunidad = " + idOportunidad);
 		}
 	}
 
@@ -158,7 +161,7 @@ public class DataBaseConnectorController {
 		if(result != null){
 			return Response.ok(result).build();
 		} else {
-			throw new SqlNotFoundException("JDBC exception: Value no present with idOportunidad = " + idOportunidad + ".");
+			throw new SqlNotFoundException("JDBC exception: Value no present with idOportunidad = " + idOportunidad);
 		}
 	}
 
@@ -169,7 +172,7 @@ public class DataBaseConnectorController {
 		if(result != null){
 			return Response.ok(result).build();
 		} else {
-			throw new SqlNotFoundException("JDBC exception: Value no present with idOportunidad = " + idOportunidad + ".");
+			throw new SqlNotFoundException("JDBC exception: Value no present with idOportunidad = " + idOportunidad);
 		}
 	}
 
