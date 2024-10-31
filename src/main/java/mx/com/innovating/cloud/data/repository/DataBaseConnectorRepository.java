@@ -253,10 +253,10 @@ public class DataBaseConnectorRepository {
                         idhidrocarburo,
                         idoportunidadobjetivo,
                         hidrocarburo,
-                        p_pce,
-                        factor_aceite,
-                        factor_gas,
-                        factor_condensado,
+                        COALESCE(p_pce,0),
+                        COALESCE(factor_aceite,0),
+                        COALESCE(factor_gas,0),
+                        COALESCE(factor_condensado,0),
                         anioprecio
                     FROM
                         catalogo.volumetriaoportunidadfactoresper50vw
