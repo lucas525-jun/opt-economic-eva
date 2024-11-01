@@ -430,6 +430,7 @@ public class DataProcess {
 		double tazaUlt = 0.0;
 
 		if (vpn > 0) {
+			log.info("::::: Calculando TIR con VPN positiva");
 			for (double x = taza; tir > 0; x += 0.0001) {
 				Double calc = 0.0;
 				for (int j = 0; j < flujo.size(); j++) {
@@ -439,6 +440,7 @@ public class DataProcess {
 				tazaUlt = x;
 			}
 		} else {
+			log.info("::::: Calculando TIR con VPN negativa");
 			for (double x = taza; tir < 0; x += 0.0001) {
 				Double calc = 0.0;
 				for (int j = 0; j < flujo.size(); j++) {
