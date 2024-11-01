@@ -238,7 +238,12 @@ public class DataProcess {
 	public static void finalProcessInversiones(List<EvaluacionEconomica> evaluacionEconomica) {
 
 		evaluacionEconomica.forEach(eval -> {
-			if (eval.getInversiones().getTotal() == null && eval.getInversiones().getLineaDescarga() != null) {
+			//if (eval.getInversiones().getTotal() == null) {
+
+				var exploratoriaTotal =
+						(eval.getInversiones().getPerforacionExp() == null ? 0 : eval.getInversiones().getPerforacionExp())
+						+ (eval.getInversiones().getTerminacionExp() == null ? 0 : eval.getInversiones().getTerminacionExp())
+						+ (eval.getInversiones().getInfraestructuraExp() == null ? 0 : eval.getInversiones().getInfraestructuraExp());
 
 				var desarrolloSinOperacional = (eval.getInversiones().getPerforacionDes() == null ? 0
 						: eval.getInversiones().getPerforacionDes())
@@ -256,9 +261,9 @@ public class DataProcess {
 				var desarrollo = desarrolloSinOperacional + eval.getInversiones().getOperacionalFuturoDesarrollo();
 
 				eval.getInversiones().setDesarrollo(desarrollo);
-				eval.getInversiones().setTotal(desarrollo);
+				eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
 
-			}
+			//}
 		});
 
 	}
@@ -379,9 +384,13 @@ public class DataProcess {
 
 		var tir = calculaTir(vpn, inversionInicial, flujosNetosEfectivo, 0.10);
 
+
 		var reporte120 = produccionTotalMmbpce.getProduccionTotalMmbpce() * factorInversion.getFactorAceite();
+		log.info("::::: reporte120 - {} ", reporte120);
 		var reporte121 = produccionTotalMmbpce.getProduccionTotalMmbpce() * factorInversion.getFactorGas();
+		log.info("::::: reporte121 - {} ", reporte121);
 		var reporte123 = produccionTotalMmbpce.getProduccionTotalMmbpce();
+		log.info("::::: reporte123 - {} ", reporte123);
 
 		var reporte708 = vpn / valorPresenteInversion;
 		var reporte721 = totalInversiones / reporte120;

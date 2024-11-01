@@ -494,8 +494,8 @@
                                fila3 += '<td >---</td>';
                                fila4 += '<td >---</td>';
                            } else {
-                               fila2 += '<td >'+ valor.pozosProduccion.pozosPerforados +'</td>';
-                               fila3 += '<td >'+ valor.pozosProduccion.pozosTerminados +'</td>';
+                               fila2 += '<td >'+ ((valor.pozosProduccion.pozosPerforados == null) ? 0 : valor.pozosProduccion.pozosPerforados) +'</td>';
+                               fila3 += '<td >'+ ((valor.pozosProduccion.pozosTerminados == null) ? 0 : valor.pozosProduccion.pozosTerminados) +'</td>';
                                fila4 += '<td >'+ valor.pozosProduccion.pozosActivos +'</td>';
                            }
 

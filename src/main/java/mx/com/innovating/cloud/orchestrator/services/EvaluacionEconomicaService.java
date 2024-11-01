@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.quarkus.logging.Log;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
@@ -138,8 +139,8 @@ public class EvaluacionEconomicaService {
         listActivos.forEach(item -> {
             var anioActualInteger = Integer.parseInt(item.getAnio());
             int yearDays = Year.of(anioActualInteger).length();
-            BigDecimal perforado = null;
-            BigDecimal terminado = null;
+            BigDecimal perforado = new BigDecimal(0);
+            BigDecimal terminado = new BigDecimal(0);
 
             Integer aniosPerforacion = pozosPerforados.size();
 
@@ -155,47 +156,97 @@ public class EvaluacionEconomicaService {
                 var invExploratoria = DataProcess.calculaInversionExploratoria(fiExploratorio,
                         paridad.getParidad());
 
+                /****************************************************************************************************/
+
+                var inversionesExpAnioInicioPerf = new Inversiones(
+                        null, invExploratoria.getExploratoria(),
+                        invExploratoria.getPerforacionExp(), invExploratoria.getTerminacionExp(),
+                        invExploratoria.getInfraestructuraExp(), null, null, null,
+                        null, null, null, null, null, null);
+
+                evaluacionEconomica.add(
+                        new EvaluacionEconomica(oportunity.getFechainicioperfexploratorio(),
+                                null, null, null,
+                                inversionesExpAnioInicioPerf, null, null));
+
+                /****************************************************************************************************/
+
                 assert terminado != null;
                 assert fiDesarrollo != null;
                 var invDesarrollo = DataProcess.calculaInversionDesarrollo(fiDesarrollo,
                         paridad.getParidad(), terminado, perforado, aniosPerforacion);
 
-                if (finalAnioFinal == anioActualInteger) {
-                    var totalInversionAnioAnterior = invDesarrollo.getDesarrolloSinOperacional()
-                            + invExploratoria.getExploratoria();
-                    var inversionesAnioAnterior = new Inversiones(totalInversionAnioAnterior,
-                            invExploratoria.getExploratoria(), invExploratoria.getPerforacionExp(),
-                            invExploratoria.getTerminacionExp(), invExploratoria.getInfraestructuraExp(),
+                /***************************************************************************************************/
+
+                var anioCompare = Integer.parseInt(item.getAnio()) - 1;
+                AtomicBoolean existe = new AtomicBoolean(false);
+
+                evaluacionEconomica.forEach(evaluacion -> {
+                    if (evaluacion.getAnio().equals(Integer.toString(anioCompare))) {
+                        existe.set(true);
+
+                        evaluacion.getInversiones()
+                                .setDesarrolloSinOperacional(invDesarrollo.getDesarrolloSinOperacional());
+                        evaluacion.getInversiones().setTerminacionDes(invDesarrollo.getTerminacionDes());
+                        evaluacion.getInversiones().setPerforacionDes(invDesarrollo.getPerforacionDes());
+                        evaluacion.getInversiones()
+                                .setInfraestructuraDes(invDesarrollo.getInfraestructuraDes());
+                        evaluacion.getInversiones()
+                                .setDesarrollo(invDesarrollo.getDesarrollo());
+
+                    }
+                });
+
+                if(!existe.get()){
+                    var inversionesAnioAnterior = new Inversiones(null,
+                            null, null, null, null,
                             invDesarrollo.getDesarrolloSinOperacional(), invDesarrollo.getPerforacionDes(),
                             invDesarrollo.getTerminacionDes(), invDesarrollo.getInfraestructuraDes(), null,
                             null, null, null, invDesarrollo.getDesarrolloSinOperacional());
 
-                    var anioAnteriorInversion = Integer.parseInt(item.getAnio()) - 1;
-                    evaluacionEconomica.add(new EvaluacionEconomica(Integer.toString(anioAnteriorInversion),
+                    evaluacionEconomica.add(new EvaluacionEconomica(Integer.toString(anioCompare),
                             null, null, null, inversionesAnioAnterior, null, null));
-                } else {
-                    var inversionesExploratoriasAnioAnterior = new Inversiones(
-                            invExploratoria.getExploratoria(), invExploratoria.getExploratoria(),
-                            invExploratoria.getPerforacionExp(), invExploratoria.getTerminacionExp(),
-                            invExploratoria.getInfraestructuraExp(), null, null, null, null, null, null,
-                            null, null, null);
-
-                    var anioAnteriorInversionExploratoria = Integer.parseInt(item.getAnio()) - 2;
-                    evaluacionEconomica.add(
-                            new EvaluacionEconomica(Integer.toString(anioAnteriorInversionExploratoria),
-                                    null, null, null, inversionesExploratoriasAnioAnterior, null, null));
-
-                    var inversionesDesarrolloAnioAnterior = new Inversiones(
-                            invDesarrollo.getDesarrolloSinOperacional(), null, null, null, null,
-                            invDesarrollo.getDesarrolloSinOperacional(), invDesarrollo.getPerforacionDes(),
-                            invDesarrollo.getTerminacionDes(), invDesarrollo.getInfraestructuraDes(), null,
-                            null, null, null, invDesarrollo.getDesarrolloSinOperacional());
-
-                    var anioAnteriorInversionDesarrollo = Integer.parseInt(item.getAnio()) - 1;
-                    evaluacionEconomica
-                            .add(new EvaluacionEconomica(Integer.toString(anioAnteriorInversionDesarrollo),
-                                    null, null, null, inversionesDesarrolloAnioAnterior, null, null));
                 }
+
+                /***************************************************************************************************/
+
+//                if (finalAnioFinal == anioActualInteger) {
+//                    var totalInversionAnioAnterior = invDesarrollo.getDesarrolloSinOperacional()
+//                            + invExploratoria.getExploratoria();
+//                    var inversionesAnioAnterior = new Inversiones(totalInversionAnioAnterior,
+//                            invExploratoria.getExploratoria(), invExploratoria.getPerforacionExp(),
+//                            invExploratoria.getTerminacionExp(), invExploratoria.getInfraestructuraExp(),
+//                            invDesarrollo.getDesarrolloSinOperacional(), invDesarrollo.getPerforacionDes(),
+//                            invDesarrollo.getTerminacionDes(), invDesarrollo.getInfraestructuraDes(), null,
+//                            null, null, null, invDesarrollo.getDesarrolloSinOperacional());
+//
+//                    var anioAnteriorInversion = Integer.parseInt(item.getAnio()) - 1;
+//                    evaluacionEconomica.add(new EvaluacionEconomica(Integer.toString(anioAnteriorInversion),
+//                            null, null, null, inversionesAnioAnterior, null, null));
+//                } else {
+
+//                    var inversionesExploratoriasAnioAnterior = new Inversiones(
+//                            invExploratoria.getExploratoria(), invExploratoria.getExploratoria(),
+//                            invExploratoria.getPerforacionExp(), invExploratoria.getTerminacionExp(),
+//                            invExploratoria.getInfraestructuraExp(), null, null, null,
+//                            null, null, null, null, null, null);
+//
+//                    evaluacionEconomica.add(
+//                            new EvaluacionEconomica(oportunity.getFechainicioperfexploratorio(),
+//                                    null, null, null,
+//                                    inversionesExploratoriasAnioAnterior, null, null));
+//
+//                    var inversionesDesarrolloAnioAnterior = new Inversiones(
+//                            invDesarrollo.getDesarrolloSinOperacional(), null, null, null, null,
+//                            invDesarrollo.getDesarrolloSinOperacional(), invDesarrollo.getPerforacionDes(),
+//                            invDesarrollo.getTerminacionDes(), invDesarrollo.getInfraestructuraDes(), null,
+//                            null, null, null, invDesarrollo.getDesarrolloSinOperacional());
+//
+//                    var anioAnteriorInversionDesarrollo = Integer.parseInt(item.getAnio()) - 1;
+//                    evaluacionEconomica
+//                            .add(new EvaluacionEconomica(Integer.toString(anioAnteriorInversionDesarrollo),
+//                                    null, null, null, inversionesDesarrolloAnioAnterior, null, null));
+//                }
 
                 assert infoInversion != null;
                 var lineaDescarga = infoInversion.getLineadedescarga() * terminado.doubleValue()
