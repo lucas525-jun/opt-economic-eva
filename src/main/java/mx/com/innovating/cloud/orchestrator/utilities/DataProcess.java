@@ -251,7 +251,7 @@ public class DataProcess {
 								: eval.getInversiones().getTerminacionDes())
 						+ (eval.getInversiones().getInfraestructuraDes() == null ? 0
 								: eval.getInversiones().getInfraestructuraDes())
-						+ eval.getInversiones().getLineaDescarga()
+						+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
 						+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
 						+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0
 								: eval.getInversiones().getPlataformaDesarrollo());
