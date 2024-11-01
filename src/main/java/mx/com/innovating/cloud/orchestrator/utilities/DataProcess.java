@@ -419,10 +419,7 @@ public class DataProcess {
 
 		}
 
-		log.info("::::: calculoVPN {}", calc);
-
-		var vpn = calc + inversionInicial;
-		return vpn;
+        return calc + inversionInicial;
 	}
 
 	private static Double calculaTir(Double vpn, Double inversionInicial, List<Double> flujo, Double taza) {
@@ -441,7 +438,7 @@ public class DataProcess {
 			}
 		} else {
 			log.info("::::: Calculando TIR con VPN negativa");
-			for (double x = taza; tir < 0; x += 0.0001) {
+			for (double x = taza; tir < 0; x -= 0.0001) {
 				Double calc = 0.0;
 				for (int j = 0; j < flujo.size(); j++) {
 					calc += flujo.get(j) / Math.pow((1 + x), (j + 1));
