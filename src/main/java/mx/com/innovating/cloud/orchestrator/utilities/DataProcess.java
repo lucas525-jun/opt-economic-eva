@@ -245,20 +245,19 @@ public class DataProcess {
 						+ (eval.getInversiones().getTerminacionExp() == null ? 0 : eval.getInversiones().getTerminacionExp())
 						+ (eval.getInversiones().getInfraestructuraExp() == null ? 0 : eval.getInversiones().getInfraestructuraExp());
 
-				var desarrolloSinOperacional = (eval.getInversiones().getPerforacionDes() == null ? 0
-						: eval.getInversiones().getPerforacionDes())
-						+ (eval.getInversiones().getTerminacionDes() == null ? 0
-								: eval.getInversiones().getTerminacionDes())
-						+ (eval.getInversiones().getInfraestructuraDes() == null ? 0
-								: eval.getInversiones().getInfraestructuraDes())
+				var desarrolloSinOperacional =
+						(eval.getInversiones().getPerforacionDes() == null ? 0 : eval.getInversiones().getPerforacionDes())
+						+ (eval.getInversiones().getTerminacionDes() == null ? 0 : eval.getInversiones().getTerminacionDes())
+						+ (eval.getInversiones().getInfraestructuraDes() == null ? 0 : eval.getInversiones().getInfraestructuraDes())
 						+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
 						+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
-						+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0
-								: eval.getInversiones().getPlataformaDesarrollo());
+						+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo());
 
 				eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
 
-				var desarrollo = desarrolloSinOperacional + eval.getInversiones().getOperacionalFuturoDesarrollo();
+				var desarrollo =
+						desarrolloSinOperacional
+						+ (eval.getInversiones().getOperacionalFuturoDesarrollo() == null ? 0 : eval.getInversiones().getOperacionalFuturoDesarrollo());
 
 				eval.getInversiones().setDesarrollo(desarrollo);
 				eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
