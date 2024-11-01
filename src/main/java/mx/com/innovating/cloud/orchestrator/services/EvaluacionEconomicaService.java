@@ -22,14 +22,10 @@ import mx.com.innovating.cloud.data.models.ProduccionTotalMmbpce;
 import mx.com.innovating.cloud.data.models.VectorProduccion;
 import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
 import mx.com.innovating.cloud.orchestrator.models.*;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import mx.com.innovating.cloud.data.models.*;
-import mx.com.innovating.cloud.data.entities.*;
 import mx.com.innovating.cloud.orchestrator.utilities.DataProcess;
 
 @Slf4j
@@ -145,6 +141,8 @@ public class EvaluacionEconomicaService {
             BigDecimal perforado = null;
             BigDecimal terminado = null;
 
+            Integer aniosPerforacion = pozosPerforados.size();
+
             var inversionesAnioActual = new Inversiones();
             if (pozosTerminados.containsKey(anioActualInteger)) {
                 terminado = pozosTerminados.get(anioActualInteger);
@@ -160,7 +158,7 @@ public class EvaluacionEconomicaService {
                 assert terminado != null;
                 assert fiDesarrollo != null;
                 var invDesarrollo = DataProcess.calculaInversionDesarrollo(fiDesarrollo,
-                        paridad.getParidad(), terminado, perforado);
+                        paridad.getParidad(), terminado, perforado, aniosPerforacion);
 
                 if (finalAnioFinal == anioActualInteger) {
                     var totalInversionAnioAnterior = invDesarrollo.getDesarrolloSinOperacional()
@@ -225,7 +223,7 @@ public class EvaluacionEconomicaService {
 
                 assert fiDesarrollo != null;
                 var invDesarrollo = DataProcess.calculaInversionDesarrollo(fiDesarrollo,
-                        paridad.getParidad(), terminadoFinal, perforado);
+                        paridad.getParidad(), terminadoFinal, perforado, aniosPerforacion);
                 var anioInversion = Integer.parseInt(item.getAnio()) - 1;
                 evaluacionEconomica.forEach(element -> {
                     if (element.getAnio().equals(Integer.toString(anioInversion))) {

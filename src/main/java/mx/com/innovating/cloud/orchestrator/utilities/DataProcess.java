@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.com.innovating.cloud.data.models.*;
 import mx.com.innovating.cloud.data.models.EscaleraProduccion;
 import mx.com.innovating.cloud.data.models.FactorInversion;
 import mx.com.innovating.cloud.data.models.FactorInversionDesarrollo;
@@ -37,10 +36,17 @@ public class DataProcess {
 	}
 
 	public static Inversiones calculaInversionDesarrollo(FactorInversionDesarrollo fiDesarrollo, Double paridad,
-			BigDecimal terminado, BigDecimal perforado) {
+														 BigDecimal terminado, BigDecimal perforado, Integer aniosPerforacion) {
 		var inversion = new Inversiones();
 		var perforacionDesarrollo = fiDesarrollo.getPerforacion() * paridad * perforado.doubleValue();
-		var terminacionDesarrollo = fiDesarrollo.getTerminacion() * paridad * terminado.doubleValue();
+
+		double terminacionDesarrollo;
+		if(aniosPerforacion == 1) {
+			terminacionDesarrollo = fiDesarrollo.getTerminacion() * paridad * perforado.doubleValue();
+		} else {
+			terminacionDesarrollo = fiDesarrollo.getTerminacion() * paridad * terminado.doubleValue();
+		}
+
 		var infraestructuraDesarrollo = fiDesarrollo.getInfraestructura() * paridad * terminado.doubleValue();
 		var inversionDesarrollo = perforacionDesarrollo + terminacionDesarrollo + infraestructuraDesarrollo;
 
