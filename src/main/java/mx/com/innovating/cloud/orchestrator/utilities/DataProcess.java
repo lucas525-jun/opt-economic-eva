@@ -381,7 +381,11 @@ public class DataProcess {
 
 		var vpn = calculaVpn(inversionInicial, flujosNetosEfectivo, 0.10);
 
+		log.info("::::: VPN calculo final {}", vpn);
+
 		var tir = calculaTir(vpn, inversionInicial, flujosNetosEfectivo, 0.10);
+
+		log.info("::::: TIR calculo final {}", tir);
 
 
 		var reporte120 = produccionTotalMmbpce.getProduccionTotalMmbpce() * factorInversion.getFactorAceite();
@@ -410,8 +414,13 @@ public class DataProcess {
 		double calc = 0.0;
 		for (int i = 0; i < flujo.size(); i++) {
 			log.info("::::: flujo {} - {}", i, flujo.get(i));
+
 			calc += flujo.get(i) / Math.pow((1 + taza), (i + 1));
+
 		}
+
+		log.info("::::: calculoVPN {}", calc);
+
 		var vpn = calc + inversionInicial;
 		return vpn;
 	}
