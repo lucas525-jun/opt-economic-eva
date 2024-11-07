@@ -317,7 +317,7 @@
                      $("#flujosDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
                      $("#resultadosDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
                    },
-                   url: 'https://pemex-ics-o-economic-evaluation-mx-pemex-migration-dev.apps.openshift.innovatingcloudservices.com.mx/api/v1/getEvaluacionEconomica/' + $("#idOportunidadObjetivo").val() + '/version/' + $("#versionOportunidad").val(),
+                   url: 'http://localhost:8084/api/v1/getEvaluacionEconomica/' + $("#idOportunidadObjetivo").val() + '/version/' + $("#versionOportunidad").val(),
                    type: 'GET',
                    success: function(res){
 
