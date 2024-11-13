@@ -47,7 +47,7 @@ public class DataProcess {
 			terminacionDesarrollo = fiDesarrollo.getTerminacion() * paridad * terminado.doubleValue();
 		}
 
-		var infraestructuraDesarrollo = fiDesarrollo.getInfraestructura() * paridad * terminado.doubleValue();
+		var infraestructuraDesarrollo = fiDesarrollo.getInfraestructura() * paridad * perforado.doubleValue();
 		var inversionDesarrollo = perforacionDesarrollo + terminacionDesarrollo + infraestructuraDesarrollo;
 
 		inversion.setDesarrolloSinOperacional(inversionDesarrollo);
