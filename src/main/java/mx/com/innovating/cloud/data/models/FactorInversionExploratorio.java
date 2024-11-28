@@ -17,6 +17,10 @@ public class FactorInversionExploratorio {
 	private Double infraestructura;
 	private Double perforacion;
 	private Double terminacion;
+	private Double manoobrapozos;
 	private Integer idversion;
 
 }
+
+
+

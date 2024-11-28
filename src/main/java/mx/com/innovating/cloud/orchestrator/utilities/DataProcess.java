@@ -38,22 +38,37 @@ public class DataProcess {
 	public static Inversiones calculaInversionDesarrollo(FactorInversionDesarrollo fiDesarrollo, Double paridad,
 														 BigDecimal terminado, BigDecimal perforado, Integer aniosPerforacion) {
 		var inversion = new Inversiones();
+
 		var perforacionDesarrollo = fiDesarrollo.getPerforacion() * paridad * perforado.doubleValue();
 
+
 		double terminacionDesarrollo;
-		if(aniosPerforacion == 1) {
+		double infraestructuraDesarrollo;
+
+		// Si pozos perforados y terminados estan en un solo año, un año antes se calcula
+		//inversion en pozo perforado * nro de pozos perforados * paridad
+		//inversion en infraestructura  * nro de pozos perforados * paridad
+		//inversion en terminacion * nro de pozos perforados * paridad
+		if(aniosPerforacion == 1){
 			terminacionDesarrollo = fiDesarrollo.getTerminacion() * paridad * perforado.doubleValue();
-		} else {
+			infraestructuraDesarrollo = fiDesarrollo.getInfraestructura() * paridad * perforado.doubleValue();
+		}else{
 			terminacionDesarrollo = fiDesarrollo.getTerminacion() * paridad * terminado.doubleValue();
+			infraestructuraDesarrollo = fiDesarrollo.getInfraestructura() * paridad * terminado.doubleValue();
 		}
 
-		var infraestructuraDesarrollo = fiDesarrollo.getInfraestructura() * paridad * terminado.doubleValue();
-		var inversionDesarrollo = perforacionDesarrollo + terminacionDesarrollo + infraestructuraDesarrollo;
+		// REGLA DE INVERSIONES A FUTURO
+		// El calculo de inversion en futuro desarrollo debe realizarse en todos
+		// los años donde haya pozos perforados y/o terminados
 
+
+
+		var inversionDesarrollo = perforacionDesarrollo + terminacionDesarrollo + infraestructuraDesarrollo;
 		inversion.setDesarrolloSinOperacional(inversionDesarrollo);
 		inversion.setPerforacionDes(perforacionDesarrollo);
 		inversion.setTerminacionDes(terminacionDesarrollo);
 		inversion.setInfraestructuraDes(infraestructuraDesarrollo);
+
 
 		return inversion;
 	}

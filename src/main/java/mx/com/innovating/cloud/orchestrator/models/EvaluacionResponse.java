@@ -15,5 +15,6 @@ public class EvaluacionResponse {
 	private InformacionOportunidad infoOportunidad;
 	private List<EvaluacionEconomica> evaluacionEconomica;
 	private FlujoContableTotal flujoContableTotal;
+	private  FactorCalculo factorCalculo;
 
 }

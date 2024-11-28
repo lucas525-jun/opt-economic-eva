@@ -4,16 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class VectorProduccion {
 
-	private String oportunidad;
-	private String objetivo;
-	private Integer idoportunidadobjetivo;
-	private String anio;
-	private Double totalmes;
-	private Double totalanual;
+	private String voportunidad;
+	private String vobjetivo;
+	private Integer vidoportunidadobjetivo;
+	private String aanio;
+	private double ctotalmes;
+	private double ctotalanual;
+
 
 }
