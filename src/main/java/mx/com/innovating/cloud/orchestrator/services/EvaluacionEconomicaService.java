@@ -71,7 +71,9 @@ public class EvaluacionEconomicaService {
                     invExploratoria.getPerforacionExp(),
                     invExploratoria.getTerminacionExp(),
                     invExploratoria.getInfraestructuraExp(),
-                    null, null, null, null, null, null, null, null, null
+                    null, null, null, null,
+                    null, null, null, null, null,
+                    null,null,null,null
             );
 
             evaluacionEconomica.add(
@@ -246,7 +248,9 @@ public class EvaluacionEconomicaService {
                             null, invExploratoria.getExploratoria(),
                             invExploratoria.getPerforacionExp(), invExploratoria.getTerminacionExp(),
                             invExploratoria.getInfraestructuraExp(), null, null, null,
-                            null, null, null, null, null, null);
+                            null, null, null, null,
+                            null, null,null,
+                            null,null,null);
 
                     evaluacionEconomica.add(
                             new EvaluacionEconomica(oportunity.getFechainicioperfexploratorio(),
@@ -364,13 +368,16 @@ public class EvaluacionEconomicaService {
                                         plataformasDesarrollo = infoInversion.getPlataformadesarrollo() * paridad.getParidad();
                                         inversionesAnioAnterior.setDuctos(ductos);
                                         inversionesAnioAnterior.setPlataformaDesarrollo(plataformasDesarrollo);
-                                        // Falta añadirlos a la lista de inversiones anio anterior
+
                                         var risersG = infoInversion.getRisers() * paridad.getParidad() * cantManifolds;
+                                        inversionesAnioAnterior.setRisers(risersG);
                                         var sistemaDeControlG = infoInversion.getSistemasdecontrol() * paridad.getParidad() * cantManifolds;
+                                        inversionesAnioAnterior.setSistemaDeControl(sistemaDeControlG);
                                     }else{
-                                        // Falta añadirlos a la lista de inversiones anio actual
                                         var arbolesSubmarinosG = infoInversion.getArbolessubmarinos() * paridad.getParidad() * pozosTotales;
+                                        inversionesAnioActual.setArbolSubmarinos(arbolesSubmarinosG);
                                         var manifoldsG = infoInversion.getManifolds() * paridad.getParidad() * cantManifolds;
+                                        inversionesAnioActual.setManifolds(manifoldsG);
                                     }
                                 }
                             } else {
@@ -474,8 +481,6 @@ public class EvaluacionEconomicaService {
             });
 
             DataProcess.finalProcessInversiones(evaluacionEconomica);
-            log.info("--------------------------------sañdña-------------------------");
-
 
             DataProcess.calculaFlujoContable(evaluacionEconomica);
 

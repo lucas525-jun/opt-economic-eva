@@ -266,7 +266,12 @@ public class DataProcess {
 						+ (eval.getInversiones().getInfraestructuraDes() == null ? 0 : eval.getInversiones().getInfraestructuraDes())
 						+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
 						+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
-						+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo());
+						+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo())
+						+ (eval.getInversiones().getSistemaDeControl() == null ? 0 : eval.getInversiones().getSistemaDeControl())
+						+ (eval.getInversiones().getRisers() == null ? 0 : eval.getInversiones().getRisers())
+						+ (eval.getInversiones().getArbolSubmarinos() == null ? 0 : eval.getInversiones().getArbolSubmarinos())
+						+ (eval.getInversiones().getManifolds() == null ? 0 : eval.getInversiones().getManifolds());
+
 
 				eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
 

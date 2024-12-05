@@ -12,8 +12,7 @@ import mx.com.innovating.cloud.data.models.*;
 import mx.com.innovating.cloud.orchestrator.models.FactorCalculo;
 
 import java.sql.ResultSetMetaData;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @ApplicationScoped
 public class DataBaseConnectorRepository {
@@ -480,6 +479,228 @@ public class DataBaseConnectorRepository {
         }
 
     }
+
+    // 1 -> Derecho Extraccion de Hidrocarburos
+    public List<Map<String, Object>> getDEH(Integer idOportunidadObj, Integer idVersion){
+        try{
+            final var queryString= """
+                        select * from impuesto.spc_dehoportunidad(:idVersion, :idOportunidadObj)                       
+                    """;
+
+
+            List<Object[]> result = em.createNativeQuery(queryString)
+                    .setParameter("idVersion", idVersion)
+                    .setParameter("idOportunidadObj", idOportunidadObj).getResultList();
+
+            //List<Object[]> result =  em.createNativeQuery(queryString).getResultList();
+            for (Object[] row : result) {
+                System.out.println(row[0] + " " + row[1] + " " + row[2]);
+            }
+            //lo paso a un formato para el excel
+            List<Map<String, Object>> formattedResult = new ArrayList<>();
+            for (Object[] row : result) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("anio", row[0]);
+                map.put("tipo", row[1]);
+                map.put("duh", row[2]);
+                formattedResult.add(map);
+            }
+            return formattedResult;
+
+
+
+        }catch (Exception e){
+            Log.error("JDBC: getImpuestos exception executing SQL",e);
+            throw new SqlExecutionErrorException("JDBC getImpuestos exception executing SQL");
+        }
+    }
+
+
+    // 2 -> Derecho de Utilidad Compartida
+    public List<Map<String, Object>> getDUC(Integer idOportunidadObj, Integer idVersion){
+        try{
+            final var queryString= """
+                        select
+                        	sanio,
+                        	 vduc1,vduc2,vduc3,
+                        	 vderecho
+                        from impuesto.spc_ducoportunidad(:idVersion, :idOportunidadObj)            
+                    """;
+
+
+            List<Object[]> result = em.createNativeQuery(queryString).setParameter("idVersion", idVersion)
+                    .setParameter("idOportunidadObj", idOportunidadObj).getResultList();
+
+            for (Object[] row : result) {
+                System.out.println(row[0] + " " + row[1] + " " + row[2] + " " + row[3] + " " + row[4]);
+            }
+
+            //List<Object[]> result =  em.createNativeQuery(queryString).getResultList();
+            //lo paso a un formato para el excel
+            List<Map<String, Object>> formattedResult = new ArrayList<>();
+            for (Object[] row : result) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("anio", row[0]);
+                map.put("vduc1", row[1]);
+                map.put("vduc2", row[2]);
+                map.put("vduc3", row[3]);
+                map.put("vderecho", row[4]);
+                formattedResult.add(map);
+            }
+            return formattedResult;
+
+
+
+        }catch (Exception e){
+            Log.error("JDBC: getImpuestos exception executing SQL",e);
+            throw new SqlExecutionErrorException("JDBC getImpuestos exception executing SQL");
+        }
+    }
+
+
+    // 3 -> Impuesto Uso Superficial
+    public List<Map<String, Object>> getIUS(Integer idOportunidadObj, Integer idVersion){
+        try{
+            final var queryString= """
+                        select
+                        ianio, iius from impuesto.spc_iusoportunidad(:idVersion, :idOportunidadObj)                    
+                    """;
+
+
+            List<Object[]> result = em.createNativeQuery(queryString)
+                    .setParameter("idVersion", idVersion)
+                    .setParameter("idOportunidadObj", idOportunidadObj).getResultList();
+
+            //List<Object[]> result =  em.createNativeQuery(queryString).getResultList();
+            for (Object[] row : result) {
+                System.out.println(row[0] + " " + row[1]);
+            }
+            //lo paso a un formato para el excel
+            List<Map<String, Object>> formattedResult = new ArrayList<>();
+            for (Object[] row : result) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("anio", row[0]);
+                map.put("imp", row[1]);
+
+                formattedResult.add(map);
+            }
+            return formattedResult;
+
+
+
+        }catch (Exception e){
+            Log.error("JDBC: getImpuestos exception executing SQL",e);
+            throw new SqlExecutionErrorException("JDBC getImpuestos exception executing SQL");
+        }
+    }
+    // 4 -> Cuota Contractual para la fase exploratoria
+    public List<Map<String, Object>> getCCO(Integer idOportunidadObj, Integer idVersion){
+        try{
+            final var queryString= """
+                        select
+                        	canio,
+                        	ccuotaexploratoria
+                        from impuesto.spc_cuotacontoportunidad(:idVersion,:idOportunidadObj)                  
+                    """;
+
+            List<Object[]> result = em.createNativeQuery(queryString)
+                    .setParameter("idVersion", idVersion)
+                    .setParameter("idOportunidadObj", idOportunidadObj).getResultList();
+
+            //List<Object[]> result =  em.createNativeQuery(queryString).getResultList();
+            for (Object[] row : result) {
+                System.out.println(row[0] + " " + row[1]);
+            }
+            //lo paso a un formato para el excel
+            List<Map<String, Object>> formattedResult = new ArrayList<>();
+            for (Object[] row : result) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("anio", row[0]);
+                map.put("imp", row[1]);
+                formattedResult.add(map);
+            }
+            return formattedResult;
+        }catch (Exception e){
+            Log.error("JDBC: getImpuestos exception executing SQL",e);
+            throw new SqlExecutionErrorException("JDBC getImpuestos exception executing SQL");
+        }
+    }
+
+    // 5 -> Impuesto actividad de exploracion y extraccion
+    public List<Map<String, Object>> getIEO(Integer idOportunidadObj, Integer idVersion){
+        try{
+            final var queryString= """
+                        
+                        select aanio, 
+                        aimpactividad 
+                        from impuesto.spc_impactexplorontoportunidad(:idVersion, :idOportunidadObj)
+                        
+                                      
+                    """;
+
+            List<Object[]> result = em.createNativeQuery(queryString)
+                    .setParameter("idVersion", idVersion)
+                    .setParameter("idOportunidadObj", idOportunidadObj).getResultList();
+
+            //List<Object[]> result =  em.createNativeQuery(queryString).getResultList();
+            for (Object[] row : result) {
+                System.out.println(row[0] + " " + row[1]);
+            }
+            //lo paso a un formato para el excel
+            List<Map<String, Object>> formattedResult = new ArrayList<>();
+            for (Object[] row : result) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("anio", row[0]);
+                map.put("imp", row[1]);
+                formattedResult.add(map);
+            }
+            return formattedResult;
+        }catch (Exception e){
+            Log.error("JDBC: getImpuestos exception executing SQL",e);
+            throw new SqlExecutionErrorException("JDBC getImpuestos exception executing SQL");
+        }
+    }
+
+    // 6 -> Impuesto sobre la renta
+    public List<Map<String, Object>> getISR(Integer idOportunidadObj, Integer idVersion){
+        try{
+            final var queryString= """
+                       select
+                          imanio,
+                          vdeduccion10,
+                          vdeduccion25,
+                          impdepreciacion,
+                          vcosto,
+                          visr from impuesto.spc_isroportunidad(:idVersion,:idOportunidadObj);            
+                    """;
+
+            List<Object[]> result = em.createNativeQuery(queryString)
+                    .setParameter("idVersion", idVersion)
+                    .setParameter("idOportunidadObj", idOportunidadObj).getResultList();
+
+            //List<Object[]> result =  em.createNativeQuery(queryString).getResultList();
+            for (Object[] row : result) {
+                System.out.println(row[0] + " " + row[1] + " " + row[2] + " " + row[3] + " " + row[4] + " " + row[5]);
+            }
+            //lo paso a un formato para el excel
+            List<Map<String, Object>> formattedResult = new ArrayList<>();
+            for (Object[] row : result) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("anio", row[0]);
+                map.put("vdeduccion10", row[1]);
+                map.put("vdeduccion25", row[2]);
+                map.put("impdepreciacion", row[3]);
+                map.put("vcosto", row[4]);
+                map.put("visr", row[5]);
+                formattedResult.add(map);
+            }
+            return formattedResult;
+        }catch (Exception e){
+            Log.error("JDBC: getImpuestos exception executing SQL",e);
+            throw new SqlExecutionErrorException("JDBC getImpuestos exception executing SQL");
+        }
+    }
+
 
     public InformacionOportunidad getInfoOportunidad(Integer idOportunidad) {
         return InformacionOportunidad.findByIdoportunidadobjetivo(idOportunidad);
