@@ -47,47 +47,55 @@ public class EvaluacionEconomicaService {
     ) {
 
         if (pce == 0) {
-            Log.info("PCE es 0. Solo se realizarán cálculos de inversión exploratoria.");
-
             InformacionOportunidad oportunity = databaseConnectorClient.getInfoOportunidad(idOportunidadObjetivo);
-            if (oportunity == null) {
-                Log.error("InformacionOportunidad es null");
-                throw new RuntimeException("InformacionOportunidad is null");
-            }
+            List<EvaluacionEconomica> evaluacionEconomica;
 
-            Log.info("Calculando inversión exploratoria");
+            Log.info("PCE es 0. Ejecutando cálculos de inversión exploratoria y flujo contable.");
+
+            Log.info(" 12 / 12 - getFactorInversion");
+            FactorInversion factorInversion = databaseConnectorClient.getFactorInversion(idOportunidadObjetivo);
+            factorInversion.setPce(0.0);
+
+            Log.info("  7 / 12 - getProduccionTotalMmbpce");
+            ProduccionTotalMmbpce produccionTotalMmbpce = databaseConnectorClient.getProduccionTotalMmbpce(idOportunidadObjetivo, version, cuota, declinada, pce, area);
+
+
+            // Lógica de preparación de evaluación económica dentro del `if`
             FactorInversionExploratorio fiExploratoria = new FactorInversionExploratorio();
             fiExploratoria.setInfraestructura(infra);
             fiExploratoria.setPerforacion(perf);
             fiExploratoria.setTerminacion(term);
 
-            Paridad paridad = databaseConnectorClient.getParidad(Integer.valueOf(oportunity.getFechainicioperfexploratorio()));
+            Paridad paridad = databaseConnectorClient.getParidad(
+                    Integer.valueOf(oportunity.getFechainicioperfexploratorio())
+            );
             var invExploratoria = DataProcess.calculaInversionExploratoria(fiExploratoria, paridad.getParidad());
 
-            List<EvaluacionEconomica> evaluacionEconomica = new ArrayList<>();
+            evaluacionEconomica = new ArrayList<>();
             var inversionesExpAnioInicioPerf = new Inversiones(
-                    null,
-                    invExploratoria.getExploratoria(),
-                    invExploratoria.getPerforacionExp(),
-                    invExploratoria.getTerminacionExp(),
-                    invExploratoria.getInfraestructuraExp(),
-                    null, null, null, null,
-                    null, null, null, null, null,
-                    null,null,null,null
+                    null, invExploratoria.getExploratoria(), invExploratoria.getPerforacionExp(),
+                    invExploratoria.getTerminacionExp(), invExploratoria.getInfraestructuraExp(), 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
             );
 
             evaluacionEconomica.add(
-                    new EvaluacionEconomica(oportunity.getFechainicioperfexploratorio(),
-                            null, null, null, inversionesExpAnioInicioPerf, null, null)
+                    new EvaluacionEconomica(
+                            oportunity.getFechainicioperfexploratorio(),
+                            null, null, null, inversionesExpAnioInicioPerf, null, null
+                    )
             );
 
-            return new EvaluacionResponse(oportunity, evaluacionEconomica, null, null);
+            // **Agregar flujo contable**
+            DataProcess.finalProcessInversiones(evaluacionEconomica);
+            DataProcess.calculaFlujoContable(evaluacionEconomica);
 
+            var flujosContablesTotales = DataProcess.calculaFlujosContablesTotales(
+                    evaluacionEconomica, produccionTotalMmbpce, factorInversion, pce
+            );
 
+            return new EvaluacionResponse(oportunity, evaluacionEconomica, flujosContablesTotales, null);
 
-
-
-        } else {
+        }  else {
 
             Log.info("PCE distinto de 0. Ejecutando flujo completo.");
 
@@ -248,9 +256,7 @@ public class EvaluacionEconomicaService {
                             null, invExploratoria.getExploratoria(),
                             invExploratoria.getPerforacionExp(), invExploratoria.getTerminacionExp(),
                             invExploratoria.getInfraestructuraExp(), null, null, null,
-                            null, null, null, null,
-                            null, null,null,
-                            null,null,null);
+                            null, null, null, null, null, null);
 
                     evaluacionEconomica.add(
                             new EvaluacionEconomica(oportunity.getFechainicioperfexploratorio(),
@@ -368,16 +374,13 @@ public class EvaluacionEconomicaService {
                                         plataformasDesarrollo = infoInversion.getPlataformadesarrollo() * paridad.getParidad();
                                         inversionesAnioAnterior.setDuctos(ductos);
                                         inversionesAnioAnterior.setPlataformaDesarrollo(plataformasDesarrollo);
-
+                                        // Falta añadirlos a la lista de inversiones anio anterior
                                         var risersG = infoInversion.getRisers() * paridad.getParidad() * cantManifolds;
-                                        inversionesAnioAnterior.setRisers(risersG);
                                         var sistemaDeControlG = infoInversion.getSistemasdecontrol() * paridad.getParidad() * cantManifolds;
-                                        inversionesAnioAnterior.setSistemaDeControl(sistemaDeControlG);
                                     }else{
+                                        // Falta añadirlos a la lista de inversiones anio actual
                                         var arbolesSubmarinosG = infoInversion.getArbolessubmarinos() * paridad.getParidad() * pozosTotales;
-                                        inversionesAnioActual.setArbolSubmarinos(arbolesSubmarinosG);
                                         var manifoldsG = infoInversion.getManifolds() * paridad.getParidad() * cantManifolds;
-                                        inversionesAnioActual.setManifolds(manifoldsG);
                                     }
                                 }
                             } else {
@@ -481,11 +484,13 @@ public class EvaluacionEconomicaService {
             });
 
             DataProcess.finalProcessInversiones(evaluacionEconomica);
+            log.info("--------------------------------sañdña-------------------------");
+
 
             DataProcess.calculaFlujoContable(evaluacionEconomica);
 
             var flujosContablesTotales = DataProcess.calculaFlujosContablesTotales(evaluacionEconomica,
-                    produccionTotalMmbpce, factorInversion);
+                    produccionTotalMmbpce, factorInversion, pce);
 
 
 
