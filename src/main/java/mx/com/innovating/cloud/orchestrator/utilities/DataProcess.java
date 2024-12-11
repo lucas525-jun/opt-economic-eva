@@ -179,17 +179,17 @@ public class DataProcess {
 			var condensado = 0.0;
 
 			switch (idhidrocarburo) {
-			case 6, 1, 2, 4 -> {
-				aceiteExtraPesado = (idhidrocarburo.equals(6) ? factorInversion.getFactorAceite() : 0) * v;
-				aceitePesado = (idhidrocarburo.equals(1) ? factorInversion.getFactorAceite() : 0) * v;
-				aceiteLigero = (idhidrocarburo.equals(2) ? factorInversion.getFactorAceite() : 0) * v;
-				aceiteSuperLigero = (idhidrocarburo.equals(4) ? factorInversion.getFactorAceite() : 0) * v;
-				gasHumedo = v * factorInversion.getFactorGas();
-			}
-			case 3, 5 -> {
-				gasHumedo = (idhidrocarburo.equals(5) ? factorInversion.getFactorGas() : 0) * v;
-				gasSeco = (idhidrocarburo.equals(3) ? factorInversion.getFactorGas() : 0) * v;
-			}
+				case 6, 1, 2, 4 -> {
+					aceiteExtraPesado = (idhidrocarburo.equals(6) ? factorInversion.getFactorAceite() : 0) * v;
+					aceitePesado = (idhidrocarburo.equals(1) ? factorInversion.getFactorAceite() : 0) * v;
+					aceiteLigero = (idhidrocarburo.equals(2) ? factorInversion.getFactorAceite() : 0) * v;
+					aceiteSuperLigero = (idhidrocarburo.equals(4) ? factorInversion.getFactorAceite() : 0) * v;
+					gasHumedo = v * factorInversion.getFactorGas();
+				}
+				case 3, 5 -> {
+					gasHumedo = (idhidrocarburo.equals(5) ? factorInversion.getFactorGas() : 0) * v;
+					gasSeco = (idhidrocarburo.equals(3) ? factorInversion.getFactorGas() : 0) * v;
+				}
 			}
 
 			condensado = v * factorInversion.getFactorCondensado();
@@ -214,7 +214,7 @@ public class DataProcess {
 	}
 
 	public static Map<Integer, BigDecimal> getPozosPerforadosByAnio(List<EscaleraProduccion> listTerminados,
-			String anioInicio) {
+																	String anioInicio) {
 
 		Map<Integer, BigDecimal> perforados = new HashMap<>();
 		var bigDecimal = new BigDecimal(1);
@@ -255,32 +255,31 @@ public class DataProcess {
 		evaluacionEconomica.forEach(eval -> {
 			//if (eval.getInversiones().getTotal() == null) {
 
-				var exploratoriaTotal =
-						(eval.getInversiones().getPerforacionExp() == null ? 0 : eval.getInversiones().getPerforacionExp())
-						+ (eval.getInversiones().getTerminacionExp() == null ? 0 : eval.getInversiones().getTerminacionExp())
-						+ (eval.getInversiones().getInfraestructuraExp() == null ? 0 : eval.getInversiones().getInfraestructuraExp());
-
-				var desarrolloSinOperacional =
-						(eval.getInversiones().getPerforacionDes() == null ? 0 : eval.getInversiones().getPerforacionDes())
-						+ (eval.getInversiones().getTerminacionDes() == null ? 0 : eval.getInversiones().getTerminacionDes())
-						+ (eval.getInversiones().getInfraestructuraDes() == null ? 0 : eval.getInversiones().getInfraestructuraDes())
-						+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
-						+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
-						+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo())
-						+ (eval.getInversiones().getSistemaDeControl() == null ? 0 : eval.getInversiones().getSistemaDeControl())
-						+ (eval.getInversiones().getRisers() == null ? 0 : eval.getInversiones().getRisers())
-						+ (eval.getInversiones().getArbolSubmarinos() == null ? 0 : eval.getInversiones().getArbolSubmarinos())
-						+ (eval.getInversiones().getManifolds() == null ? 0 : eval.getInversiones().getManifolds());
+			var exploratoriaTotal =
+					(eval.getInversiones().getPerforacionExp() == null ? 0 : eval.getInversiones().getPerforacionExp())
+							+ (eval.getInversiones().getTerminacionExp() == null ? 0 : eval.getInversiones().getTerminacionExp())
+							+ (eval.getInversiones().getInfraestructuraExp() == null ? 0 : eval.getInversiones().getInfraestructuraExp());
 
 
-				eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
+			//no aplica,  como 0
+			var desarrolloSinOperacional =
+					(eval.getInversiones().getPerforacionDes() == null ? 0 : eval.getInversiones().getPerforacionDes())
+							+ (eval.getInversiones().getTerminacionDes() == null ? 0 : eval.getInversiones().getTerminacionDes())
+							+ (eval.getInversiones().getInfraestructuraDes() == null ? 0 : eval.getInversiones().getInfraestructuraDes())
+							+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
+							+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
+							+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo());
 
-				var desarrollo =
-						desarrolloSinOperacional
-						+ (eval.getInversiones().getOperacionalFuturoDesarrollo() == null ? 0 : eval.getInversiones().getOperacionalFuturoDesarrollo());
+			eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
 
-				eval.getInversiones().setDesarrollo(desarrollo);
-				eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
+
+			// no aplica, tiene como 0
+			var desarrollo =
+					desarrolloSinOperacional
+							+ (eval.getInversiones().getOperacionalFuturoDesarrollo() == null ? 0 : eval.getInversiones().getOperacionalFuturoDesarrollo());
+
+			eval.getInversiones().setDesarrollo(desarrollo);
+			eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
 
 			//}
 		});
@@ -292,9 +291,9 @@ public class DataProcess {
 		AtomicInteger flujo = new AtomicInteger();
 		evaluacionEconomica.forEach(eval -> {
 
-			var totalInversiones = (eval.getInversiones() != null && eval.getInversiones().getTotal() != null)
+			var totalInversiones = (eval.getInversiones().getTotal() != null)
 					? eval.getInversiones().getTotal()
-					: 0.0;
+					: eval.getInversiones().getExploratoria();
 
 			var totalCostos = (eval.getCostos() != null && eval.getCostos().getTotal() != null)
 					? eval.getCostos().getTotal()
@@ -331,7 +330,7 @@ public class DataProcess {
 	}
 
 	public static FlujoContableTotal calculaFlujosContablesTotales(List<EvaluacionEconomica> evaluacionEconomica,
-			ProduccionTotalMmbpce produccionTotalMmbpce, FactorInversion factorInversion) {
+																   ProduccionTotalMmbpce produccionTotalMmbpce, FactorInversion factorInversion, double pce) {
 
 		List<Double> flujosNetosEfectivo = new ArrayList<>();
 		List<Double> flujosDescontadosEfectivoList = new ArrayList<>();
@@ -343,6 +342,9 @@ public class DataProcess {
 		var inversionExploratoria = evaluacionEconomica.get(0).getInversiones().getExploratoria();
 		var desarrolloSinOperacional = evaluacionEconomica.get(0).getInversiones().getDesarrolloSinOperacional();
 		List<Double> listTotalesInversiones = new ArrayList<>();
+
+		var perfDes = evaluacionEconomica.get(0).getInversiones().getPerforacionDes();
+
 
 		List<Double> listTotalesCostos = new ArrayList<>();
 
@@ -403,7 +405,29 @@ public class DataProcess {
 
 		log.info("::::: VPN calculo final {}", vpn);
 
-		var tir = calculaTir(vpn, inversionInicial, flujosNetosEfectivo, 0.10);
+
+		Double tir = 0.0;
+		var reporte708 = 0.0;
+		var reporte721 = 0.0;
+		var reporte722 = 0.0;
+		var reporte723 = 0.0;
+		var utilidadBpce = 0.0;
+		var relacionCostoBeneficio = 0.0;
+		var costoDescubrimiento720 = 0.0;
+		var costoOperacion = 0.0;
+
+		if (perfDes != 0.0) {
+			tir = calculaTir(vpn, inversionInicial, flujosNetosEfectivo, 0.10);
+
+
+		} else {
+
+			tir = 0.0;
+
+
+		}
+
+
 
 		log.info("::::: TIR calculo final {}", tir);
 
@@ -415,18 +439,27 @@ public class DataProcess {
 		var reporte123 = produccionTotalMmbpce.getProduccionTotalMmbpce();
 		log.info("::::: reporte123 - {} ", reporte123);
 
-		var reporte708 = vpn / valorPresenteInversion;
-		var reporte721 = totalInversiones / reporte120;
-		var reporte722 = totalInversiones / reporte121;
-		var reporte723 = totalInversiones / reporte123;
-		var utilidadBpce = vpn / reporte123;
-		var relacionCostoBeneficio = valorPresenteIngresos / valorPresenteEgresos;
-		var costoDescubrimiento = inversionExploratoria / factorInversion.getPce();
-		var costoOperacion = costosTotal / reporte123;
+
+
+		if (perfDes != 0.0) {
+
+			reporte708 = vpn / valorPresenteInversion;
+			reporte721 = totalInversiones / reporte120;
+			reporte722 = totalInversiones / reporte121;
+			reporte723 = totalInversiones / reporte123;
+			utilidadBpce = vpn / reporte123;
+			relacionCostoBeneficio = valorPresenteIngresos / valorPresenteEgresos;
+			costoOperacion = costosTotal / reporte123;
+			costoDescubrimiento720 = inversionExploratoria / pce;
+
+
+		}
+
+
 
 		return new FlujoContableTotal(vpn, tir, flujosDescontadosEfectivoTotal, valorPresenteInversion,
 				valorPresenteEgresos, valorPresenteIngresos, valorPresenteCostos, reporte708, reporte721, reporte722,
-				reporte723, utilidadBpce, relacionCostoBeneficio, costoDescubrimiento, costoOperacion);
+				reporte723, utilidadBpce, relacionCostoBeneficio, costoDescubrimiento720, costoOperacion);
 
 	}
 
@@ -439,35 +472,45 @@ public class DataProcess {
 
 		}
 
-        return calc + inversionInicial;
+		return calc + inversionInicial;
 	}
 
 	private static Double calculaTir(Double vpn, Double inversionInicial, List<Double> flujo, Double taza) {
 		Double tir = vpn;
 		double tazaUlt = 0.0;
+		double tolerancia = 0.01; // Ajusta la tolerancia para el cálculo de TIR
+		int maxIteraciones = 10000; // Número máximo de iteraciones
+		int iteracion = 0;
 
 		if (vpn > 0) {
 			log.info("::::: Calculando TIR con VPN positiva");
-			for (double x = taza; tir > 0; x += 0.0001) {
+			for (double x = taza; Math.abs(tir) > tolerancia && iteracion < maxIteraciones; x += 0.0001) {
 				Double calc = 0.0;
 				for (int j = 0; j < flujo.size(); j++) {
 					calc += flujo.get(j) / Math.pow((1 + x), (j + 1));
 				}
 				tir = inversionInicial + calc;
 				tazaUlt = x;
+				iteracion++;
 			}
 		} else {
 			log.info("::::: Calculando TIR con VPN negativa");
-			for (double x = taza; tir < 0; x -= 0.0001) {
+			for (double x = taza; Math.abs(tir) > tolerancia && iteracion < maxIteraciones; x -= 0.0001) {
 				Double calc = 0.0;
 				for (int j = 0; j < flujo.size(); j++) {
 					calc += flujo.get(j) / Math.pow((1 + x), (j + 1));
 				}
 				tir = inversionInicial + calc;
 				tazaUlt = x;
+				iteracion++;
 			}
 		}
 
-		return tazaUlt * 100;
+		if (iteracion >= maxIteraciones) {
+			log.warn("Número máximo de iteraciones alcanzado sin converger a un valor de TIR válido.");
+		}
+
+		return tazaUlt * 100; // Convertir a porcentaje
 	}
 }
+
