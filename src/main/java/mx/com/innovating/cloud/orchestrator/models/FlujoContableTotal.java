@@ -25,7 +25,7 @@ public class FlujoContableTotal {
 
 	private Double utilidadBpce;
 	private Double relacionCostoBeneficio;
-	private Double costoDescubrimiento;
+	private Double costoDescubrimiento720;
 	private Double costoOperacion;
 
 }
