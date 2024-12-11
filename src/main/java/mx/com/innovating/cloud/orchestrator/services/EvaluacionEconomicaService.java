@@ -75,8 +75,7 @@ public class EvaluacionEconomicaService {
             var inversionesExpAnioInicioPerf = new Inversiones(
                     null, invExploratoria.getExploratoria(), invExploratoria.getPerforacionExp(),
                     invExploratoria.getTerminacionExp(), invExploratoria.getInfraestructuraExp(), 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-            );
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0 );
 
             evaluacionEconomica.add(
                     new EvaluacionEconomica(
@@ -93,9 +92,10 @@ public class EvaluacionEconomicaService {
                     evaluacionEconomica, produccionTotalMmbpce, factorInversion, pce
             );
 
-            return new EvaluacionResponse(oportunity, evaluacionEconomica, flujosContablesTotales, null);
+            return new EvaluacionResponse(pce, oportunity, evaluacionEconomica, flujosContablesTotales, null);
 
-        }  else {
+        }
+        else {
 
             Log.info("PCE distinto de 0. Ejecutando flujo completo.");
 
@@ -256,7 +256,9 @@ public class EvaluacionEconomicaService {
                             null, invExploratoria.getExploratoria(),
                             invExploratoria.getPerforacionExp(), invExploratoria.getTerminacionExp(),
                             invExploratoria.getInfraestructuraExp(), null, null, null,
-                            null, null, null, null, null, null);
+                            null, null, null, null,
+                            null, null,null,
+                            null,null,null);
 
                     evaluacionEconomica.add(
                             new EvaluacionEconomica(oportunity.getFechainicioperfexploratorio(),
@@ -374,13 +376,16 @@ public class EvaluacionEconomicaService {
                                         plataformasDesarrollo = infoInversion.getPlataformadesarrollo() * paridad.getParidad();
                                         inversionesAnioAnterior.setDuctos(ductos);
                                         inversionesAnioAnterior.setPlataformaDesarrollo(plataformasDesarrollo);
-                                        // Falta añadirlos a la lista de inversiones anio anterior
+
                                         var risersG = infoInversion.getRisers() * paridad.getParidad() * cantManifolds;
+                                        inversionesAnioAnterior.setRisers(risersG);
                                         var sistemaDeControlG = infoInversion.getSistemasdecontrol() * paridad.getParidad() * cantManifolds;
+                                        inversionesAnioAnterior.setSistemaDeControl(sistemaDeControlG);
                                     }else{
-                                        // Falta añadirlos a la lista de inversiones anio actual
                                         var arbolesSubmarinosG = infoInversion.getArbolessubmarinos() * paridad.getParidad() * pozosTotales;
+                                        inversionesAnioActual.setArbolSubmarinos(arbolesSubmarinosG);
                                         var manifoldsG = infoInversion.getManifolds() * paridad.getParidad() * cantManifolds;
+                                        inversionesAnioActual.setManifolds(manifoldsG);
                                     }
                                 }
                             } else {
@@ -484,8 +489,6 @@ public class EvaluacionEconomicaService {
             });
 
             DataProcess.finalProcessInversiones(evaluacionEconomica);
-            log.info("--------------------------------sañdña-------------------------");
-
 
             DataProcess.calculaFlujoContable(evaluacionEconomica);
 
@@ -495,7 +498,7 @@ public class EvaluacionEconomicaService {
 
 
 
-            return new EvaluacionResponse(oportunity, evaluacionEconomica, flujosContablesTotales, factorCalculo);
+            return new EvaluacionResponse(pce,oportunity, evaluacionEconomica, flujosContablesTotales, factorCalculo);
 
         }
 

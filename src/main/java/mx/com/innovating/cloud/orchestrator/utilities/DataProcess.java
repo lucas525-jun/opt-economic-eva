@@ -179,17 +179,17 @@ public class DataProcess {
 			var condensado = 0.0;
 
 			switch (idhidrocarburo) {
-			case 6, 1, 2, 4 -> {
-				aceiteExtraPesado = (idhidrocarburo.equals(6) ? factorInversion.getFactorAceite() : 0) * v;
-				aceitePesado = (idhidrocarburo.equals(1) ? factorInversion.getFactorAceite() : 0) * v;
-				aceiteLigero = (idhidrocarburo.equals(2) ? factorInversion.getFactorAceite() : 0) * v;
-				aceiteSuperLigero = (idhidrocarburo.equals(4) ? factorInversion.getFactorAceite() : 0) * v;
-				gasHumedo = v * factorInversion.getFactorGas();
-			}
-			case 3, 5 -> {
-				gasHumedo = (idhidrocarburo.equals(5) ? factorInversion.getFactorGas() : 0) * v;
-				gasSeco = (idhidrocarburo.equals(3) ? factorInversion.getFactorGas() : 0) * v;
-			}
+				case 6, 1, 2, 4 -> {
+					aceiteExtraPesado = (idhidrocarburo.equals(6) ? factorInversion.getFactorAceite() : 0) * v;
+					aceitePesado = (idhidrocarburo.equals(1) ? factorInversion.getFactorAceite() : 0) * v;
+					aceiteLigero = (idhidrocarburo.equals(2) ? factorInversion.getFactorAceite() : 0) * v;
+					aceiteSuperLigero = (idhidrocarburo.equals(4) ? factorInversion.getFactorAceite() : 0) * v;
+					gasHumedo = v * factorInversion.getFactorGas();
+				}
+				case 3, 5 -> {
+					gasHumedo = (idhidrocarburo.equals(5) ? factorInversion.getFactorGas() : 0) * v;
+					gasSeco = (idhidrocarburo.equals(3) ? factorInversion.getFactorGas() : 0) * v;
+				}
 			}
 
 			condensado = v * factorInversion.getFactorCondensado();
@@ -214,7 +214,7 @@ public class DataProcess {
 	}
 
 	public static Map<Integer, BigDecimal> getPozosPerforadosByAnio(List<EscaleraProduccion> listTerminados,
-			String anioInicio) {
+																	String anioInicio) {
 
 		Map<Integer, BigDecimal> perforados = new HashMap<>();
 		var bigDecimal = new BigDecimal(1);
@@ -255,31 +255,31 @@ public class DataProcess {
 		evaluacionEconomica.forEach(eval -> {
 			//if (eval.getInversiones().getTotal() == null) {
 
-				var exploratoriaTotal =
-						(eval.getInversiones().getPerforacionExp() == null ? 0 : eval.getInversiones().getPerforacionExp())
-						+ (eval.getInversiones().getTerminacionExp() == null ? 0 : eval.getInversiones().getTerminacionExp())
-						+ (eval.getInversiones().getInfraestructuraExp() == null ? 0 : eval.getInversiones().getInfraestructuraExp());
+			var exploratoriaTotal =
+					(eval.getInversiones().getPerforacionExp() == null ? 0 : eval.getInversiones().getPerforacionExp())
+							+ (eval.getInversiones().getTerminacionExp() == null ? 0 : eval.getInversiones().getTerminacionExp())
+							+ (eval.getInversiones().getInfraestructuraExp() == null ? 0 : eval.getInversiones().getInfraestructuraExp());
 
 
-				//no aplica,  como 0
-				var desarrolloSinOperacional =
-						(eval.getInversiones().getPerforacionDes() == null ? 0 : eval.getInversiones().getPerforacionDes())
-						+ (eval.getInversiones().getTerminacionDes() == null ? 0 : eval.getInversiones().getTerminacionDes())
-						+ (eval.getInversiones().getInfraestructuraDes() == null ? 0 : eval.getInversiones().getInfraestructuraDes())
-						+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
-						+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
-						+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo());
+			//no aplica,  como 0
+			var desarrolloSinOperacional =
+					(eval.getInversiones().getPerforacionDes() == null ? 0 : eval.getInversiones().getPerforacionDes())
+							+ (eval.getInversiones().getTerminacionDes() == null ? 0 : eval.getInversiones().getTerminacionDes())
+							+ (eval.getInversiones().getInfraestructuraDes() == null ? 0 : eval.getInversiones().getInfraestructuraDes())
+							+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
+							+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
+							+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo());
 
-				eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
+			eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
 
 
-				// no aplica, tiene como 0
-				var desarrollo =
-						desarrolloSinOperacional
-						+ (eval.getInversiones().getOperacionalFuturoDesarrollo() == null ? 0 : eval.getInversiones().getOperacionalFuturoDesarrollo());
+			// no aplica, tiene como 0
+			var desarrollo =
+					desarrolloSinOperacional
+							+ (eval.getInversiones().getOperacionalFuturoDesarrollo() == null ? 0 : eval.getInversiones().getOperacionalFuturoDesarrollo());
 
-				eval.getInversiones().setDesarrollo(desarrollo);
-				eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
+			eval.getInversiones().setDesarrollo(desarrollo);
+			eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
 
 			//}
 		});
@@ -330,7 +330,7 @@ public class DataProcess {
 	}
 
 	public static FlujoContableTotal calculaFlujosContablesTotales(List<EvaluacionEconomica> evaluacionEconomica,
-			ProduccionTotalMmbpce produccionTotalMmbpce, FactorInversion factorInversion, double pce) {
+																   ProduccionTotalMmbpce produccionTotalMmbpce, FactorInversion factorInversion, double pce) {
 
 		List<Double> flujosNetosEfectivo = new ArrayList<>();
 		List<Double> flujosDescontadosEfectivoList = new ArrayList<>();
@@ -417,12 +417,12 @@ public class DataProcess {
 		var costoOperacion = 0.0;
 
 		if (perfDes != 0.0) {
-			 tir = calculaTir(vpn, inversionInicial, flujosNetosEfectivo, 0.10);
+			tir = calculaTir(vpn, inversionInicial, flujosNetosEfectivo, 0.10);
 
 
 		} else {
 
-			 tir = 0.0;
+			tir = 0.0;
 
 
 		}
@@ -472,7 +472,7 @@ public class DataProcess {
 
 		}
 
-        return calc + inversionInicial;
+		return calc + inversionInicial;
 	}
 
 	private static Double calculaTir(Double vpn, Double inversionInicial, List<Double> flujo, Double taza) {

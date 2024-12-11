@@ -24,6 +24,10 @@ public class Inversiones {
 	private Double lineaDescarga;
 	private Double ductos;
 	private Double plataformaDesarrollo;
+	private Double sistemaDeControl;
+	private Double risers;
+	private Double manifolds;
+	private Double arbolSubmarinos;
 
 	private Double operacionalFuturoDesarrollo;
 
