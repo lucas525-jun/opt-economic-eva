@@ -346,6 +346,10 @@ public class DataProcess {
 		var perfDes = evaluacionEconomica.get(0).getInversiones().getPerforacionDes();
 
 
+		if (perfDes == null) {
+			perfDes = 0.0;
+		}
+
 		List<Double> listTotalesCostos = new ArrayList<>();
 
 		evaluacionEconomica.forEach(eval -> {
