@@ -9,6 +9,7 @@ import jakarta.ws.rs.PathParam;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 import mx.com.innovating.cloud.data.exceptions.SqlExecutionErrorException;
 import mx.com.innovating.cloud.data.models.*;
+import mx.com.innovating.cloud.orchestrator.models.Areakmasignacion;
 import mx.com.innovating.cloud.orchestrator.models.FactorCalculo;
 
 import java.sql.ResultSetMetaData;
@@ -54,6 +55,48 @@ public class DataBaseConnectorRepository {
             throw new SqlExecutionErrorException("JDBC getCatalogo exception executing SQL");
         }
     }
+
+
+    public Areakmasignacion getAreakmasignacion(Integer pnoportunidadobjetivo, Integer pnidversion) {
+        try {
+            final var queryString = """
+            SELECT 
+                idoportunidadobjetivo,
+                idoportunidad,
+                idversion,
+                areakmasignacion,
+                pg
+            FROM 
+                catalogo.reloportunidadobjetivotbl
+            WHERE 
+                idversion = :pnidversion
+                AND idoportunidadobjetivo = :pnoportunidadobjetivo
+            """;
+
+            Optional<Areakmasignacion> result = em.createNativeQuery(queryString, Areakmasignacion.class)
+                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo)
+                    .setParameter("pnidversion", pnidversion)
+                    .getResultStream()
+                    .findFirst();
+
+            if (result.isEmpty()) {
+                Log.error("ReloportunidadObjetivo: No data found with idoportunidadobjetivo = " + pnoportunidadobjetivo +
+                        " and idversion = " + pnidversion);
+                throw new SqlExecutionErrorException("ReloportunidadObjetivo: No data found with provided parameters.");
+            }
+
+            return result.get();
+        } catch (Exception e) {
+            Log.error("JDBC: getReloportunidadObjetivo exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC: getReloportunidadObjetivo exception executing SQL");
+        }
+    }
+
+
+
+
+
+
 
 
 
@@ -465,12 +508,11 @@ public class DataBaseConnectorRepository {
 
         try {
             final var queryString = """
-                    SELECT c.idoportunidadobjetivo, a.idoportunidad, a.oportunidad, b.nombreversion
-                    FROM catalogo.oportunidadvw a
-                    join catalogo.versiontbl b on a.idversion = b.idversion
-                    join catalogo.claveobjetivovw c on a.idoportunidad = c.idoportunidad
+                    SELECT idoportunidadobjetivo, idoportunidad, oportunidad, b.nombreversion FROM catalogo.claveobjetivovw a
+                    JOIN catalogo.versiontbl b ON a.idversion = b.idversion
                     where nombreversion = :nombreVersion
                     """;
+
             return em.createNativeQuery(queryString, Oportunidades.class)
                     .setParameter("nombreVersion", nombreVersion)
                     .getResultStream().toList();

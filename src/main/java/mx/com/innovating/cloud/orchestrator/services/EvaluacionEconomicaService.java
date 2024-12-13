@@ -92,7 +92,10 @@ public class EvaluacionEconomicaService {
                     evaluacionEconomica, produccionTotalMmbpce, factorInversion, pce
             );
 
-            return new EvaluacionResponse(pce, oportunity, evaluacionEconomica, flujosContablesTotales, null);
+
+           Double areamasignacion = databaseConnectorClient.getAreakmasignacion(idOportunidadObjetivo, version).getAreakmasignacion();
+
+            return new EvaluacionResponse(areamasignacion, pce, oportunity, evaluacionEconomica, flujosContablesTotales, null);
 
         }
         else {
@@ -497,8 +500,9 @@ public class EvaluacionEconomicaService {
 
 
 
+            Double areamasignacion = databaseConnectorClient.getAreakmasignacion(idOportunidadObjetivo, version).getAreakmasignacion();
 
-            return new EvaluacionResponse(pce,oportunity, evaluacionEconomica, flujosContablesTotales, factorCalculo);
+            return new EvaluacionResponse(areamasignacion, pce,oportunity, evaluacionEconomica, flujosContablesTotales, factorCalculo);
 
         }
 
