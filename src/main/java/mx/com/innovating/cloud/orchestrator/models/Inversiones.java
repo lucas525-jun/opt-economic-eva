@@ -28,6 +28,11 @@ public class Inversiones {
 	private Double risers;
 	private Double manifolds;
 	private Double arbolSubmarinos;
+	private Double estacionCompresion;
+	private Double bateria;
+	private Double cubiertaProcesos;
+	private Double buqueTanqueCompra;
+	private Double buqueTanqueRenta;
 
 	private Double operacionalFuturoDesarrollo;
 

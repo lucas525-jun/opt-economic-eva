@@ -455,22 +455,21 @@ public class DataBaseConnectorRepository {
 
         try {
             final var queryString = """
-                    SELECT DISTINCT 
-                        idhidrocarburo,
-                        idoportunidadobjetivo,
-                        hidrocarburo,
-                        COALESCE(p_pce,0),
-                        COALESCE(factor_aceite,0),
-                        COALESCE(factor_gas,0),
-                        COALESCE(factor_condensado,0),
-                        anioprecio
-                    FROM
-                        catalogo.volumetriaoportunidadfactoresper50vw
-                    WHERE
-                        idoportunidadobjetivo = :idOportunidad
-                     AND
-                        idtipovalor = 2      
+                    SELECT 
+                        DISTINCT 
+                        ro.idhidrocarburo, 
+                        mv.idoportunidadobjetivo, 
+                        h.hidrocarburo, 
+                        COALESCE(mv.mediapce,0), 
+                        COALESCE(mv.mediaaceite/mv.mediapce,0 )AS fc_aceite,
+                        COALESCE(mv.mediagas/mv.mediapce,0) AS fc_gas,
+                        COALESCE(mv.mediacondensado/mv.mediapce,0) AS fc_condensado
+                        FROM catalogo.mediavolumetriaoportunidadtbl mv
+                    INNER JOIN catalogo.reloportunidadobjetivotbl ro on mv.idoportunidadobjetivo = ro.idoportunidadobjetivo
+                    INNER JOIN catalogo.hidrocarburotbl h on ro.idhidrocarburo = h.idhidrocarburo
+                    WHERE mv.idoportunidadobjetivo =:idOportunidad;     
                     """;
+
             Optional<FactorInversion> result = em.createNativeQuery(queryString, FactorInversion.class).setParameter("idOportunidad", idOportunidad)
                     .getResultStream().findFirst();
             if(result.isEmpty()){
