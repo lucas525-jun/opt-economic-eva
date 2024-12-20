@@ -75,7 +75,8 @@ public class EvaluacionEconomicaService {
             var inversionesExpAnioInicioPerf = new Inversiones(
                     null, invExploratoria.getExploratoria(), invExploratoria.getPerforacionExp(),
                     invExploratoria.getTerminacionExp(), invExploratoria.getInfraestructuraExp(), 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0 );
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0
+                    , 0.0, 0.0, 0.0, 0.0, 0.0);
 
             evaluacionEconomica.add(
                     new EvaluacionEconomica(
@@ -261,7 +262,8 @@ public class EvaluacionEconomicaService {
                             invExploratoria.getInfraestructuraExp(), null, null, null,
                             null, null, null, null,
                             null, null,null,
-                            null,null,null);
+                            null,null,null,
+                            null,null,null,null,null);
 
                     evaluacionEconomica.add(
                             new EvaluacionEconomica(oportunity.getFechainicioperfexploratorio(),
@@ -384,11 +386,23 @@ public class EvaluacionEconomicaService {
                                         inversionesAnioAnterior.setRisers(risersG);
                                         var sistemaDeControlG = infoInversion.getSistemasdecontrol() * paridad.getParidad() * cantManifolds;
                                         inversionesAnioAnterior.setSistemaDeControl(sistemaDeControlG);
+                                        var cubiertaProcesosG = infoInversion.getCubiertadeproces() * paridad.getParidad() * cantManifolds;
+                                        inversionesAnioAnterior.setCubiertaProcesos(cubiertaProcesosG);
                                     }else{
                                         var arbolesSubmarinosG = infoInversion.getArbolessubmarinos() * paridad.getParidad() * pozosTotales;
                                         inversionesAnioActual.setArbolSubmarinos(arbolesSubmarinosG);
                                         var manifoldsG = infoInversion.getManifolds() * paridad.getParidad() * cantManifolds;
                                         inversionesAnioActual.setManifolds(manifoldsG);
+                                        var estacionCompresionG = infoInversion.getEstacioncompresion() * paridad.getParidad();
+                                        inversionesAnioActual.setEstacionCompresion(estacionCompresionG);
+                                        var bateriaG = infoInversion.getBateria() * paridad.getParidad();
+                                        inversionesAnioActual.setBateria(bateriaG);
+                                        var buqueTanqueCompraG = infoInversion.getBuquetanquecompra() * paridad.getParidad();
+                                        inversionesAnioActual.setBuqueTanqueCompra(buqueTanqueCompraG);
+                                        var buqueTanqueRentaG = infoInversion.getBuquetanquerenta() * paridad.getParidad();
+                                        inversionesAnioActual.setBuqueTanqueRenta(buqueTanqueRentaG);
+
+
                                     }
                                 }
                             } else {

@@ -186,8 +186,16 @@ public class DataProcess {
 					aceiteSuperLigero = (idhidrocarburo.equals(4) ? factorInversion.getFactorAceite() : 0) * v;
 					gasHumedo = v * factorInversion.getFactorGas();
 				}
-				case 3, 5 -> {
-					gasHumedo = (idhidrocarburo.equals(5) ? factorInversion.getFactorGas() : 0) * v;
+				case 3, 5, 9 -> {
+
+					if(idhidrocarburo.equals(9)){
+						gasHumedo = factorInversion.getFactorGas() * v;
+					}else if(idhidrocarburo.equals(5)){
+						gasHumedo = factorInversion.getFactorGas() * v;
+					}else{
+						gasHumedo = 0;
+					}
+
 					gasSeco = (idhidrocarburo.equals(3) ? factorInversion.getFactorGas() : 0) * v;
 				}
 			}
@@ -268,7 +276,17 @@ public class DataProcess {
 							+ (eval.getInversiones().getInfraestructuraDes() == null ? 0 : eval.getInversiones().getInfraestructuraDes())
 							+ (eval.getInversiones().getLineaDescarga() == null ? 0 : eval.getInversiones().getLineaDescarga())
 							+ (eval.getInversiones().getDuctos() == null ? 0 : eval.getInversiones().getDuctos())
-							+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo());
+							+ (eval.getInversiones().getPlataformaDesarrollo() == null ? 0 : eval.getInversiones().getPlataformaDesarrollo())
+					        + (eval.getInversiones().getSistemaDeControl() == null ? 0 : eval.getInversiones().getSistemaDeControl())
+							+ (eval.getInversiones().getRisers() == null ? 0 : eval.getInversiones().getRisers())
+							+ (eval.getInversiones().getManifolds() == null ? 0 : eval.getInversiones().getManifolds())
+							+ (eval.getInversiones().getArbolSubmarinos() == null ? 0 : eval.getInversiones().getArbolSubmarinos())
+							+ (eval.getInversiones().getEstacionCompresion() == null ? 0 : eval.getInversiones().getEstacionCompresion())
+							+ (eval.getInversiones().getBateria() == null ? 0 : eval.getInversiones().getBateria())
+							+ (eval.getInversiones().getCubiertaProcesos() == null ? 0 : eval.getInversiones().getCubiertaProcesos())
+							+ (eval.getInversiones().getBuqueTanqueCompra() == null ? 0 : eval.getInversiones().getBuqueTanqueCompra())
+							+ (eval.getInversiones().getBuqueTanqueRenta() == null ? 0 : eval.getInversiones().getBuqueTanqueRenta());
+
 
 			eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
 
