@@ -287,6 +287,15 @@ public class DataProcess {
 							+ (eval.getInversiones().getBuqueTanqueCompra() == null ? 0 : eval.getInversiones().getBuqueTanqueCompra())
 							+ (eval.getInversiones().getBuqueTanqueRenta() == null ? 0 : eval.getInversiones().getBuqueTanqueRenta());
 
+			System.out.println("SISTEMAS DE CONTROL " + eval.getInversiones().getSistemaDeControl());
+			System.out.println("RISERS " + eval.getInversiones().getRisers());
+			System.out.println("MANIFOLDS" + eval.getInversiones().getManifolds());
+			System.out.println("ARBOL SUBMARINO" + eval.getInversiones().getArbolSubmarinos());
+			System.out.println("ESTACION COMPRESION" +eval.getInversiones().getEstacionCompresion());
+			System.out.println("BATERIA" + eval.getInversiones().getBateria());
+			System.out.println("CUBIERTA PROCESOS" + eval.getInversiones().getCubiertaProcesos());
+			System.out.println("BUQUE TANQUE COMPRA" +eval.getInversiones().getBuqueTanqueCompra());
+			System.out.println("BUQUE TANQUE RENTA" +eval.getInversiones().getBuqueTanqueRenta());
 
 			eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
 

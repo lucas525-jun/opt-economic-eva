@@ -35,6 +35,8 @@ public class Inversiones {
 	private Double buqueTanqueRenta;
 
 	private Double operacionalFuturoDesarrollo;
+	private Double mantenimientoDePozos;
+	private Double mantenimientoInfraestructuraFuturoDesarrollo;
 
 	private Double desarrollo;
 

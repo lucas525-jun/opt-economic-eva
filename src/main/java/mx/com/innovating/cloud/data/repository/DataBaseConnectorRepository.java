@@ -515,6 +515,7 @@ public class DataBaseConnectorRepository {
             return em.createNativeQuery(queryString, Oportunidades.class)
                     .setParameter("nombreVersion", nombreVersion)
                     .getResultStream().toList();
+
         } catch (Exception e) {
             Log.error("JDBC: getOportunidadesByNombreVersion exception executing SQL", e);
             throw new SqlExecutionErrorException("JDBC getOportunidadesByNombreVersion exception executing SQL");
