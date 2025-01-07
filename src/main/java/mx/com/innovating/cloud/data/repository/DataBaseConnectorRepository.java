@@ -9,6 +9,7 @@ import jakarta.ws.rs.PathParam;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 import mx.com.innovating.cloud.data.exceptions.SqlExecutionErrorException;
 import mx.com.innovating.cloud.data.models.*;
+import mx.com.innovating.cloud.orchestrator.models.Areakmasignacion;
 import mx.com.innovating.cloud.orchestrator.models.FactorCalculo;
 
 import java.sql.ResultSetMetaData;
@@ -106,7 +107,40 @@ public class DataBaseConnectorRepository {
 
 
 
+    public Areakmasignacion getAreakmasignacion(Integer pnoportunidadobjetivo, Integer pnidversion) {
+        try {
+            final var queryString = """
+            SELECT 
+                idoportunidadobjetivo,
+                idoportunidad,
+                idversion,
+                areakmasignacion,
+                pg
+            FROM 
+                catalogo.reloportunidadobjetivotbl
+            WHERE 
+                idversion = :pnidversion
+                AND idoportunidadobjetivo = :pnoportunidadobjetivo
+            """;
 
+            Optional<Areakmasignacion> result = em.createNativeQuery(queryString, Areakmasignacion.class)
+                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo)
+                    .setParameter("pnidversion", pnidversion)
+                    .getResultStream()
+                    .findFirst();
+
+            if (result.isEmpty()) {
+                Log.error("ReloportunidadObjetivo: No data found with idoportunidadobjetivo = " + pnoportunidadobjetivo +
+                        " and idversion = " + pnidversion);
+                throw new SqlExecutionErrorException("ReloportunidadObjetivo: No data found with provided parameters.");
+            }
+
+            return result.get();
+        } catch (Exception e) {
+            Log.error("JDBC: getReloportunidadObjetivo exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC: getReloportunidadObjetivo exception executing SQL");
+        }
+    }
 
 
 
@@ -411,21 +445,19 @@ public class DataBaseConnectorRepository {
 
         try {
             final var queryString = """
-                    SELECT DISTINCT 
-                        idhidrocarburo,
-                        idoportunidadobjetivo,
-                        hidrocarburo,
-                        COALESCE(p_pce,0),
-                        COALESCE(factor_aceite,0),
-                        COALESCE(factor_gas,0),
-                        COALESCE(factor_condensado,0),
-                        anioprecio
-                    FROM
-                        catalogo.volumetriaoportunidadfactoresper50vw
-                    WHERE
-                        idoportunidadobjetivo = :idOportunidad
-                     AND
-                        idtipovalor = 2      
+                     SELECT 
+                        DISTINCT 
+                        ro.idhidrocarburo, 
+                        mv.idoportunidadobjetivo, 
+                        h.hidrocarburo, 
+                        COALESCE(mv.mediapce,0), 
+                        COALESCE(mv.mediaaceite/mv.mediapce,0 )AS fc_aceite,
+                        COALESCE(mv.mediagas/mv.mediapce,0) AS fc_gas,
+                        COALESCE(mv.mediacondensado/mv.mediapce,0) AS fc_condensado
+                        FROM catalogo.mediavolumetriaoportunidadtbl mv
+                    INNER JOIN catalogo.reloportunidadobjetivotbl ro on mv.idoportunidadobjetivo = ro.idoportunidadobjetivo
+                    INNER JOIN catalogo.hidrocarburotbl h on ro.idhidrocarburo = h.idhidrocarburo
+                    WHERE mv.idoportunidadobjetivo =:idOportunidad;     
                     """;
             Optional<FactorInversion> result = em.createNativeQuery(queryString, FactorInversion.class).setParameter("idOportunidad", idOportunidad)
                     .getResultStream().findFirst();
@@ -463,13 +495,13 @@ public class DataBaseConnectorRepository {
     public List<Oportunidades> getOportunidadesByNombreVersion(String nombreVersion) {
 
         try {
+            System.out.println(nombreVersion);
             final var queryString = """
-                    SELECT c.idoportunidadobjetivo, a.idoportunidad, a.oportunidad, b.nombreversion
-                    FROM catalogo.oportunidadvw a
-                    join catalogo.versiontbl b on a.idversion = b.idversion
-                    join catalogo.claveobjetivovw c on a.idoportunidad = c.idoportunidad
+                    SELECT idoportunidadobjetivo, idoportunidad, oportunidad, b.nombreversion FROM catalogo.claveobjetivovw a
+                    JOIN catalogo.versiontbl b ON a.idversion = b.idversion
                     where nombreversion = :nombreVersion
                     """;
+
             return em.createNativeQuery(queryString, Oportunidades.class)
                     .setParameter("nombreVersion", nombreVersion)
                     .getResultStream().toList();

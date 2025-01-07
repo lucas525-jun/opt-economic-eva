@@ -12,6 +12,8 @@ import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 @NoArgsConstructor
 public class EvaluacionResponse {
 
+	private Double areamasignacion;
+	private Double pceSimuladoOportunidad;
 	private InformacionOportunidad infoOportunidad;
 	private List<EvaluacionEconomica> evaluacionEconomica;
 	private FlujoContableTotal flujoContableTotal;
