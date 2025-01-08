@@ -288,16 +288,14 @@ public class DataProcess {
 							+ (eval.getInversiones().getBuqueTanqueRenta() == null ? 0 : eval.getInversiones().getBuqueTanqueRenta());
 
 
-			eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
+				eval.getInversiones().setDesarrolloSinOperacional(desarrolloSinOperacional);
 
+				var desarrollo =
+						desarrolloSinOperacional
+						+ (eval.getInversiones().getOperacionalFuturoDesarrollo() == null ? 0 : eval.getInversiones().getOperacionalFuturoDesarrollo());
 
-			// no aplica, tiene como 0
-			var desarrollo =
-					desarrolloSinOperacional
-							+ (eval.getInversiones().getOperacionalFuturoDesarrollo() == null ? 0 : eval.getInversiones().getOperacionalFuturoDesarrollo());
-
-			eval.getInversiones().setDesarrollo(desarrollo);
-			eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
+				eval.getInversiones().setDesarrollo(desarrollo);
+				eval.getInversiones().setTotal(desarrollo + exploratoriaTotal);
 
 			//}
 		});
@@ -421,7 +419,7 @@ public class DataProcess {
 
 		log.info("::::: inversionInicial {}", inversionInicial);
 
-		//flujosNetosEfectivo.remove(0);
+		flujosNetosEfectivo.remove(0);
 
 		var vpn = calculaVpn(inversionInicial, flujosNetosEfectivo, 0.10);
 
@@ -440,10 +438,10 @@ public class DataProcess {
 
 		if (perfDes != 0.0) {
 			// OG
-			//tir = calculaTir(vpn, inversionInicial,flujosNetosEfectivo, 0.10);
+			tir = calculaTir(vpn, inversionInicial,flujosNetosEfectivo, 0.10);
 
 			// Modificada
-			tir = calculaTir(flujosNetosEfectivo, inversionInicial,0.10);
+			//tir = calculaTir(flujosNetosEfectivo, inversionInicial,0.10);
 
 
 		} else {
@@ -499,48 +497,8 @@ public class DataProcess {
 		}
 
 		return calc + inversionInicial;
-
 	}
 
-	/**
-	 * Calcula la TIRM (MIRR) dados los flujos de caja, la tasa de reinversión y la tasa de financiamiento.
-	 *
-	 * @param flujos        Array con los flujos de caja.
-	 * @param inversionInicial Tasa de reinversión para los flujos positivos.
-	 * @param tasa      Tasa de financiamiento para los flujos negativos.
-	 * @return La TIRM/MIRR como un valor decimal.
-	 */
-
-	public static double calculaTir(List<Double> flujos, double inversionInicial, double tasa) {
-		int n = flujos.size(); // Número de periodos
-		double positiveCashFlowFutureValue = 0; // Valor futuro de flujos positivos
-		double negativeCashFlowPresentValue = Math.abs(inversionInicial); // Comenzamos con la inversión inicial
-
-		// Calcular el valor futuro de los flujos positivos
-		for (int i = 0; i < n; i++) {
-			if (flujos.get(i) > 0) {
-				positiveCashFlowFutureValue += flujos.get(i) * Math.pow(1 + tasa, n - i);
-			}
-		}
-
-		// Calcular el valor presente de los flujos negativos (si hay más flujos negativos además de la inversión inicial)
-		for (int i = 0; i < n; i++) {
-			if (flujos.get(i) < 0) {
-				negativeCashFlowPresentValue += Math.abs(flujos.get(i)) / Math.pow(1 + tasa, i);
-			}
-		}
-
-		// Calcular la TIRM (MIRR)
-		double tirm = Math.pow(positiveCashFlowFutureValue / negativeCashFlowPresentValue, 1.0/n) - 1;
-
-		return tirm * 100;
-	}
-
-
-
-
-
-	/*
 	private static Double calculaTir(Double vpn, Double inversionInicial, List<Double> flujo, Double taza) {
 		Double tir = vpn;
 		double tazaUlt = 0.0;
@@ -578,12 +536,4 @@ public class DataProcess {
 
 		return tazaUlt * 100; // Convertir a porcentaje
 	}
-	*/
-
-
-
-
-
-
 }
-

@@ -56,6 +56,48 @@ public class DataBaseConnectorRepository {
     }
 
 
+    public Areakmasignacion getAreakmasignacion(Integer pnoportunidadobjetivo, Integer pnidversion) {
+        try {
+            final var queryString = """
+            SELECT 
+                idoportunidadobjetivo,
+                idoportunidad,
+                idversion,
+                areakmasignacion,
+                pg
+            FROM 
+                catalogo.reloportunidadobjetivotbl
+            WHERE 
+                idversion = :pnidversion
+                AND idoportunidadobjetivo = :pnoportunidadobjetivo
+            """;
+
+            Optional<Areakmasignacion> result = em.createNativeQuery(queryString, Areakmasignacion.class)
+                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo)
+                    .setParameter("pnidversion", pnidversion)
+                    .getResultStream()
+                    .findFirst();
+
+            if (result.isEmpty()) {
+                Log.error("ReloportunidadObjetivo: No data found with idoportunidadobjetivo = " + pnoportunidadobjetivo +
+                        " and idversion = " + pnidversion);
+                throw new SqlExecutionErrorException("ReloportunidadObjetivo: No data found with provided parameters.");
+            }
+
+            return result.get();
+        } catch (Exception e) {
+            Log.error("JDBC: getReloportunidadObjetivo exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC: getReloportunidadObjetivo exception executing SQL");
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 
@@ -107,40 +149,7 @@ public class DataBaseConnectorRepository {
 
 
 
-    public Areakmasignacion getAreakmasignacion(Integer pnoportunidadobjetivo, Integer pnidversion) {
-        try {
-            final var queryString = """
-            SELECT 
-                idoportunidadobjetivo,
-                idoportunidad,
-                idversion,
-                areakmasignacion,
-                pg
-            FROM 
-                catalogo.reloportunidadobjetivotbl
-            WHERE 
-                idversion = :pnidversion
-                AND idoportunidadobjetivo = :pnoportunidadobjetivo
-            """;
 
-            Optional<Areakmasignacion> result = em.createNativeQuery(queryString, Areakmasignacion.class)
-                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo)
-                    .setParameter("pnidversion", pnidversion)
-                    .getResultStream()
-                    .findFirst();
-
-            if (result.isEmpty()) {
-                Log.error("ReloportunidadObjetivo: No data found with idoportunidadobjetivo = " + pnoportunidadobjetivo +
-                        " and idversion = " + pnidversion);
-                throw new SqlExecutionErrorException("ReloportunidadObjetivo: No data found with provided parameters.");
-            }
-
-            return result.get();
-        } catch (Exception e) {
-            Log.error("JDBC: getReloportunidadObjetivo exception executing SQL", e);
-            throw new SqlExecutionErrorException("JDBC: getReloportunidadObjetivo exception executing SQL");
-        }
-    }
 
 
 
@@ -495,13 +504,11 @@ public class DataBaseConnectorRepository {
     public List<Oportunidades> getOportunidadesByNombreVersion(String nombreVersion) {
 
         try {
-            System.out.println(nombreVersion);
             final var queryString = """
                     SELECT idoportunidadobjetivo, idoportunidad, oportunidad, b.nombreversion FROM catalogo.claveobjetivovw a
                     JOIN catalogo.versiontbl b ON a.idversion = b.idversion
                     where nombreversion = :nombreVersion
                     """;
-
             return em.createNativeQuery(queryString, Oportunidades.class)
                     .setParameter("nombreVersion", nombreVersion)
                     .getResultStream().toList();

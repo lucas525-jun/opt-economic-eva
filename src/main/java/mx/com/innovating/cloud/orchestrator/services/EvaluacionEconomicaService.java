@@ -47,6 +47,8 @@ public class EvaluacionEconomicaService {
     ) {
 
         if (pce == 0) {
+            Log.info("PCE es 0. Solo se realizarán cálculos de inversión exploratoria.");
+
             InformacionOportunidad oportunity = databaseConnectorClient.getInfoOportunidad(idOportunidadObjetivo);
             List<EvaluacionEconomica> evaluacionEconomica;
 
@@ -75,8 +77,8 @@ public class EvaluacionEconomicaService {
             var inversionesExpAnioInicioPerf = new Inversiones(
                     null, invExploratoria.getExploratoria(), invExploratoria.getPerforacionExp(),
                     invExploratoria.getTerminacionExp(), invExploratoria.getInfraestructuraExp(), 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0
-                    , 0.0, 0.0, 0.0, 0.0, 0.0);
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0
+                    , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
             evaluacionEconomica.add(
                     new EvaluacionEconomica(
@@ -261,8 +263,8 @@ public class EvaluacionEconomicaService {
                             invExploratoria.getPerforacionExp(), invExploratoria.getTerminacionExp(),
                             invExploratoria.getInfraestructuraExp(), null, null, null,
                             null, null, null, null,
-                            null, null,null, null,
-                            null,null,null, null,
+                            null, null,null,
+                            null,null,null,null, null,
                             null,null,null,null,null);
 
                     evaluacionEconomica.add(
@@ -367,6 +369,7 @@ public class EvaluacionEconomicaService {
                     double plataformasDesarrollo = 0;
                     for (OportunidadPlanDesarrollo plan : planDesarrollo) {
                         String nombreVersion = plan.getNombreVersion();
+                        String prefix = nombreVersion.substring(0, 3); // Obtiene los primeros 3 caracteres
                         char lastChar = nombreVersion.charAt(nombreVersion.length() - 1); // Obtiene el último carácter
                         if (Character.isDigit(lastChar)) { // Verifica si el último carácter es un dígito
                             int lastDigit = Character.getNumericValue(lastChar); // Convierte el carácter a número
@@ -424,6 +427,12 @@ public class EvaluacionEconomicaService {
                     var mantenimientoInfraestructuraFutDes = costoOperacionMap.get(item.getAnio() + "-23")
                             * produccionDiariaPromedio.get(item.getAnio()).getMbpce() * yearDays
                             * paridad.getParidad() / 1000;
+                    /*
+                    if(ductos == 0){
+                        ductos = infoInversion.getDucto() * paridad.getParidad();
+                        inversionesAnioActual.setDuctos(ductos);
+                    }
+                    */
 
                     inversionesAnioActual.setLineaDescarga(lineaDescarga);
                     inversionesAnioActual.setOperacionalFuturoDesarrollo(futuroDesarrollo);
@@ -469,13 +478,10 @@ public class EvaluacionEconomicaService {
                             * produccionDiariaPromedio.get(item.getAnio()).getMbpce() * yearDays
                             * paridad.getParidad() / 1000;
 
-
                     inversionesAnioActual.setLineaDescarga(lineaDescarga);
                     inversionesAnioActual.setOperacionalFuturoDesarrollo(futuroDesarrollo);
                     inversionesAnioActual.setMantenimientoDePozos(mantenimientoPozos);
                     inversionesAnioActual.setMantenimientoInfraestructuraFuturoDesarrollo(mantenimientoInfraestructuraFutDes);
-
-
                 }else if(pozosTerminados.containsKey(anioActualInteger)){
 
                     terminado = pozosTerminados.get(anioActualInteger);
@@ -521,7 +527,6 @@ public class EvaluacionEconomicaService {
                     inversionesAnioActual.setOperacionalFuturoDesarrollo(futuroDesarrollo);
                     inversionesAnioActual.setMantenimientoDePozos(mantenimientoPozos);
                     inversionesAnioActual.setMantenimientoInfraestructuraFuturoDesarrollo(mantenimientoInfraestructuraFutDes);
-
 
                 }
 
