@@ -47,6 +47,8 @@ public class EvaluacionEconomicaService {
     ) {
 
         if (pce == 0) {
+            Log.info("PCE es 0. Solo se realizarán cálculos de inversión exploratoria.");
+
             InformacionOportunidad oportunity = databaseConnectorClient.getInfoOportunidad(idOportunidadObjetivo);
             List<EvaluacionEconomica> evaluacionEconomica;
 
@@ -363,11 +365,11 @@ public class EvaluacionEconomicaService {
 
 
                     double cantManifolds =  Math.ceil(pozosTotales/6.0);
-                    System.out.println("Cantidad de manifolds " + cantManifolds);
                     double ductos = 0;
                     double plataformasDesarrollo = 0;
                     for (OportunidadPlanDesarrollo plan : planDesarrollo) {
                         String nombreVersion = plan.getNombreVersion();
+                        String prefix = nombreVersion.substring(0, 3); // Obtiene los primeros 3 caracteres
                         char lastChar = nombreVersion.charAt(nombreVersion.length() - 1); // Obtiene el último carácter
                         if (Character.isDigit(lastChar)) { // Verifica si el último carácter es un dígito
                             int lastDigit = Character.getNumericValue(lastChar); // Convierte el carácter a número
@@ -460,7 +462,6 @@ public class EvaluacionEconomicaService {
                                     .setInfraestructuraDes(invDesarrollo.getInfraestructuraDes());
                         }
                     });
-
 
                     assert infoInversion != null;
                     var lineaDescarga = infoInversion.getLineadedescarga() * terminado.doubleValue()
