@@ -120,6 +120,7 @@ public class DataBaseConnectorController {
 	@GET
 	@Path("/getFactorInversion/{idOportunidad}")
 	public Response factorInversion(@PathParam("idOportunidad") Integer idOportunidad) {
+
 		var result = dbRepository.getFactorInversion(idOportunidad);
 		if(result != null){
 			return Response.ok(result).build();
