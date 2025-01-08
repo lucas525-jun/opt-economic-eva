@@ -20,6 +20,8 @@ public class ImpuestosService {
 
 
 
+
+
     public byte[] generateExcelImpuestos(Integer idOportunidad, Integer version) {
         // Obtener datos desde el repositorio
         Map<String, List<Map<String, Object>>> dataMap = Map.of(
@@ -30,6 +32,8 @@ public class ImpuestosService {
                 "Impuesto Actividad de Exploracion y Extraccion", dataBaseConnectorRepository.getIEO(idOportunidad, version),
                 "Impuesto Sobre la Renta", dataBaseConnectorRepository.getISR(idOportunidad, version)
         );
+
+
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Map<String, Row> totalRows = new LinkedHashMap<>();
