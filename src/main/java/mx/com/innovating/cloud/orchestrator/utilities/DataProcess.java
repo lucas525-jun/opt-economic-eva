@@ -361,7 +361,6 @@ public class DataProcess {
 
 		var perfDes = evaluacionEconomica.get(0).getInversiones().getPerforacionDes();
 
-
 		if (perfDes == null) {
 			perfDes = 0.0;
 		}
@@ -378,8 +377,6 @@ public class DataProcess {
 			listTotalesInversiones.add(eval.getInversiones().getTotal());
 			listTotalesCostos.add(eval.getCostos() == null ? 0 : eval.getCostos().getTotal());
 		});
-
-		listTotalesInversiones.remove(0);
 
 		var totalInversiones = 0.0;
 		for (Double total : listTotalesInversiones) {
@@ -419,8 +416,6 @@ public class DataProcess {
 
 		log.info("::::: inversionInicial {}", inversionInicial);
 
-		flujosNetosEfectivo.remove(0);
-
 		var vpn = calculaVpn(inversionInicial, flujosNetosEfectivo, 0.10);
 
 		log.info("::::: VPN calculo final {}", vpn);
@@ -436,19 +431,13 @@ public class DataProcess {
 		var costoDescubrimiento720 = 0.0;
 		var costoOperacion = 0.0;
 
-		if (perfDes != 0.0) {
-			// OG
-			tir = calculaTir(vpn, inversionInicial,flujosNetosEfectivo, 0.10);
 
-			// Modificada
-			//tir = calculaTir(flujosNetosEfectivo, inversionInicial,0.10);
+		if (pce != 0.0) {
 
+			tir = calcularTIR(flujosNetosEfectivo, 0.10);
 
 		} else {
-
 			tir = 0.0;
-
-
 		}
 
 
@@ -488,52 +477,53 @@ public class DataProcess {
 	}
 
 	private static Double calculaVpn(Double inversionInicial, List<Double> flujo, Double taza) {
+		// Crear una copia del flujo sin el primer elemento
+		List<Double> flujosNetosEfectivo = flujo.subList(1, flujo.size());
+
 		double calc = 0.0;
-		for (int i = 0; i < flujo.size(); i++) {
-			log.info("::::: flujo {} - {}", i, flujo.get(i));
 
-			calc += flujo.get(i) / Math.pow((1 + taza), (i + 1));
-
+		// Recorrer el nuevo flujo para calcular el VPN
+		for (int i = 0; i < flujosNetosEfectivo.size(); i++) {
+			log.info("::::: flujo {} - {}", i + 1, flujosNetosEfectivo.get(i)); // Flujo desplazado en el tiempo
+			calc += flujosNetosEfectivo.get(i) / Math.pow((1 + taza), (i + 1));
 		}
 
 		return calc + inversionInicial;
 	}
 
-	private static Double calculaTir(Double vpn, Double inversionInicial, List<Double> flujo, Double taza) {
-		Double tir = vpn;
-		double tazaUlt = 0.0;
-		double tolerancia = 0.01; // Ajusta la tolerancia para el cálculo de TIR
-		int maxIteraciones = 10000; // Número máximo de iteraciones
-		int iteracion = 0;
+	public static double calcularTIR(List<Double> flujosDeCaja, double estimacionInicial) {
+		double tolerancia = 1e-6;
+		int maxIteraciones = 10000;
+		double tir = estimacionInicial; // Tasa inicial
+		for (int iteracion = 0; iteracion < maxIteraciones; iteracion++) {
+			double van = 0.0; // Valor actual neto (VAN)
+			double vanDerivada = 0.0; // Derivada del VAN
 
-		if (vpn > 0) {
-			log.info("::::: Calculando TIR con VPN positiva");
-			for (double x = taza; Math.abs(tir) > tolerancia && iteracion < maxIteraciones; x += 0.0001) {
-				Double calc = 0.0;
-				for (int j = 0; j < flujo.size(); j++) {
-					calc += flujo.get(j) / Math.pow((1 + x), (j + 1));
+			// Calcular VAN y su derivada
+			for (int t = 0; t < flujosDeCaja.size(); t++) {
+				van += flujosDeCaja.get(t) / Math.pow(1 + tir, t);
+				if (t > 0) {
+					vanDerivada += -t * flujosDeCaja.get(t) / Math.pow(1 + tir, t + 1);
 				}
-				tir = inversionInicial + calc;
-				tazaUlt = x;
-				iteracion++;
 			}
-		} else {
-			log.info("::::: Calculando TIR con VPN negativa");
-			for (double x = taza; Math.abs(tir) > tolerancia && iteracion < maxIteraciones; x -= 0.0001) {
-				Double calc = 0.0;
-				for (int j = 0; j < flujo.size(); j++) {
-					calc += flujo.get(j) / Math.pow((1 + x), (j + 1));
-				}
-				tir = inversionInicial + calc;
-				tazaUlt = x;
-				iteracion++;
+
+			// Evitar división por cero
+			if (vanDerivada == 0) {
+				throw new ArithmeticException("La derivada del VAN es cero. El método no puede continuar.");
 			}
+
+			// Actualizar la TIR usando el método de Newton-Raphson
+			double nuevaTir = tir - van / vanDerivada;
+
+			// Verificar si la diferencia entre iteraciones es menor que la tolerancia
+			if (Math.abs(nuevaTir - tir) < tolerancia) {
+				return nuevaTir * 100; // Convertir a porcentaje
+			}
+
+			tir = nuevaTir; // Actualizar TIR para la siguiente iteración
 		}
 
-		if (iteracion >= maxIteraciones) {
-			log.warn("Número máximo de iteraciones alcanzado sin converger a un valor de TIR válido.");
-		}
-
-		return tazaUlt * 100; // Convertir a porcentaje
+		throw new RuntimeException("No se encontró la solución en el número máximo de iteraciones.");
 	}
+
 }
