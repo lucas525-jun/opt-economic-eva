@@ -378,8 +378,6 @@ public class DataProcess {
 			listTotalesCostos.add(eval.getCostos() == null ? 0 : eval.getCostos().getTotal());
 		});
 
-		//listTotalesInversiones.remove(0);
-
 		var totalInversiones = 0.0;
 		for (Double total : listTotalesInversiones) {
 			totalInversiones += total == null ? 0 : total;
@@ -434,9 +432,7 @@ public class DataProcess {
 		var costoOperacion = 0.0;
 
 
-		if (perfDes != 0.0) {
-			// Og
-			//tir = calculaTir(vpn, inversionInicial,flujosNetosEfectivo, 0.10);
+		if (pce != 0.0) {
 
 			tir = calcularTIR(flujosNetosEfectivo, 0.10);
 

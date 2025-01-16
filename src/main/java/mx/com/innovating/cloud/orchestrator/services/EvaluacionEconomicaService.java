@@ -369,7 +369,6 @@ public class EvaluacionEconomicaService {
                     double plataformasDesarrollo = 0;
                     for (OportunidadPlanDesarrollo plan : planDesarrollo) {
                         String nombreVersion = plan.getNombreVersion();
-                        String prefix = nombreVersion.substring(0, 3); // Obtiene los primeros 3 caracteres
                         char lastChar = nombreVersion.charAt(nombreVersion.length() - 1); // Obtiene el último carácter
                         if (Character.isDigit(lastChar)) { // Verifica si el último carácter es un dígito
                             int lastDigit = Character.getNumericValue(lastChar); // Convierte el carácter a número
@@ -427,12 +426,6 @@ public class EvaluacionEconomicaService {
                     var mantenimientoInfraestructuraFutDes = costoOperacionMap.get(item.getAnio() + "-23")
                             * produccionDiariaPromedio.get(item.getAnio()).getMbpce() * yearDays
                             * paridad.getParidad() / 1000;
-                    /*
-                    if(ductos == 0){
-                        ductos = infoInversion.getDucto() * paridad.getParidad();
-                        inversionesAnioActual.setDuctos(ductos);
-                    }
-                    */
 
                     inversionesAnioActual.setLineaDescarga(lineaDescarga);
                     inversionesAnioActual.setOperacionalFuturoDesarrollo(futuroDesarrollo);
