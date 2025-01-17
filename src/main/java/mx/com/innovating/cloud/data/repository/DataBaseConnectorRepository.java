@@ -338,7 +338,7 @@ public class DataBaseConnectorRepository {
     public Paridad getParidad(@CacheKey Integer anio) {
 
         try {
-            final var queryString = "SELECT paridad FROM catalogo.premisastbl WHERE año = :anio";
+            final var queryString = "SELECT paridad FROM catalogo.premisastbl WHERE year = :anio";
             Optional<Paridad> result = em.createNativeQuery(queryString, Paridad.class).setParameter("anio", anio)
                     .getResultStream()
                     .findFirst();
