@@ -1,11 +1,6 @@
 package mx.com.innovating.cloud.data.repository;
 
 import io.quarkus.logging.Log;
-
-import io.quarkus.cache.CacheResult;
-import io.quarkus.cache.CacheKey;
-import jakarta.transaction.Transactional;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -14,23 +9,11 @@ import jakarta.ws.rs.PathParam;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 import mx.com.innovating.cloud.data.exceptions.SqlExecutionErrorException;
 import mx.com.innovating.cloud.data.models.*;
-
 import mx.com.innovating.cloud.orchestrator.models.Areakmasignacion;
 import mx.com.innovating.cloud.orchestrator.models.FactorCalculo;
-import mx.com.innovating.cloud.data.calculator.ProduccionAnualService;
-import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
-import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
 
 import java.sql.ResultSetMetaData;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.*;
 
 @ApplicationScoped
 public class DataBaseConnectorRepository {
@@ -38,20 +21,7 @@ public class DataBaseConnectorRepository {
     @Inject
     EntityManager em;
 
-    @Inject
-    ProduccionAnualService produccionAnualService;
-
-    @Inject
-    EscaleraProduccionService escaleraProduccionService;
-
-    @Inject
-    PozoVolumenService pozoVolumenService;
-
-    @Transactional
-    @CacheResult(cacheName = "plan-desarrollo-cache")
-
-    public List<OportunidadPlanDesarrollo> getPlanDesarrolloByOportunidad(@CacheKey Integer idOportunidad,
-            @CacheKey Integer idVersion) {
+    public List<OportunidadPlanDesarrollo> getPlanDesarrolloByOportunidad(Integer idOportunidad, Integer idVersion) {
         try {
             final var queryString = """
                     SELECT distinct o.idoportunidad,
@@ -81,10 +51,7 @@ public class DataBaseConnectorRepository {
         }
     }
 
-    @Transactional
-    @CacheResult(cacheName = "areakm-asignacion-cache")
-    public Areakmasignacion getAreakmasignacion(@CacheKey Integer pnoportunidadobjetivo,
-            @CacheKey Integer pnidversion) {
+    public Areakmasignacion getAreakmasignacion(Integer pnoportunidadobjetivo, Integer pnidversion) {
         try {
             final var queryString = """
                     SELECT
@@ -120,9 +87,7 @@ public class DataBaseConnectorRepository {
         }
     }
 
-    @Transactional
-    @CacheResult(cacheName = "factor-calculo-cache")
-    public FactorCalculo getFactorCalculo(@CacheKey Integer pnoportunidadobjetivo, @CacheKey Integer pnidversion) {
+    public FactorCalculo getFactorCalculo(Integer pnoportunidadobjetivo, Integer pnidversion) {
         try {
             final var queryString = """
                     SELECT
@@ -159,127 +124,116 @@ public class DataBaseConnectorRepository {
 
     public List<VectorProduccion> getVectorProduccion(Integer pnoportunidadobjetivo, Integer pnidversion,
             double pncuota, double pndeclinada, double pnpce, double pnarea) {
-        List<VectorProduccion> results = new ArrayList<>();
+        try {
+            final var queryString = "SELECT * FROM calculo.spp_produccionanual(:pnidversion, :pnoportunidadobjetivo, :pncuota, :pndeclinada, :pnpce, :pnarea)";
 
-        results = produccionAnualService.calculateProduccionAnual(
-                pnidversion, pnoportunidadobjetivo, pncuota,
-                pndeclinada, pnpce, pnarea);
+            return em.createNativeQuery(queryString, VectorProduccion.class)
+                    .setParameter("pnidversion", pnidversion)
+                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo)
+                    .setParameter("pncuota", pncuota)
+                    .setParameter("pndeclinada", pndeclinada)
+                    .setParameter("pnpce", pnpce)
+                    .setParameter("pnarea", pnarea)
+                    .getResultStream()
+                    .toList();
 
-        return results;
+        } catch (Exception e) {
+            Log.error("JDBC: getVectorProduccion exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC: getVectorProduccion exception executing SQL");
+        }
     }
 
     public List<ProduccionPozos> getProduccionPozo(Integer idOportunidad, Integer version, Double pncuota,
             Double pndeclinada, Double pnpce) {
-        List<ProduccionPozos> results = new ArrayList<>();
-
-        results = pozoVolumenService.calcularPozoVolumen(
-                version,
-                idOportunidad,
-                pncuota,
-                pndeclinada,
-                pnpce);
-
-        return results;
+        try {
+            final var queryString = "SELECT * FROM calculo.spp_pozovolumen(:version, :idOportunidad, :pncuota, :pndeclinada, :pnpce)";
+            return em.createNativeQuery(queryString, ProduccionPozos.class)
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("pncuota", pncuota)
+                    .setParameter("pndeclinada", pndeclinada)
+                    .setParameter("pnpce", pnpce)
+                    .setParameter("version", version).getResultStream().toList();
+        } catch (Exception e) {
+            Log.error("JDBC: getProduccionPozo exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC: getProduccionPozo exception executing SQL");
+        }
 
     }
 
     public List<EscaleraProduccion> getEscaleraProduccion(Integer pnoportunidadobjetivo, Integer pnidversion,
             double pncuota, double pndeclinada, double pnpce, double pnarea) {
-        List<EscaleraProduccion> results = new ArrayList<>();
-
-        results = escaleraProduccionService.calculateEscaleraProduccion(
-                pnidversion,
-                pnoportunidadobjetivo,
-                pncuota,
-                pndeclinada,
-                pnpce,
-                pnarea);
-        return results;
+        try {
+            final var queryString = "SELECT * from calculo.spp_escaleraproduccion(:version, :idOportunidad,:pncuota,:pndeclinada, :pnpce, :pnarea )";
+            return em.createNativeQuery(queryString, EscaleraProduccion.class)
+                    .setParameter("idOportunidad", pnoportunidadobjetivo)
+                    .setParameter("cuota", pncuota)
+                    .setParameter("declinada", pndeclinada)
+                    .setParameter("pce", pnpce)
+                    .setParameter("area", pnarea)
+                    .setParameter("pnidversion", pnidversion).getResultStream().toList();
+        } catch (Exception e) {
+            Log.error("JDBC: getEscaleraProduccion exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC getEscaleraProduccion exception executing SQL");
+        }
 
     }
 
-    public List<EscaleraProduccion> getPozosPerforados(
-            Integer pnoportunidadobjetivo,
-            Integer pnidversion,
-            double pncuota,
-            double pndeclinada,
-            double pnpce,
-            double pnarea) {
+    public List<EscaleraProduccion> getPozosPerforados(Integer pnoportunidadobjetivo, Integer pnidversion,
+            double pncuota, double pndeclinada, double pnpce, double pnarea) {
         try {
-            // Get all escalera produccion results
-            List<EscaleraProduccion> allResults = escaleraProduccionService.calculateEscaleraProduccion(
-                    pnidversion,
-                    pnoportunidadobjetivo,
-                    pncuota,
-                    pndeclinada,
-                    pnpce,
-                    pnarea);
-
-            // First, find minimum vidconsecutivo for each pozo
-            Map<Integer, Integer> minConsecutivosPerPozo = allResults.stream()
-                    .collect(Collectors.groupingBy(
-                            EscaleraProduccion::getIdpozo,
-                            Collectors.collectingAndThen(
-                                    Collectors.minBy(Comparator.comparing(EscaleraProduccion::getIdconsecutivo)),
-                                    opt -> opt.map(EscaleraProduccion::getIdconsecutivo).orElse(null))));
-
-            // Then filter the original results to match those minimums
-            return allResults.stream()
-                    .filter(result -> result.getIdconsecutivo().equals(
-                            minConsecutivosPerPozo.get(result.getIdpozo())))
-                    .sorted(Comparator.comparing(EscaleraProduccion::getIdpozo))
-                    .collect(Collectors.toList());
+            final var queryString = """
+                        SELECT *
+                        FROM calculo.spp_escaleraproduccion(:pnidversion, :pnoportunidadobjetivo, :pncuota, :pndeclinada, :pnpce, :pnarea) t
+                        WHERE vidconsecutivo = (
+                            SELECT MIN(vidconsecutivo)
+                            FROM calculo.spp_escaleraproduccion(:pnidversion, :pnoportunidadobjetivo,:pncuota, :pndeclinada, :pnpce, :pnarea ) t2
+                            WHERE t2.vidpozo = t.vidpozo
+                        )
+                        ORDER BY vidpozo
+                    """;
+            return em.createNativeQuery(queryString, EscaleraProduccion.class)
+                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo)
+                    .setParameter("pncuota", pncuota)
+                    .setParameter("pndeclinada", pndeclinada)
+                    .setParameter("pnpce", pnpce)
+                    .setParameter("pnarea", pnarea)
+                    .setParameter("pnidversion", pnidversion) // Si `:version` es equivalente a `pnidversion`
+                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo) // Si `:idOportunidad` es equivalente
+                                                                                  // a `pnoportunidadobjetivo`
+                    .getResultStream()
+                    .toList();
         } catch (Exception e) {
-            Log.error("Error in getPozosPerforados", e);
-            throw new SqlExecutionErrorException("Error in getPozosPerforados");
+            Log.error("JDBC: getPozosPerforados exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC getPozosPerforados exception executing SQL");
         }
     }
 
-    public List<PozosActivos> getPozosActivos(
-            Integer pnoportunidadobjetivo,
-            Integer pnidversion,
-            double pncuota,
-            double pndeclinada,
-            double pnpce,
-            double pnarea) {
+    public List<PozosActivos> getPozosActivos(Integer pnoportunidadobjetivo, Integer pnidversion, double pncuota,
+            double pndeclinada, double pnpce, double pnarea) {
         try {
-            // Get all escalera produccion results
-            List<EscaleraProduccion> allResults = escaleraProduccionService.calculateEscaleraProduccion(
-                    pnidversion,
-                    pnoportunidadobjetivo,
-                    pncuota,
-                    pndeclinada,
-                    pnpce,
-                    pnarea);
-
-            // Group by year and count
-            Map<String, Long> countsByYear = allResults.stream()
-                    .collect(Collectors.groupingBy(
-                            EscaleraProduccion::getAnio,
-                            Collectors.counting()));
-
-            // Convert to final format
-            List<PozosActivos> results = countsByYear.entrySet().stream()
-                    .map(entry -> new PozosActivos(
-                            entry.getKey(),
-                            // Convert to BigDecimal and round to 3 decimal places
-                            BigDecimal.valueOf(entry.getValue())
-                                    .divide(BigDecimal.valueOf(12.0), 3, RoundingMode.HALF_UP)))
-                    .sorted(Comparator.comparing(PozosActivos::getAnio))
-                    .collect(Collectors.toList());
-
-            return results;
+            final var queryString = """
+                    SELECT vanio, ROUND(COUNT(*) /12.0, 3) AS promedio_anual
+                                  FROM (
+                                           select * from calculo.spp_escaleraproduccion(:pnidversion, :pnoportunidadobjetivo, :pncuota, :pndeclinada, :pnpce, :pnarea) ) t
+                                  GROUP BY vanio
+                                  ORDER BY vanio;
+                    """;
+            return em.createNativeQuery(queryString, PozosActivos.class)
+                    .setParameter("pnoportunidadobjetivo", pnoportunidadobjetivo)
+                    .setParameter("pnidversion", pnidversion)
+                    .setParameter("pncuota", pncuota)
+                    .setParameter("pndeclinada", pndeclinada)
+                    .setParameter("pnpce", pnpce)
+                    .setParameter("pnarea", pnarea)
+                    .getResultStream().toList();
         } catch (Exception e) {
-            Log.error("Error in getPozosActivos", e);
-            throw new SqlExecutionErrorException("Error in getPozosActivos");
+            Log.error("JDBC: getPozosActivos exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC getPozosActivos exception executing SQL");
         }
+
     }
 
-    @Transactional
-    @CacheResult(cacheName = "precio-hidrocarburo-cache")
-
-    public List<PrecioHidrocarburo> getPrecioHidrocarburo(@CacheKey Integer idOportunidad,
-            @CacheKey Integer idPrograma) {
+    public List<PrecioHidrocarburo> getPrecioHidrocarburo(Integer idOportunidad, Integer idPrograma) {
 
         try {
             final var queryString = """
@@ -306,33 +260,29 @@ public class DataBaseConnectorRepository {
             Log.error("JDBC: getPrecioHidrocarburo exception executing SQL", e);
             throw new SqlExecutionErrorException("JDBC getPrecioHidrocarburo exception executing SQL");
         }
-
-    }
-
-    @Transactional
-    @CacheResult(cacheName = "paridad-cache")
-    public Paridad getParidad(@CacheKey Integer anio) {
-
-        try {
-            final var queryString = "SELECT paridad FROM catalogo.premisastbl WHERE año = :anio";
-            Optional<Paridad> result = em.createNativeQuery(queryString, Paridad.class).setParameter("anio", anio)
-                    .getResultStream()
-                    .findFirst();
-            if (result.isEmpty()) {
-                Log.error("Paridad: Value no present with anio = " + anio);
-                throw new SqlExecutionErrorException("Paridad: Value no present with anio = " + anio);
-            }
-            return result.get();
-        } catch (Exception e) {
-            Log.error("JDBC: getParidad exception executing SQL", e);
+                    
+                    }
+                    @Transactional
+                    @CacheResult(cacheName = "get-paridad-cache")
+                    public Paridad getParidad(@CacheKey Integer
+                        try {
+                            final var queryStr
+                            Optional<Par
+                                    .getResultStream()
+                                    .find
+                            if (result.isEmpty()) {
+                                Log.err
+                                throw new SqlExecutionE
+                            }
+                            return result.get();
+                        } catch (Exception e) {
+                            Log.error("JDBC: getParidad exception executing SQL", e);
             throw new SqlExecutionErrorException("JDBC getParidadexception executing SQL");
         }
 
     }
 
-    @Transactional
-    @CacheResult(cacheName = "factor-inversion-exploratorio-cache")
-    public FactorInversionExploratorio getFactorInversionExploratorio(@CacheKey Integer idOportunidad) {
+    public FactorInversionExploratorio getFactorInversionExploratorio(Integer idOportunidad) {
         try {
             final var queryString = """
                     SELECT *
@@ -391,9 +341,7 @@ public class DataBaseConnectorRepository {
         }
     }
 
-    @Transactional
-    @CacheResult(cacheName = "factor-inversion-desarrollo-cache")
-    public FactorInversionDesarrollo getFactorInversionDesarrollo(@CacheKey Integer idOportunidad) {
+    public FactorInversionDesarrollo getFactorInversionDesarrollo(Integer idOportunidad) {
 
         try {
             final var queryString = """
@@ -421,51 +369,39 @@ public class DataBaseConnectorRepository {
 
     }
 
-    public ProduccionTotalMmbpce getProduccionTotalMmbpce(
-            Integer idOportunidad,
-            Integer version,
-            Double pncuota,
-            Double pndeclinada,
-            Double pnpce,
-            Double pnarea) {
+    public ProduccionTotalMmbpce getProduccionTotalMmbpce(Integer idOportunidad, Integer version, Double pncuota,
+            Double pndeclinada, Double pnpce, Double pnarea) {
         try {
+            final var queryString = """
+                    SELECT SUM(vproduccion) AS total
+                    FROM calculo.spp_escaleraproduccion(:version, :idOportunidad, :pncuota, :pndeclinada, :pnpce, :pnarea);
+                    """;
+            Optional<ProduccionTotalMmbpce> result = em.createNativeQuery(queryString, ProduccionTotalMmbpce.class)
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("pncuota", pncuota)
+                    .setParameter("pndeclinada", pndeclinada)
+                    .setParameter("pnpce", pnpce)
+                    .setParameter("pnarea", pnarea)
+                    .setParameter("version", version).getResultStream().findFirst();
 
-            List<EscaleraProduccion> results = escaleraProduccionService.calculateEscaleraProduccion(
-                    version,
-                    idOportunidad,
-                    pncuota,
-                    pndeclinada,
-                    pnpce,
-                    pnarea);
-
-            // Calculate the sum of vproduccion
-            double total = results.stream()
-                    .mapToDouble(EscaleraProduccion::getProduccion)
-                    .sum();
-
-            // Create and return ProduccionTotalMmbpce object
-            ProduccionTotalMmbpce produccionTotal = new ProduccionTotalMmbpce();
-            produccionTotal.setProduccionTotalMmbpce(total);
-
-            if (produccionTotal == null) {
+            if (result.isEmpty()) {
                 Log.error("JDBC exception: getProduccionTotalMmbpce Value no present with idOportunidad = "
                         + idOportunidad);
                 throw new SqlExecutionErrorException(
-                        "JDBC exception: getProduccionTotalMmbpce Value no present with idOportunidad = "
+                        "JDBC exception: VgetProduccionTotalMmbpce alue no present with idOportunidad = "
                                 + idOportunidad);
             }
 
-            return produccionTotal;
+            return result.get();
 
         } catch (Exception e) {
             Log.error("JDBC: getProduccionTotalMmbpce exception executing SQL", e);
             throw new SqlExecutionErrorException("JDBC getProduccionTotalMmbpce exception executing SQL");
         }
+
     }
 
-    @Transactional
-    @CacheResult(cacheName = "informacion-inversion-cache")
-    public InformacionInversion getInformacionInversion(@CacheKey Integer idOportunidad) {
+    public InformacionInversion getInformacionInversion(Integer idOportunidad) {
 
         try {
             final var queryString = """
@@ -492,13 +428,11 @@ public class DataBaseConnectorRepository {
 
     }
 
-    @Transactional
-    @CacheResult(cacheName = "factor-inversion-cache")
-    public FactorInversion getFactorInversion(@CacheKey Integer idOportunidad) {
+    public FactorInversion getFactorInversion(Integer idOportunidad) {
 
         try {
             final var queryString = """
-                    SELECT
+                     SELECT
                         DISTINCT
                         ro.idhidrocarburo,
                         mv.idoportunidadobjetivo,
@@ -512,7 +446,6 @@ public class DataBaseConnectorRepository {
                     INNER JOIN catalogo.hidrocarburotbl h on ro.idhidrocarburo = h.idhidrocarburo
                     WHERE mv.idoportunidadobjetivo =:idOportunidad;
                     """;
-
             Optional<FactorInversion> result = em.createNativeQuery(queryString, FactorInversion.class)
                     .setParameter("idOportunidad", idOportunidad)
                     .getResultStream().findFirst();
@@ -529,9 +462,7 @@ public class DataBaseConnectorRepository {
 
     }
 
-    @Transactional
-    @CacheResult(cacheName = "costo-operacion-cache")
-    public List<CostoOperacion> getCostoOperacion(@CacheKey Integer idProyecto) {
+    public List<CostoOperacion> getCostoOperacion(Integer idProyecto) {
 
         try {
             final var queryString = """
@@ -550,9 +481,7 @@ public class DataBaseConnectorRepository {
 
     }
 
-    @Transactional
-    @CacheResult(cacheName = "oportunidades-by-version-cache")
-    public List<Oportunidades> getOportunidadesByNombreVersion(@CacheKey String nombreVersion) {
+    public List<Oportunidades> getOportunidadesByNombreVersion(String nombreVersion) {
 
         try {
             final var queryString = """
@@ -560,7 +489,6 @@ public class DataBaseConnectorRepository {
                     JOIN catalogo.versiontbl b ON a.idversion = b.idversion
                     where nombreversion = :nombreVersion
                     """;
-
             return em.createNativeQuery(queryString, Oportunidades.class)
                     .setParameter("nombreVersion", nombreVersion)
                     .getResultStream().toList();
@@ -571,36 +499,8 @@ public class DataBaseConnectorRepository {
 
     }
 
-    @Transactional
-    @CacheResult(cacheName = "info-oportunidad-cache")
-    public InformacionOportunidad getInfoOportunidad(@CacheKey Integer idOportunidad) {
-        return InformacionOportunidad.findByIdoportunidadobjetivo(idOportunidad);
-    }
-
-    @Transactional
-    @CacheResult(cacheName = "get-paridad-cache")
-    public Paridad getParidad(@CacheKey Integer anio) {
-        try {
-            final var queryString = "SELECT p.paridad FROM catalogo.premisastbl p WHERE p.year =:anio";
-            Optional<Paridad> result = em.createNativeQuery(queryString, Paridad.class).setParameter("anio", anio)
-                    .getResultStream()
-                    .findFirst();
-            if (result.isEmpty()) {
-                Log.error("Paridad: Value no present with anio = " + anio);
-                throw new SqlExecutionErrorException("Paridad: Value no present with anio = " + anio);
-            }
-            return result.get();
-        } catch (Exception e) {
-            Log.error("JDBC: getParidad exception executing SQL", e);
-            throw new SqlExecutionErrorException("JDBC getParidadexception executing SQL");
-        }
-
-    }
-
     // 1 -> Derecho Extraccion de Hidrocarburos
-    @Transactional
-    @CacheResult(cacheName = "get-deh-cache")
-    public List<Map<String, Object>> getDEH(@CacheKey Integer idOportunidadObj, @CacheKey Integer idVersion) {
+    public List<Map<String, Object>> getDEH(Integer idOportunidadObj, Integer idVersion) {
         try {
             final var queryString = """
                         select * from impuesto.spc_dehoportunidad(:idVersion, :idOportunidadObj)
@@ -632,9 +532,7 @@ public class DataBaseConnectorRepository {
     }
 
     // 2 -> Derecho de Utilidad Compartida
-    @Transactional
-    @CacheResult(cacheName = "get-deh-cache")
-    public List<Map<String, Object>> getDUC(@CacheKey Integer idOportunidadObj, @CacheKey Integer idVersion) {
+    public List<Map<String, Object>> getDUC(Integer idOportunidadObj, Integer idVersion) {
         try {
             final var queryString = """
                         select
@@ -672,9 +570,7 @@ public class DataBaseConnectorRepository {
     }
 
     // 3 -> Impuesto Uso Superficial
-    @Transactional
-    @CacheResult(cacheName = "get-ius-cache")
-    public List<Map<String, Object>> getIUS(@CacheKey Integer idOportunidadObj, @CacheKey Integer idVersion) {
+    public List<Map<String, Object>> getIUS(Integer idOportunidadObj, Integer idVersion) {
         try {
             final var queryString = """
                         select
@@ -707,9 +603,7 @@ public class DataBaseConnectorRepository {
     }
 
     // 4 -> Cuota Contractual para la fase exploratoria
-    @Transactional
-    @CacheResult(cacheName = "get-cco-cache")
-    public List<Map<String, Object>> getCCO(@CacheKey Integer idOportunidadObj, @CacheKey Integer idVersion) {
+    public List<Map<String, Object>> getCCO(Integer idOportunidadObj, Integer idVersion) {
         try {
             final var queryString = """
                         select
@@ -742,9 +636,7 @@ public class DataBaseConnectorRepository {
     }
 
     // 5 -> Impuesto actividad de exploracion y extraccion
-    @Transactional
-    @CacheResult(cacheName = "get-ieo-cache")
-    public List<Map<String, Object>> getIEO(@CacheKey Integer idOportunidadObj, @CacheKey Integer idVersion) {
+    public List<Map<String, Object>> getIEO(Integer idOportunidadObj, Integer idVersion) {
         try {
             final var queryString = """
 
@@ -779,9 +671,7 @@ public class DataBaseConnectorRepository {
     }
 
     // 6 -> Impuesto sobre la renta
-    @Transactional
-    @CacheResult(cacheName = "get-isr-cache")
-    public List<Map<String, Object>> getISR(@CacheKey Integer idOportunidadObj, @CacheKey Integer idVersion) {
+    public List<Map<String, Object>> getISR(Integer idOportunidadObj, Integer idVersion) {
         try {
             final var queryString = """
                        select
@@ -818,6 +708,10 @@ public class DataBaseConnectorRepository {
             Log.error("JDBC: getImpuestos exception executing SQL", e);
             throw new SqlExecutionErrorException("JDBC getImpuestos exception executing SQL");
         }
+    }
+
+    public InformacionOportunidad getInfoOportunidad(Integer idOportunidad) {
+        return InformacionOportunidad.findByIdoportunidadobjetivo(idOportunidad);
     }
 
 }
