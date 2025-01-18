@@ -135,7 +135,6 @@ public class DeclinaExpOportunidadService {
                 return declinadaExpList;
         }
 
-        @Transactional
         public List<DeclinaExpoportunidadResult> calcularDeclinaExpoportunidad(
                         int pnidversion,
                         int pnoportunidadobjetivo,

@@ -114,46 +114,51 @@ public class EscaleraProduccionService {
         int nmes = declinadaPozo.size() - 2;
         List<EscaleraProduccion> results = new ArrayList<>();
         int consecutiveId = 1;
-        int pi = 1; // Starting pozo sequence number
+        int pi = 1;
 
-        // Track global pozo sequence to match SPP logic
+        // First pass: Create all well sequences to get max idsec (z)
         List<SecuenciaPozo> secuenciaPozos = new ArrayList<>();
-        List<SecuenciaMes> secuenciaMeses = new ArrayList<>();
 
-        // Mimic SPP's nested loop structure
-        for (int x = 0; x < fechaInicioResults.size(); x++) {
-            FechaInicioResult currentEntrada = fechaInicioResults.get(x);
-            LocalDate varFecha = currentEntrada.getFechaEntrada().toLocalDate();
-            int varPozos = currentEntrada.getNPozos();
-            int pf = varPozos; // Final pozo for this sequence
-
-            // Generate pozo sequence
+        for (FechaInicioResult entrada : fechaInicioResults) {
+            int pf = entrada.getNPozos();
             for (int idPozo = pi; idPozo <= pf; idPozo++) {
                 String pozoName = "POZO " + idPozo;
                 secuenciaPozos.add(new SecuenciaPozo(secuenciaPozos.size() + 1, idPozo, pozoName));
+            }
+            pi = pf + 1;
+        }
 
-                // Generate month sequence
+        // Get z (max idsec) and remainder
+        int z = secuenciaPozos.size();
+        ProduccionPozos pv = pozoVolumenService.calcularPozoVolumen(
+                pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce).get(0);
+        double r = pv.getCvnumpozo() - Math.floor(pv.getCvnumpozo());
+
+        // Reset for main processing
+        pi = 1;
+
+        for (int x = 0; x < fechaInicioResults.size(); x++) {
+            FechaInicioResult currentEntrada = fechaInicioResults.get(x);
+            LocalDate varFecha = currentEntrada.getFechaEntrada().toLocalDate();
+            int pf = currentEntrada.getNPozos();
+
+            for (int idPozo = pi; idPozo <= pf; idPozo++) {
+                String pozoName = "POZO " + idPozo;
+                int currentSeqId = secuenciaPozos.get(idPozo - 1).idsec;
+
                 for (int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
                     LocalDate currentDate = varFecha.plusMonths(mesIndex);
                     YearMonth yearMonth = YearMonth.from(currentDate);
-
-                    // Get corresponding declinada pozo entry
                     DeclinadaPozo dp = declinadaPozo.get(mesIndex);
 
-                    // Calculate production
-                    double produccion = (dp.perfil * yearMonth.lengthOfMonth()) / 1000.0;
-
-                    // Remainder logic
-                    ProduccionPozos pv = pozoVolumenService.calcularPozoVolumen(
-                            pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce).get(0);
-
-                    // Apply remainder only to the last well in the sequence
-                    double remainder = pv.getCvnumpozo() - Math.floor(pv.getCvnumpozo());
-                    if (idPozo == Math.floor(pv.getCvnumpozo()) && remainder > 0) {
-                        produccion *= remainder;
+                    // Exactly match SPP's CASE logic
+                    double produccion;
+                    if (currentSeqId == z && r > 0) {
+                        produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * r;
+                    } else {
+                        produccion = (dp.perfil * yearMonth.lengthOfMonth()) / 1000.0;
                     }
 
-                    // Create result
                     results.add(new EscaleraProduccion(
                             consecutiveId++,
                             mesIndex + 1,
@@ -168,8 +173,6 @@ public class EscaleraProduccionService {
                             Date.valueOf(currentDate)));
                 }
             }
-
-            // Update pi for next sequence
             pi = pf + 1;
         }
 

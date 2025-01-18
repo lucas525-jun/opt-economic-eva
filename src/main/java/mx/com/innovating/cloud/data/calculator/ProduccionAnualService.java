@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 
 import mx.com.innovating.cloud.data.models.VectorProduccion;
 import mx.com.innovating.cloud.data.models.EscaleraProduccion;
-import mx.com.innovating.cloud.data.models.EscaleraProduccion;
 import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
 
 import java.math.BigDecimal;
@@ -51,7 +50,6 @@ public class ProduccionAnualService {
                 return query.getResultList();
         }
 
-        @Transactional
         public List<VectorProduccion> calculateProduccionAnual(
                         int pnidversion,
                         int pnoportunidadobjetivo,
@@ -103,20 +101,21 @@ public class ProduccionAnualService {
                                                         .findFirst();
 
                                         return catalogInfo.map(info -> new VectorProduccion(
-                                                        (String) info[0], // oportunidad
-                                                        (String) info[1], // objetivo
-                                                        key.idoportunidadobjetivo,
-                                                        key.anio,
-                                                        totalMes.doubleValue(), // ctotalmes
-                                                        totalAnual.doubleValue() // ctotalanual
+                                                        (String) info[0], // oportunidad -> voportunidad
+                                                        (String) info[1], // objetivo -> vobjetivo
+                                                        key.idoportunidadobjetivo, // idoportunidadobjetivo ->
+                                                                                   // vidoportunidadobjetivo
+                                                        key.anio, // anio -> aanio
+                                                        totalMes.doubleValue(), // totalmes -> ctotalmes
+                                                        totalAnual.doubleValue() // totalanual -> ctotalanual
                                         )).orElse(null);
                                 })
                                 .filter(Objects::nonNull)
-                                .sorted(Comparator.comparing(VectorProduccion::getAanio))
+                                .sorted(Comparator.comparing(VectorProduccion::getAanio)) // Updated from getAnio() to
+                                                                                          // getAanio()
                                 .collect(Collectors.toList());
         }
 
-        // Input parameter validation
         private void validateInputParameters(
                         int pnidversion,
                         int pnoportunidadobjetivo,
@@ -138,7 +137,6 @@ public class ProduccionAnualService {
                 }
         }
 
-        // Detailed logging for debugging
         private void logCalculationDetails(
                         int pnidversion,
                         int pnoportunidadobjetivo,
@@ -152,9 +150,8 @@ public class ProduccionAnualService {
                                 pnoportunidadobjetivo,
                                 escaleraResults.size());
 
-                // Optional: More detailed logging if needed
                 escaleraResults.stream()
-                                .limit(10) // Log first 10 results to avoid overwhelming logs
+                                .limit(10)
                                 .forEach(result -> Log.debugf(
                                                 "Escalera Result - Opportunity: %d, Year: %s, Production: %f",
                                                 result.getIdoportunidadobjetivo(),
@@ -162,7 +159,6 @@ public class ProduccionAnualService {
                                                 result.getProduccion()));
         }
 
-        // Helper class for grouping production results
         private static class ProductionKey {
                 final int idoportunidadobjetivo;
                 final String anio;

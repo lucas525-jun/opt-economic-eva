@@ -58,7 +58,6 @@
             <artifactId>quarkus-narayana-jta</artifactId>
         </dependency>
 
-
         <!-- Main Dependencies -->
         <dependency>
             <groupId>io.quarkus</groupId>
