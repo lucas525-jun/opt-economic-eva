@@ -21,7 +21,7 @@ import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
 
 import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
 
-@QuarkusMain
+// @QuarkusMain
 public class ProduccionAnualRunner implements QuarkusApplication {
     // @Inject
     // CacheConfig cacheConfig;
