@@ -85,6 +85,7 @@ public class FechaInicioService {
     @Transactional
     @CacheResult(cacheName = "tipo-calculo-cache")
     protected String obtenerTipoCalculo(@CacheKey Integer pnIdVersion, @CacheKey Integer pnOportunidadObjetivo) {
+
         String sql = """
                 SELECT DISTINCT o.tipocalculo
                 FROM catalogo.oportunidadvw o

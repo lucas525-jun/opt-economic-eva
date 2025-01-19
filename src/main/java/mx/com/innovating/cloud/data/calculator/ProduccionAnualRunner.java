@@ -2,6 +2,7 @@ package mx.com.innovating.cloud.data.calculator;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import io.quarkus.cache.CacheManager;
 import io.quarkus.logging.Log;
 
 import io.quarkus.runtime.Quarkus;
@@ -11,18 +12,19 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.ArrayList;
 
-// import mx.com.innovating.cloud.data.models.FechaInicioResult;
 import mx.com.innovating.cloud.data.models.*;
-import mx.com.innovating.cloud.data.models.ProduccionTotalMmbpce;
-
 import mx.com.innovating.cloud.data.calculator.ProduccionAnualService;
 import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
-// import mx.com.innovating.cloud.data.calculator.FechaInicioService;
-// import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
+import mx.com.innovating.cloud.data.calculator.DeclinaExpOportunidadService;
+import mx.com.innovating.cloud.data.calculator.FechaInicioService;
+import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
+
 import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
 
-// @QuarkusMain
+@QuarkusMain
 public class ProduccionAnualRunner implements QuarkusApplication {
+    // @Inject
+    // CacheConfig cacheConfig;
 
     @Inject
     ProduccionAnualService service;
@@ -33,8 +35,14 @@ public class ProduccionAnualRunner implements QuarkusApplication {
     @Inject
     DataBaseConnectorRepository dataBaseConnectorRepository;
 
-    // @Inject
-    // PozoVolumenService pozoVolumenService;
+    @Inject
+    PozoVolumenService pozoVolumenService;
+
+    @Inject
+    FechaInicioService fechaInicioService;
+
+    @Inject
+    DeclinaExpOportunidadService declinaExpOportunidadService;
 
     public static void main(String... args) {
         Quarkus.run(ProduccionAnualRunner.class, args);
@@ -42,38 +50,55 @@ public class ProduccionAnualRunner implements QuarkusApplication {
 
     @Override
     public int run(String... args) {
-        int pnidversion = 112;
-        int pnoportunidadobjetivo = 3164;
-        double pncuota = 3.3884525419684497;
-        double pndeclinada = 14.973997848271287;
-        double pnpce = 36.148568808209205;
-        double pnarea = 2.1133959936268787;
+
+        // cacheManager.getCacheNames().forEach(cacheName ->
+        // cacheManager.getCache(cacheName).get().invalidateAll());
+        int pnidversion = 101;
+        int pnoportunidadobjetivo = 3153;
+        double pncuota = 6.40411740557325;
+        double pndeclinada = 10.0890784038171;
+        double pnpce = 5.81635999830272;
+        double pnarea = 4.0561533216062;
         // List<ProduccionTotalMmbpce> results = new ArrayList<>();
         // List<EscaleraProduccion> results = new ArrayList<>();
         // List<ProduccionPozos> results = new ArrayList<>();
+        // List<FechaInicioResult> results = new ArrayList<>();
+        List<VectorProduccion> results = new ArrayList<>();
+
         Log.info("================started");
         try {
-            // results = escaleraProduccionService.calculateEscaleraProduccion(
-            // results = fechaInicioService.calcularFechaInicio(
+            // for (int i = 0; i < 20; i++) {
+            long startTime = System.nanoTime();
 
+            // results = escaleraProduccion.calcularDeclinaExpoportunidad(
+            // results = fechaInicioService.calcularFechaInicio(
             // results = pozoVolumenService.calcularPozoVolumen(
-            ProduccionTotalMmbpce results = dataBaseConnectorRepository.getProduccionTotalMmbpce(
+            // results = dataBaseConnectorRepository.getPozosPerforados(
+            results = dataBaseConnectorRepository.getVectorProduccion(
                     pnoportunidadobjetivo,
                     pnidversion,
                     pncuota,
                     pndeclinada,
+                    // pnpce);
                     pnpce,
                     pnarea);
             Log.info("================ended");
-            // results.stream()
-            // .limit(10)
-            // .forEach(row -> Log.info(row.toString()));
-            Log.info("Production Total Mmbpce: " + results.getProduccionTotalMmbpce());
 
-            // Log.info("Total number of results: " + results.size());
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            // Log.info("Execution " + (i + 1) + " took " + duration + " ns");
+
+            // }
+            results.stream()
+                    // .limit(10)
+                    .forEach(row -> Log.info(row.toString()));
+
+            Log.info("Total number of results: " + results.size());
 
             return 0;
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
             return 1;
         }

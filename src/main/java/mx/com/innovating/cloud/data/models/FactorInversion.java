@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 public class FactorInversion {
 
 	private Integer idhidrocarburo;
-	private Long idoportunidadobjetivo;
+	private Integer idoportunidadobjetivo;
 	private String hidrocarburo;
 	private Double pce;
 	private Double factorAceite;
 	private Double factorGas;
 	private Double factorCondensado;
-}
 
+}

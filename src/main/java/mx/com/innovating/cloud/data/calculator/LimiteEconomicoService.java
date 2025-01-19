@@ -35,7 +35,6 @@ public class LimiteEconomicoService {
                 .getResultList();
     }
 
-    @Transactional
     public List<LimiteEconomicoResult> calcularLimiteEconomico(
             int pnidversion,
             int pnoportunidadobjetivo,
