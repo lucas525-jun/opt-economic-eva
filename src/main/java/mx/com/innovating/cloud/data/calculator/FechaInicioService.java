@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import mx.com.innovating.cloud.data.models.FechaInicioResult;
 import mx.com.innovating.cloud.data.models.ProduccionPozos;
 import mx.com.innovating.cloud.data.models.NumEquipoResult;
+import mx.com.innovating.cloud.data.models.NumeroPozoAreaConvencionalResult;
 import mx.com.innovating.cloud.data.models.ProduccionPozos;
 import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
 import mx.com.innovating.cloud.data.calculator.NumEquipoService;
@@ -37,6 +38,9 @@ public class FechaInicioService {
 
     @Inject
     NumEquipoService numEquipoService;
+
+    @Inject
+    NumeroPozoAreaConvencionalService numeroPozoAreaConvencionalService;
 
     public List<FechaInicioResult> calcularFechaInicio(
             Integer pnIdVersion,
@@ -109,22 +113,16 @@ public class FechaInicioService {
         }
     }
 
-    @Transactional
-    @CacheResult(cacheName = "numero-pozo-area-cache")
     protected Double calcularNumeroPozoArea(
-            @CacheKey Integer pnIdVersion,
-            @CacheKey Integer pnOportunidadObjetivo,
-            @CacheKey Double pnArea) {
-        String sql = """
-                    SELECT num_pozo
-                    FROM calculo.spc_numeropozoporareaconvencional(:idVersion, :idOportunidadObjetivo, :area)
-                """;
+            Integer pnIdVersion,
+            Integer pnOportunidadObjetivo,
+            Double pnArea) {
+        NumeroPozoAreaConvencionalResult result = numeroPozoAreaConvencionalService.calcularNumeroPozoAreaConvencional(
+                pnIdVersion,
+                pnOportunidadObjetivo,
+                pnArea);
 
-        return ((Number) em.createNativeQuery(sql)
-                .setParameter("idVersion", pnIdVersion)
-                .setParameter("idOportunidadObjetivo", pnOportunidadObjetivo)
-                .setParameter("area", pnArea)
-                .getSingleResult()).doubleValue();
+        return result.getNumPozo();
     }
 
     private Integer calcularNumeroPozos(

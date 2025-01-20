@@ -2,7 +2,6 @@ package mx.com.innovating.cloud.data.calculator;
 
 import io.quarkus.cache.CacheResult;
 import io.quarkus.cache.CacheKey;
-import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -37,37 +36,30 @@ public class ProduccionAnualService {
 
         @Transactional
         @CacheResult(cacheName = "oportunidad-objetivo-cache")
-        public List<Object[]> getOportunidadObjetivoData(@CacheKey int idoportunidadobjetivo) {
+        public List<Object[]> getOportunidadObjetivoData(@CacheKey int vidoportunidadobjetivo) {
                 String sql = """
-                                    SELECT cv.oportunidad, cv.objetivo, cv.idoportunidadobjetivo
-                                    FROM catalogo.datosoportunidadobjetivovw cv
-                                    WHERE cv.idoportunidadobjetivo = :idoportunidadobjetivo
+                                SELECT cv.oportunidad, cv.objetivo, cv.idoportunidadobjetivo
+                                FROM catalogo.datosoportunidadobjetivovw cv
+                                WHERE cv.idoportunidadobjetivo = :vidoportunidadobjetivo
                                 """;
 
                 Query query = em.createNativeQuery(sql)
-                                .setParameter("idoportunidadobjetivo", idoportunidadobjetivo);
+                                .setParameter("vidoportunidadobjetivo", vidoportunidadobjetivo);
 
                 return query.getResultList();
         }
 
         public List<VectorProduccion> calculateProduccionAnual(
                         int pnidversion,
-                        int pnoportunidadobjetivo,
+                        int vidoportunidadobjetivo,
                         double pncuota,
                         double pndeclinada,
                         double pnpce,
                         double pnarea) {
-
-                // Validate input parameters
-                validateInputParameters(pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce, pnarea);
-
                 // Get escalera produccion data
                 List<EscaleraProduccion> escaleraResults = escaleraProduccionService
-                                .calculateEscaleraProduccion(pnidversion, pnoportunidadobjetivo,
+                                .calculateEscaleraProduccion(pnidversion, vidoportunidadobjetivo,
                                                 pncuota, pndeclinada, pnpce, pnarea);
-
-                // Log input parameters and results count for debugging
-                logCalculationDetails(pnidversion, pnoportunidadobjetivo, escaleraResults);
 
                 // Group production results with BigDecimal for precise calculations
                 Map<ProductionKey, BigDecimal> groupedProduction = escaleraResults.stream()
@@ -81,7 +73,7 @@ public class ProduccionAnualService {
                                                                 BigDecimal::add)));
 
                 // Fetch catalog data
-                List<Object[]> catalogData = getOportunidadObjetivoData(pnoportunidadobjetivo);
+                List<Object[]> catalogData = getOportunidadObjetivoData(vidoportunidadobjetivo);
 
                 // Transform to VectorProduccion with precise calculations
                 return groupedProduction.entrySet().stream()
@@ -97,75 +89,30 @@ public class ProduccionAnualService {
 
                                         // Find matching catalog entry
                                         Optional<Object[]> catalogInfo = catalogData.stream()
-                                                        .filter(row -> (Integer) row[2] == key.idoportunidadobjetivo)
+                                                        .filter(row -> (Integer) row[2] == key.vidoportunidadobjetivo)
                                                         .findFirst();
 
                                         return catalogInfo.map(info -> new VectorProduccion(
-                                                        (String) info[0], // oportunidad -> voportunidad
-                                                        (String) info[1], // objetivo -> vobjetivo
-                                                        key.idoportunidadobjetivo, // idoportunidadobjetivo ->
-                                                                                   // vidoportunidadobjetivo
-                                                        key.anio, // anio -> aanio
-                                                        totalMes.doubleValue(), // totalmes -> ctotalmes
-                                                        totalAnual.doubleValue() // totalanual -> ctotalanual
+                                                        (String) info[0], // voportunidad
+                                                        (String) info[1], // vobjetivo
+                                                        key.vidoportunidadobjetivo, // vidoportunidadobjetivo
+                                                        key.aanio, // aanio
+                                                        totalMes.doubleValue(), // ctotalmes
+                                                        totalAnual.doubleValue() // ctotalanual
                                         )).orElse(null);
                                 })
                                 .filter(Objects::nonNull)
-                                .sorted(Comparator.comparing(VectorProduccion::getAanio)) // Updated from getAnio() to
-                                                                                          // getAanio()
+                                .sorted(Comparator.comparing(VectorProduccion::getAanio))
                                 .collect(Collectors.toList());
         }
 
-        private void validateInputParameters(
-                        int pnidversion,
-                        int pnoportunidadobjetivo,
-                        double pncuota,
-                        double pndeclinada,
-                        double pnpce,
-                        double pnarea) {
-
-                if (pnidversion <= 0) {
-                        throw new IllegalArgumentException("Invalid version ID: " + pnidversion);
-                }
-                if (pnoportunidadobjetivo <= 0) {
-                        throw new IllegalArgumentException(
-                                        "Invalid opportunity objective ID: " + pnoportunidadobjetivo);
-                }
-                if (pncuota < 0 || pndeclinada < 0 || pnpce < 0 || pnarea < 0) {
-                        throw new IllegalArgumentException(
-                                        "Negative values not allowed for quota, declined, PCE, or area");
-                }
-        }
-
-        private void logCalculationDetails(
-                        int pnidversion,
-                        int pnoportunidadobjetivo,
-                        List<EscaleraProduccion> escaleraResults) {
-
-                Log.infof("Calculation Parameters: " +
-                                "Version ID: %d, " +
-                                "Opportunity Objective ID: %d, " +
-                                "Total Escalera Results: %d",
-                                pnidversion,
-                                pnoportunidadobjetivo,
-                                escaleraResults.size());
-
-                escaleraResults.stream()
-                                .limit(10)
-                                .forEach(result -> Log.debugf(
-                                                "Escalera Result - Opportunity: %d, Year: %s, Production: %f",
-                                                result.getIdoportunidadobjetivo(),
-                                                result.getAnio(),
-                                                result.getProduccion()));
-        }
-
         private static class ProductionKey {
-                final int idoportunidadobjetivo;
-                final String anio;
+                final int vidoportunidadobjetivo;
+                final String aanio;
 
-                ProductionKey(int idoportunidadobjetivo, String anio) {
-                        this.idoportunidadobjetivo = idoportunidadobjetivo;
-                        this.anio = anio;
+                ProductionKey(int vidoportunidadobjetivo, String aanio) {
+                        this.vidoportunidadobjetivo = vidoportunidadobjetivo;
+                        this.aanio = aanio;
                 }
 
                 @Override
@@ -175,13 +122,13 @@ public class ProduccionAnualService {
                         if (o == null || getClass() != o.getClass())
                                 return false;
                         ProductionKey that = (ProductionKey) o;
-                        return idoportunidadobjetivo == that.idoportunidadobjetivo &&
-                                        Objects.equals(anio, that.anio);
+                        return vidoportunidadobjetivo == that.vidoportunidadobjetivo &&
+                                        Objects.equals(aanio, that.aanio);
                 }
 
                 @Override
                 public int hashCode() {
-                        return Objects.hash(idoportunidadobjetivo, anio);
+                        return Objects.hash(vidoportunidadobjetivo, aanio);
                 }
         }
 }

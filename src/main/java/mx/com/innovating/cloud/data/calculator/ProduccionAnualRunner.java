@@ -15,10 +15,15 @@ import java.util.ArrayList;
 import mx.com.innovating.cloud.data.models.*;
 import mx.com.innovating.cloud.data.calculator.ProduccionAnualService;
 import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
+import mx.com.innovating.cloud.data.calculator.EspesorNetoService.EspesorNetoResult;
 import mx.com.innovating.cloud.data.calculator.DeclinaExpOportunidadService;
 import mx.com.innovating.cloud.data.calculator.FechaInicioService;
 import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
-
+import mx.com.innovating.cloud.data.calculator.NumeroPozoporAreaService;
+import mx.com.innovating.cloud.data.calculator.NumeroPozoPorVolumenService;
+import mx.com.innovating.cloud.data.calculator.FechaAnioService;
+import mx.com.innovating.cloud.data.calculator.FechaAnioService.FechaAnioResult;
+import mx.com.innovating.cloud.data.calculator.NumeroPozoAreaConvencionalService;
 import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
 
 // @QuarkusMain
@@ -44,6 +49,24 @@ public class ProduccionAnualRunner implements QuarkusApplication {
     @Inject
     DeclinaExpOportunidadService declinaExpOportunidadService;
 
+    @Inject
+    NumeroPozoporAreaService numeroPozoporAreaService;
+
+    @Inject
+    NumeroPozoPorVolumenService numeroPozoPorVolumenService;
+
+    @Inject
+    FechaAnioService fechaAnioService;
+
+    @Inject
+    HiperbolicoAnualService hiperbolicoAnualService;
+
+    @Inject
+    EspesorNetoService espesorNetoService;
+
+    @Inject
+    EscaleraProduccionNdService escaleraProduccionNdService;
+
     public static void main(String... args) {
         Quarkus.run(ProduccionAnualRunner.class, args);
     }
@@ -51,46 +74,41 @@ public class ProduccionAnualRunner implements QuarkusApplication {
     @Override
     public int run(String... args) {
 
-        // cacheManager.getCacheNames().forEach(cacheName ->
-        // cacheManager.getCache(cacheName).get().invalidateAll());
-        int pnidversion = 101;
-        int pnoportunidadobjetivo = 3153;
-        double pncuota = 6.40411740557325;
-        double pndeclinada = 10.0890784038171;
-        double pnpce = 5.81635999830272;
-        double pnarea = 4.0561533216062;
-        // List<ProduccionTotalMmbpce> results = new ArrayList<>();
-        // List<EscaleraProduccion> results = new ArrayList<>();
-        // List<ProduccionPozos> results = new ArrayList<>();
-        // List<FechaInicioResult> results = new ArrayList<>();
-        List<VectorProduccion> results = new ArrayList<>();
+        // int pnidversion = 101;
+        // int pnoportunidadobjetivo = 3153;
+        // double pncuota = 6.40411740557325;
+        // double pndeclinada = 10.0890784038171;
+        // double pnpce = 5.81635999830272;
+        // double pnarea = 4.0561533216062;
 
+        Integer pnidversion = 1;
+        Integer pnoportunidadobjetivo = 1852;
+        Integer pntipovalor = 2;
+        Integer pnmeses = 240;
+        double pnaleatorio = 0.339936256408691;
+
+        Integer percentil = 66;
         Log.info("================started");
         try {
             // for (int i = 0; i < 20; i++) {
             long startTime = System.nanoTime();
 
-            // results = escaleraProduccion.calcularDeclinaExpoportunidad(
-            // results = fechaInicioService.calcularFechaInicio(
-            // results = pozoVolumenService.calcularPozoVolumen(
-            // results = dataBaseConnectorRepository.getPozosPerforados(
-            results = dataBaseConnectorRepository.getVectorProduccion(
-                    pnoportunidadobjetivo,
-                    pnidversion,
-                    pncuota,
-                    pndeclinada,
-                    // pnpce);
-                    pnpce,
-                    pnarea);
-            Log.info("================ended");
+            List<EscaleraProduccionNdService.EscaleraProduccionNdResult> results = escaleraProduccionNdService
+                    .spcEscaleraProduccionNd(
+                            pnidversion,
+                            pnoportunidadobjetivo,
+                            pntipovalor,
+                            pnmeses,
+                            pnaleatorio);
 
+            Log.info("================ended");
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             // Log.info("Execution " + (i + 1) + " took " + duration + " ns");
 
             // }
             results.stream()
-                    // .limit(10)
+                    .limit(108)
                     .forEach(row -> Log.info(row.toString()));
 
             Log.info("Total number of results: " + results.size());
