@@ -16,6 +16,7 @@ import mx.com.innovating.cloud.data.models.FactorInversionExploratorio;
 import mx.com.innovating.cloud.data.models.Paridad;
 import mx.com.innovating.cloud.data.models.ProduccionTotalMmbpce;
 import mx.com.innovating.cloud.orchestrator.models.*;
+import org.apache.poi.ss.formula.functions.Irr;
 
 @Slf4j
 public class DataProcess {
@@ -143,8 +144,12 @@ public class DataProcess {
 			var aceiteSuperLigero = v.getAceiteSuperLigero()
 					* (preciosMap.get(k + "-4") == null ? 0 : preciosMap.get(k + "-4")) * operacionConstante;
 
-			var gasHumedo = v.getGasHumedo() * (preciosMap.get(k + "-5") == null ? 0 : preciosMap.get(k + "-5"))
-					* operacionConstante;
+			var gasHumedo = preciosMap.get(k + "-5") != null ?
+					v.getGasHumedo() * preciosMap.get(k + "-5") * operacionConstante :
+					preciosMap.get(k + "-9") != null ?
+							v.getGasHumedo() * preciosMap.get(k + "-9") * operacionConstante :
+							0;
+
 			var gasSeco = v.getGasSeco() * (preciosMap.get(k + "-3") == null ? 0 : preciosMap.get(k + "-3"))
 					* operacionConstante;
 
@@ -434,9 +439,12 @@ public class DataProcess {
 
 		if (pce != 0.0) {
 
-			tir = calcularTIR(flujosNetosEfectivo, 0.10);
+			double[] flujosDeCajaArray = flujosNetosEfectivo.stream()
+					.mapToDouble(Double::doubleValue)
+					.toArray();
 
-		} else {
+			tir = Irr.irr(flujosDeCajaArray, 0.10) * 100;
+        } else {
 			tir = 0.0;
 		}
 
@@ -489,41 +497,6 @@ public class DataProcess {
 		}
 
 		return calc + inversionInicial;
-	}
-
-	public static double calcularTIR(List<Double> flujosDeCaja, double estimacionInicial) {
-		double tolerancia = 1e-6;
-		int maxIteraciones = 10000;
-		double tir = estimacionInicial; // Tasa inicial
-		for (int iteracion = 0; iteracion < maxIteraciones; iteracion++) {
-			double van = 0.0; // Valor actual neto (VAN)
-			double vanDerivada = 0.0; // Derivada del VAN
-
-			// Calcular VAN y su derivada
-			for (int t = 0; t < flujosDeCaja.size(); t++) {
-				van += flujosDeCaja.get(t) / Math.pow(1 + tir, t);
-				if (t > 0) {
-					vanDerivada += -t * flujosDeCaja.get(t) / Math.pow(1 + tir, t + 1);
-				}
-			}
-
-			// Evitar división por cero
-			if (vanDerivada == 0) {
-				throw new ArithmeticException("La derivada del VAN es cero. El método no puede continuar.");
-			}
-
-			// Actualizar la TIR usando el método de Newton-Raphson
-			double nuevaTir = tir - van / vanDerivada;
-
-			// Verificar si la diferencia entre iteraciones es menor que la tolerancia
-			if (Math.abs(nuevaTir - tir) < tolerancia) {
-				return nuevaTir * 100; // Convertir a porcentaje
-			}
-
-			tir = nuevaTir; // Actualizar TIR para la siguiente iteración
-		}
-
-		throw new RuntimeException("No se encontró la solución en el número máximo de iteraciones.");
 	}
 
 }
