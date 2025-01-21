@@ -11,8 +11,8 @@ public class FactorInversionDTO {
     private Integer idhidrocarburo;
     private Integer idoportunidadobjetivo;
     private String hidrocarburo;
+    private Double mediapce;
     private Double fc_aceite;
     private Double fc_gas;
     private Double fc_condensado;
-    private Double mediapce;
 }
