@@ -26,7 +26,6 @@ import mx.com.innovating.cloud.data.models.FactorInversionDesarrollo;
 import mx.com.innovating.cloud.data.models.ProduccionTotalMmbpce;
 import mx.com.innovating.cloud.data.models.InformacionInversion;
 import mx.com.innovating.cloud.data.models.FactorInversion;
-import mx.com.innovating.cloud.data.models.FactorInversionDTO;
 import mx.com.innovating.cloud.data.models.CostoOperacion;
 import mx.com.innovating.cloud.data.models.Oportunidades;
 import mx.com.innovating.cloud.data.models.EscaleraProduccion;
@@ -520,6 +519,7 @@ public class DataBaseConnectorRepository {
     @Transactional
     @CacheResult(cacheName = "factor-inversion-cache")
     public FactorInversion getFactorInversion(@CacheKey Integer idOportunidad) {
+
         try {
             final var queryString = """
                     SELECT
@@ -527,43 +527,30 @@ public class DataBaseConnectorRepository {
                         ro.idhidrocarburo,
                         mv.idoportunidadobjetivo,
                         h.hidrocarburo,
-                        COALESCE(mv.mediapce,0) as mediapce,
-                        COALESCE(mv.mediaaceite/mv.mediapce,0) AS fc_aceite,
+                        COALESCE(mv.mediapce,0),
+                        COALESCE(mv.mediaaceite/mv.mediapce,0 )AS fc_aceite,
                         COALESCE(mv.mediagas/mv.mediapce,0) AS fc_gas,
                         COALESCE(mv.mediacondensado/mv.mediapce,0) AS fc_condensado
                         FROM catalogo.mediavolumetriaoportunidadtbl mv
                     INNER JOIN catalogo.reloportunidadobjetivotbl ro on mv.idoportunidadobjetivo = ro.idoportunidadobjetivo
                     INNER JOIN catalogo.hidrocarburotbl h on ro.idhidrocarburo = h.idhidrocarburo
-                    WHERE mv.idoportunidadobjetivo = :idOportunidad
+                    WHERE mv.idoportunidadobjetivo =:idOportunidad;
                     """;
 
-            Optional<FactorInversionDTO> result = em.createNativeQuery(queryString, FactorInversionDTO.class)
+            Optional<FactorInversion> result = em.createNativeQuery(queryString, FactorInversion.class)
                     .setParameter("idOportunidad", idOportunidad)
                     .getResultStream().findFirst();
-
             if (result.isEmpty()) {
                 Log.error("FactorInversion: Value no present with idOportunidad = " + idOportunidad);
                 throw new SqlExecutionErrorException(
                         "FactorInversion: Value no present with idOportunidad = " + idOportunidad);
             }
-
-            // Map DTO to domain model
-            FactorInversionDTO dto = result.get();
-            FactorInversion factorInversion = new FactorInversion();
-            factorInversion.setIdhidrocarburo(dto.getIdhidrocarburo());
-            factorInversion.setIdoportunidadobjetivo(dto.getIdoportunidadobjetivo());
-            factorInversion.setHidrocarburo(dto.getHidrocarburo());
-            factorInversion.setPce(dto.getMediapce());
-            factorInversion.setFactorAceite(dto.getFc_aceite());
-            factorInversion.setFactorGas(dto.getFc_gas());
-            factorInversion.setFactorCondensado(dto.getFc_condensado());
-
-            return factorInversion;
-
+            return result.get();
         } catch (Exception e) {
             Log.error("JDBC: getFactorInversion exception executing SQL", e);
             throw new SqlExecutionErrorException("JDBC getInformacionInversion exception executing SQL");
         }
+
     }
 
     @Transactional
