@@ -19,7 +19,7 @@ Name          | Type           | Description
 idOportunidad | integer (path) | Target Opportunity ID
 
 ```
-http://localhost:8080/api/v1/getEvaluacionEconomica/{idOportunidad}
+http://localhost:8084/api/v1/getEvaluacionEconomica/{idOportunidad}
 ```
 
 ### - Response data
