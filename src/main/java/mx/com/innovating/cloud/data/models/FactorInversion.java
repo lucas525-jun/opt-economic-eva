@@ -13,8 +13,8 @@ public class FactorInversion {
 	private Integer idoportunidadobjetivo;
 	private String hidrocarburo;
 	private Double pce;
-	private Double fc_aceite;
-	private Double fc_gas;
-	private Double fc_condensado;
+	private Double factorAceite;
+	private Double factorGas;
+	private Double factorCondensado;
 
 }
