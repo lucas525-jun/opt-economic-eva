@@ -53,4 +53,13 @@ public class FactorCalculo {
     public void setFc_condensado(Double fcCondensado) {
         this.fc_condensado = fcCondensado;
     }
+
+    public FactorCalculo(Long idoportunidadobjetivo, Integer idversion, Double fc_aceite, Double fc_gas,
+            Double fc_condensado) {
+        this.idoportunidadobjetivo = idoportunidadobjetivo;
+        this.idversion = idversion;
+        this.fc_aceite = fc_aceite;
+        this.fc_gas = fc_gas;
+        this.fc_condensado = fc_condensado;
+    }
 }
