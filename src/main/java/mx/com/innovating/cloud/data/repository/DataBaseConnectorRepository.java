@@ -528,9 +528,9 @@ public class DataBaseConnectorRepository {
                         mv.idoportunidadobjetivo,
                         h.hidrocarburo,
                         COALESCE(mv.mediapce,0) AS pce,
-                        COALESCE(mv.mediaaceite/mv.mediapce,0) AS factorAceite,
-                        COALESCE(mv.mediagas/mv.mediapce,0) AS factorGas,
-                        COALESCE(mv.mediacondensado/mv.mediapce,0) AS factorCondensado
+                        COALESCE(mv.mediaaceite/mv.mediapce,0) AS "factorAceite",
+                        COALESCE(mv.mediagas/mv.mediapce,0) AS "factorGas",
+                        COALESCE(mv.mediacondensado/mv.mediapce,0) AS "factorCondensado"
                         FROM catalogo.mediavolumetriaoportunidadtbl mv
                     INNER JOIN catalogo.reloportunidadobjetivotbl ro on mv.idoportunidadobjetivo = ro.idoportunidadobjetivo
                     INNER JOIN catalogo.hidrocarburotbl h on ro.idhidrocarburo = h.idhidrocarburo
