@@ -14,11 +14,11 @@ public class FactorCalculo {
     private Double fc_condensado;
 
     // Getters y Setters
-    public Integer getIdoportunidadobjetivo() {
+    public Long getIdoportunidadobjetivo() {
         return idoportunidadobjetivo;
     }
 
-    public void setIdoportunidadobjetivo(Integer idoportunidadobjetivo) {
+    public void setIdoportunidadobjetivo(Long idoportunidadobjetivo) {
         this.idoportunidadobjetivo = idoportunidadobjetivo;
     }
 
