@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 public class FactorCalculo {
 
     @Id // Solo si estás mapeando con JPA y tienes una clave primaria
-    private Integer idoportunidadobjetivo;
+    private Long idoportunidadobjetivo;
     private Integer idversion;
     private Double fc_aceite;
     private Double fc_gas;
