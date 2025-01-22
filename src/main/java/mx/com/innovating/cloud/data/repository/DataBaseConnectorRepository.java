@@ -527,8 +527,8 @@ public class DataBaseConnectorRepository {
                         ro.idhidrocarburo,
                         mv.idoportunidadobjetivo,
                         h.hidrocarburo,
-                        COALESCE(mv.mediapce,0),
-                        COALESCE(mv.mediaaceite/mv.mediapce,0 )AS fc_aceite,
+                        COALESCE(mv.mediapce,0) AS pce,
+                        COALESCE(mv.mediaaceite/mv.mediapce,0) AS fc_aceite,
                         COALESCE(mv.mediagas/mv.mediapce,0) AS fc_gas,
                         COALESCE(mv.mediacondensado/mv.mediapce,0) AS fc_condensado
                         FROM catalogo.mediavolumetriaoportunidadtbl mv
