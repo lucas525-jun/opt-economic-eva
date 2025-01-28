@@ -1,0 +1,96 @@
+1.	spp_escaleraproduccionnd
+@Inject
+EscaleraProduccionNdService escaleraProduccionNdService;
+
+List<EscaleraProduccionNdService.EscaleraProduccionNdResult> results = escaleraProduccionNdService.spcEscaleraProduccionNd(
+                  pnidversion,
+                  pnoportunidadobjetivo,
+                  pntipovalor,
+                  pnmeses,
+                  pnaleatorio);
+§ También es posible llamar con el parámetro *percentil*.
+En este caso, puede agregar el parámetro *percentil* al final de los parámetros.
+Ambos son posibles.
+ ex: 
+(
+pnidversion,
+pnoportunidadobjetivo,
+pntipovalor,
+pnmeses,
+pnaleatorio,
+percentil)
+
+2.	spc_fechaanio
+@Inject
+FechaAnioService fechaAnioService;
+
+List<FechaAnioService.FechaAnioResult> results = fechaAnioService.spcFechaAnio(
+                       pnidversion,
+                       pnoportunidadobjetivo,
+                       pntipovalor,
+                       pnmeses,
+                       paleatorio);
+
+§ También es posible llamar con el parámetro *percentil*.
+En este caso, puede agregar el parámetro *percentil* al final de los parámetros.
+Ambos son posibles.
+
+3.	spc_numeropozoporvolumen
+@Inject
+NumeroPozoPorVolumenService numeroPozoPorVolumenService;
+
+List<NumeroPozoPorVolumenService.NumeroPozoPorVolumenResult> results = numeroPozoPorVolumenService.spcNumeroPozoPorVolumen(
+                       pnidversion,
+                       pnoportunidadobjetivo,
+                       pntipovalor,
+                       pnmeses);
+§ También es posible llamar con el parámetro *percentil*.
+En este caso, puede agregar el parámetro *percentil* al final de los parámetros.
+Ambos son posibles.
+
+4.	spc_numeropozoporarea
+@Inject
+NumeroPozoporAreaService numeroPozoporAreaService;
+
+List<NumeroPozoporAreaService.NumeroPozoporAreaResult> results = numeroPozoporAreaService.spcNumeropozoporarea(
+                       pnidversion,
+                       pnoportunidadobjetivo,
+                   	   pnpaleatorio,
+                       pnmeses);
+§ También es posible llamar con el parámetro *percentil*.
+En este caso, puede agregar el parámetro *percentil* al final de los parámetros.
+Ambos son posibles.
+
+
+5.	spc_espesorneto
+@Inject
+EspesorNetoService espesorNetoService;
+
+List<EspesorNetoService.EspesorNetoResult> results = espesorNetoService.spcEspesorneto(
+                      pnaleatorio,
+                      pnoportunidadobjetivo);
+
+6.	spp_hiperbolicoanual
+@Inject
+HiperbolicoAnualService hiperbolicoAnualService;
+
+List<HiperbolicoAnualService.HiperbolicoAnualResult> results = hiperbolicoAnualService.sppHiperbolicoAnual(
+                        pnoportunidadobjetivo,
+                        pntipovalor,
+                        pnmeses);
+
+
+7.	spp_hiperbolicooportunidad
+
+@Inject
+HiperbolicoOportunidadService hiperbolicoOportunidadService;
+
+List<HiperbolicoOportunidadService.HiperbolicoAnualResult> results = hiperbolicoOportunidadService.sppHiperbolicoOportunidad(
+                        pnoportunidadobjetivo,
+                        pntipovalor,
+                        pnmeses);
+
+
+
+Si este manual tiene algún problema, verifique el código.
+

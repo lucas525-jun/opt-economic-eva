@@ -16,5 +16,5 @@ public class FactorInversion {
 	private Double factorAceite;
 	private Double factorGas;
 	private Double factorCondensado;
-}
 
+}
