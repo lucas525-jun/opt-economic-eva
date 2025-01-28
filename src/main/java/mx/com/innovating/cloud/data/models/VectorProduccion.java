@@ -17,6 +17,4 @@ public class VectorProduccion {
 	private String aanio;
 	private double ctotalmes;
 	private double ctotalanual;
-
-
 }
