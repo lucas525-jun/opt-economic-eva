@@ -13,6 +13,9 @@ public class FactorCalculo {
     private Double fc_gas;
     private Double fc_condensado;
 
+    public FactorCalculo() {
+    }
+
     // Getters y Setters
     public Long getIdoportunidadobjetivo() {
         return idoportunidadobjetivo;

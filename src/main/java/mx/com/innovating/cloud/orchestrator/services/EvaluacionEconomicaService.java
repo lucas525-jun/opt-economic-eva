@@ -48,20 +48,21 @@ public class EvaluacionEconomicaService {
                         double buquetaqueCompra, double buquetaqueRenta) {
 
                 if (pce == 0) {
-                        Log.info("PCE es 0. Solo se realizarán cálculos de inversión exploratoria.");
+                        // log.info("PCE es 0. Solo se realizarán cálculos de inversión exploratoria.");
 
                         InformacionOportunidad oportunity = databaseConnectorClient
                                         .getInfoOportunidad(idOportunidadObjetivo);
                         List<EvaluacionEconomica> evaluacionEconomica;
 
-                        Log.info("PCE es 0. Ejecutando cálculos de inversión exploratoria y flujo contable.");
+                        // log.info("PCE es 0. Ejecutando cálculos de inversión exploratoria y flujo
+                        // contable.");
 
-                        Log.info(" 12 / 12 - getFactorInversion");
+                        // log.info(" 12 / 12 - getFactorInversion");
                         FactorInversion factorInversion = databaseConnectorClient
                                         .getFactorInversion(idOportunidadObjetivo);
                         factorInversion.setPce(0.0);
 
-                        Log.info("  7 / 12 - getProduccionTotalMmbpce");
+                        // log.info(" 7 / 12 - getProduccionTotalMmbpce");
                         ProduccionTotalMmbpce produccionTotalMmbpce = databaseConnectorClient.getProduccionTotalMmbpce(
                                         idOportunidadObjetivo, version, cuota, declinada, pce, area);
 
@@ -104,9 +105,9 @@ public class EvaluacionEconomicaService {
 
                 } else {
 
-                        Log.info("PCE distinto de 0. Ejecutando flujo completo.");
+                        // log.info("PCE distinto de 0. Ejecutando flujo completo.");
 
-                        Log.info("  1 / 12 - getPozoPerforados");
+                        // log.info(" 1 / 12 - getPozoPerforados");
                         InformacionOportunidad oportunity = databaseConnectorClient
                                         .getInfoOportunidad(idOportunidadObjetivo);
 
@@ -115,27 +116,27 @@ public class EvaluacionEconomicaService {
                                 throw new RuntimeException("InformacionOportunidad is null");
                         }
 
-                        Log.info("  2 / 12 - getPozoPerforados");
+                        // log.info(" 2 / 12 - getPozoPerforados");
                         List<EscaleraProduccion> listTerminados = databaseConnectorClient.getPozosPerforados(
                                         idOportunidadObjetivo, version, cuota, declinada, pce, area); // getPozosTerminados(idOportunidad)
                                                                                                       // hecho
 
-                        Log.info("  3 / 12 - getFactorInversionExploratorio");
+                        // log.info(" 3 / 12 - getFactorInversionExploratorio");
                         FactorInversionExploratorio fiExploratoria = new FactorInversionExploratorio();
                         fiExploratoria.setInfraestructura(infra);
                         fiExploratoria.setPerforacion(perf);
                         fiExploratoria.setTerminacion(term);
-                        Log.info("-------------------------------------------------");
-                        Log.info(fiExploratoria);
+                        // log.info("-------------------------------------------------");
+                        // log.info(fiExploratoria);
 
-                        Log.info("  4 / 12 - getFactorInversionDesarrollo");
+                        // log.info(" 4 / 12 - getFactorInversionDesarrollo");
 
                         FactorInversionDesarrollo fiDesarrollo = new FactorInversionDesarrollo(); // enviar de micro
                         fiDesarrollo.setInfraestructura(infraDES);
                         fiDesarrollo.setPerforacion(perfDES);
                         fiDesarrollo.setTerminacion(termDES);
 
-                        Log.info("  5 / 12 - getInformacionInversion");
+                        // log.info(" 5 / 12 - getInformacionInversion");
                         InformacionInversion infoInversion = new InformacionInversion();
                         infoInversion.setPlataformadesarrollo(plataformadesarrollo);
                         infoInversion.setLineadedescarga(lineadedescarga);
@@ -150,53 +151,53 @@ public class EvaluacionEconomicaService {
                         infoInversion.setBuquetanquecompra(buquetaqueCompra);
                         infoInversion.setBuquetanquerenta(buquetaqueRenta);
 
-                        Log.info("  6 / 12 - getCostoOperacion");
+                        // log.info(" 6 / 12 - getCostoOperacion");
                         List<CostoOperacion> listCostoOperacion = databaseConnectorClient
                                         .getCostoOperacion(oportunity.getIdproyecto());
 
-                        Log.info("  7 / 12 - getProduccionTotalMmbpce");
+                        // log.info(" 7 / 12 - getProduccionTotalMmbpce");
                         ProduccionTotalMmbpce produccionTotalMmbpce = databaseConnectorClient.getProduccionTotalMmbpce(
                                         idOportunidadObjetivo, version, cuota, declinada, pce, area);
 
-                        Log.info("  8 / 12 - getParidad");
+                        // log.info(" 8 / 12 - getParidad");
                         Paridad paridad = databaseConnectorClient
                                         .getParidad(Integer.valueOf(oportunity.getFechainicioperfexploratorio()));
 
-                        Log.info("  9 / 12 - getVectorProduccion");
+                        // log.info(" 9 / 12 - getVectorProduccion");
                         List<VectorProduccion> listVectorProduccion = databaseConnectorClient.getVectorProduccion(
                                         idOportunidadObjetivo, version, cuota, declinada, pce, area);
 
-                        Log.info(" 10 / 12 - getPrecioHidrocarburo");
+                        // log.info(" 10 / 12 - getPrecioHidrocarburo");
                         List<PrecioHidrocarburo> listPrecios = databaseConnectorClient
                                         .getPrecioHidrocarburo(idOportunidadObjetivo, oportunity.getIdprograma());
 
-                        Log.info(" 11 / 12 - getPozosActivos");
+                        // log.info(" 11 / 12 - getPozosActivos");
                         List<PozosActivos> listActivos = databaseConnectorClient.getPozosActivos(idOportunidadObjetivo,
                                         version, cuota, declinada, pce, area);
 
-                        // error
-                        Log.warn("Consultas que no funcionan");
-                        Log.info(" 12 / 12 - getFactorInversion");
+                        // log.info(" 12 / 12 - getFactorInversion");
                         FactorInversion factorInversion = databaseConnectorClient
                                         .getFactorInversion(idOportunidadObjetivo);
 
-                        Log.info(" 13 / 13 - factor calculo");
+                        // log.info(" 13 / 13 - factor calculo");
                         FactorCalculo factorCalculo = databaseConnectorClient.getFactorCalculo(idOportunidadObjetivo,
                                         version);
 
-                        log.info("Obteniendo la informacion de los pozos perforados");
+                        // log.info("Obteniendo la informacion de los pozos perforados");
                         assert listTerminados != null;
                         Map<Integer, BigDecimal> pozosPerforados = DataProcess.getPozosPerforadosByAnio(listTerminados,
                                         oportunity.getFechainicio());
 
-                        log.info("::::: numero de anios con pozos perforados: {}", pozosPerforados.size());
+                        // log.info("::::: numero de anios con pozos perforados: {}",
+                        // pozosPerforados.size());
 
-                        log.info("Obteniendo la informacion de los pozos terminados");
+                        // log.info("Obteniendo la informacion de los pozos terminados");
                         Map<Integer, BigDecimal> pozosTerminados = DataProcess.getPozosterminadosByAnio(listTerminados);
 
-                        log.info("::::: numero de anios con pozos terminados: {}", pozosTerminados.size());
+                        // log.info("::::: numero de anios con pozos terminados: {}",
+                        // pozosTerminados.size());
 
-                        log.info("Obteniendo la informacion del plan de desarrollo");
+                        // log.info("Obteniendo la informacion del plan de desarrollo");
                         List<OportunidadPlanDesarrollo> planDesarrollo = databaseConnectorClient
                                         .getPlanDesarrolloByOportunidad(idOportunidadObjetivo, version);
 
@@ -205,28 +206,28 @@ public class EvaluacionEconomicaService {
                                 for (Integer key : pozosTerminados.keySet()) {
                                         anioFinal = anioFinal > key ? anioFinal : key;
                                 }
-                                log.info("::::: anioFinal: {}", anioFinal);
+                                // log.info("::::: anioFinal: {}", anioFinal);
                         }
 
-                        log.info("Obteniendo vector de produccion");
+                        // log.info("Obteniendo vector de produccion");
                         Map<String, Double> vectorProduccion = new HashMap<>();
                         assert listVectorProduccion != null;
                         listVectorProduccion.forEach(item -> vectorProduccion.put(String.valueOf(item.getAanio()),
                                         item.getCtotalanual()));
 
-                        log.info("Calculando produccion diaria promedio");
+                        // log.info("Calculando produccion diaria promedio");
                         Map<String, ProduccionDiariaPromedio> produccionDiariaPromedio = DataProcess
                                         .calculaProduccionDiariaPromedioByAnio(factorInversion, vectorProduccion,
                                                         oportunity.getIdhidrocarburo());
 
-                        log.info("Obteniendo precios hidrocarburos");
+                        // log.info("Obteniendo precios hidrocarburos");
                         Map<String, Double> preciosMap = new HashMap<>();
                         assert listPrecios != null;
                         listPrecios.forEach(
                                         item -> preciosMap.put(item.getAnioprecio() + "-" + item.getIdhidrocarburo(),
                                                         item.getPrecio()));
 
-                        log.info("Calculando Ingresos");
+                        // log.info("Calculando Ingresos");
                         assert paridad != null;
                         Map<String, Ingresos> ingresosMap = DataProcess.calculaIngresosByAnio(paridad,
                                         produccionDiariaPromedio, preciosMap);
@@ -240,7 +241,7 @@ public class EvaluacionEconomicaService {
                         Map<String, Costos> costosMap = DataProcess.calculaCostosByAnio(costoOperacionMap,
                                         produccionDiariaPromedio, paridad);
 
-                        log.info("Generando Respuesta");
+                        // log.info("Generando Respuesta");
                         List<EvaluacionEconomica> evaluacionEconomica = new ArrayList<>();
                         int finalAnioFinal = anioFinal;
                         assert listActivos != null;
