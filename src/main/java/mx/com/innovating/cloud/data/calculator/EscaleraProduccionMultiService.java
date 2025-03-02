@@ -1,24 +1,27 @@
 package mx.com.innovating.cloud.data.calculator;
 
-import io.quarkus.cache.CacheKey;
-import io.quarkus.cache.CacheResult;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import mx.com.innovating.cloud.data.models.DeclinaExpoportunidadResult;
-import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
 import mx.com.innovating.cloud.data.models.FechaInicioResult;
 
 import mx.com.innovating.cloud.data.models.ProduccionPozos;
+import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
 
+import java.net.URLDecoder;
 import java.time.LocalDate;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class EscaleraProduccionService {
+public class EscaleraProduccionMultiService {
     @Inject
     EntityManager em;
 
@@ -26,10 +29,13 @@ public class EscaleraProduccionService {
     DeclinaExpOportunidadService declinaExpService;
 
     @Inject
-    FechaInicioService fechaInicioService;
+    FechaInicioMultiObjetivoService fechaInicioMultiObjetivoService;
 
     @Inject
     PozoVolumenService pozoVolumenService;
+
+    @Inject
+    FactoresCalculatorService factoresCalculatorService;
 
     private static class DeclinadaPozo {
         private final int idsecuencia;
@@ -78,15 +84,53 @@ public class EscaleraProduccionService {
         }
     }
 
-    // @Transactional
-    // @CacheResult(cacheName = "escalera-produccion-cache")
-    public List<EscaleraProduccionMulti> calculateEscaleraProduccion(
+    public List<EscaleraProduccionMulti> calculateEscaleraProduccionMulti(
             int pnidversion,
             int pnoportunidadobjetivo,
             double pncuota,
             double pndeclinada,
             double pnpce,
-            double pnarea) {
+            double pnarea,
+            String fechaString) {
+
+        LocalDateTime fechaParam = null;
+        if (fechaString == null || fechaString.equals("unexist")) {
+        } else {
+            try {
+                String decodedFecha = URLDecoder.decode(fechaString, StandardCharsets.UTF_8.toString());
+                try {
+                    // Try full datetime format
+                    DateTimeFormatter fullFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    fechaParam = LocalDateTime.parse(decodedFecha, fullFormatter);
+                } catch (Exception e1) {
+                    try {
+                        // Try date-only format
+                        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        LocalDate date = LocalDate.parse(decodedFecha, dateFormatter);
+                        fechaParam = date.atStartOfDay();
+                    } catch (Exception e2) {
+                        // Try dd/MM/yyyy format
+                        DateTimeFormatter altFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        LocalDate date = LocalDate.parse(decodedFecha, altFormatter);
+                        fechaParam = date.atStartOfDay();
+                    }
+                }
+            } catch (Exception e) {
+                Log.error("Error parsing date: " + fechaString + ". Using current time.", e);
+            }
+        }
+
+        List<Object[]> factores = factoresCalculatorService.calcularFactores(pnoportunidadobjetivo);
+        double fcaceite = 0.0;
+        double fcgas = 0.0;
+        double fccondensado = 0.0;
+
+        if (!factores.isEmpty()) {
+            Object[] factor = factores.get(0);
+            fcaceite = factor[0] != null ? (Double) factor[0] : 0.0;
+            fcgas = factor[1] != null ? (Double) factor[1] : 0.0;
+            fccondensado = factor[2] != null ? (Double) factor[2] : 0.0;
+        }
 
         // Fetch declinada results
         List<DeclinaExpoportunidadResult> declinaResults = declinaExpService.calcularDeclinaExpoportunidad(
@@ -104,9 +148,16 @@ public class EscaleraProduccionService {
 
         // Fetch fecha inicio results
         List<FechaInicioResult> fechaInicioResults;
-        fechaInicioResults = fechaInicioService
-                .calcularFechaInicio(
-                        pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce, pnarea);
+        if (fechaString == null || fechaString.equals("unexist")) {
+            fechaInicioResults = fechaInicioMultiObjetivoService
+                    .sppFechaInicioMulti(
+                            pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce, pnarea);
+
+        } else {
+            fechaInicioResults = fechaInicioMultiObjetivoService
+                    .sppFechaInicioMulti(
+                            pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce, pnarea, fechaParam);
+        }
 
         int nmes = declinadaPozo.size() - 2;
         List<EscaleraProduccionMulti> results = new ArrayList<>();
@@ -148,13 +199,18 @@ public class EscaleraProduccionService {
                     YearMonth yearMonth = YearMonth.from(currentDate);
                     DeclinadaPozo dp = declinadaPozo.get(mesIndex);
 
-                    // Exactly match SPP's CASE logic
+                    // Calculate base production
                     double produccion;
                     if (currentSeqId == z && r > 0) {
                         produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * r;
                     } else {
                         produccion = (dp.perfil * yearMonth.lengthOfMonth()) / 1000.0;
                     }
+
+                    // Calculate derived productions
+                    double prodAceite = produccion * fcaceite;
+                    double prodGas = produccion * fcgas;
+                    double prodCondensado = produccion * fccondensado;
 
                     results.add(new EscaleraProduccionMulti(
                             consecutiveId++,
@@ -167,9 +223,9 @@ public class EscaleraProduccionService {
                             String.valueOf(currentDate.getYear()),
                             currentDate.getMonthValue(),
                             produccion,
-                            0.0,
-                            0.0,
-                            0.0,
+                            prodAceite,
+                            prodGas,
+                            prodCondensado,
                             Date.valueOf(currentDate)));
                 }
             }
