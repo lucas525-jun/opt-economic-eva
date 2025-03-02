@@ -63,7 +63,10 @@ public class FechaInicioService {
 
         // Calculate entrada (ceiling of pozos/equipo)
         Integer varEntrada = (int) Math.ceil((double) varNPozos / varNEquipo);
-
+        if (varNPozos <= 1) {
+            varNEquipo = 1;
+            varEntrada = 1;
+        }
         // Get initial dates and durations
         QueryDateInfo dateInfo = obtenerInfoFechas(pnIdVersion, pnOportunidadObjetivo);
 
@@ -96,15 +99,16 @@ public class FechaInicioService {
                 LEFT JOIN catalogo.claveobjetivovw co ON
                     co.idoportunidad = o.idoportunidad
                     AND co.idversion = o.idversion
-                WHERE o.idversion = ?
-                AND co.idoportunidadobjetivo = ?
+                WHERE o.idversion = :idversion
+                AND co.idoportunidadobjetivo = :idoportunidadobjetivo
                 """;
 
         try {
             return (String) em.createNativeQuery(sql)
-                    .setParameter(1, pnIdVersion)
-                    .setParameter(2, pnOportunidadObjetivo)
+                    .setParameter("idversion", pnIdVersion)
+                    .setParameter("idoportunidadobjetivo", pnOportunidadObjetivo)
                     .getSingleResult();
+
         } catch (jakarta.persistence.NoResultException e) {
             Log.error("No tipo calculo found for idVersion=" + pnIdVersion +
                     " and idOportunidadObjetivo=" + pnOportunidadObjetivo);
@@ -240,7 +244,6 @@ public class FechaInicioService {
         for (int idCte = 2; idCte <= varEntrada; idCte++) {
             currentFechaTermino = currentFechaInicio.plusDays(varNDias.longValue());
 
-            // Exactly matching the original SQL CASE logic
             int npozo = (idCte == varEntrada) ? varNPozos : (varNEquipo * idCte);
 
             agregarResultado(

@@ -12,18 +12,15 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.io.File;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import java.util.Collections;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import mx.com.innovating.cloud.data.models.*;
-import mx.com.innovating.cloud.data.calculator.ProduccionAnualService;
-import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
-import mx.com.innovating.cloud.data.calculator.EspesorNetoService.EspesorNetoResult;
-import mx.com.innovating.cloud.data.calculator.DeclinaExpOportunidadService;
-import mx.com.innovating.cloud.data.calculator.FechaInicioService;
-import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
-import mx.com.innovating.cloud.data.calculator.NumeroPozoporAreaService;
-import mx.com.innovating.cloud.data.calculator.NumeroPozoPorVolumenService;
-import mx.com.innovating.cloud.data.calculator.FechaAnioService;
-import mx.com.innovating.cloud.data.calculator.FechaAnioService.FechaAnioResult;
-import mx.com.innovating.cloud.data.calculator.NumeroPozoAreaConvencionalService;
 import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
 
 // @QuarkusMain
@@ -38,13 +35,18 @@ public class ProduccionAnualRunner implements QuarkusApplication {
     EscaleraProduccionService escaleraProduccionService;
 
     @Inject
+    FechaInicioMultiObjetivoService fechaInicioMultiObjetivoService;
+    @Inject
+    FechaInicioService fechaInicioService;
+
+    @Inject
+    EscaleraProduccionMultiService escaleraProduccionMultiService;
+
+    @Inject
     DataBaseConnectorRepository dataBaseConnectorRepository;
 
     @Inject
     PozoVolumenService pozoVolumenService;
-
-    @Inject
-    FechaInicioService fechaInicioService;
 
     @Inject
     DeclinaExpOportunidadService declinaExpOportunidadService;
@@ -74,45 +76,97 @@ public class ProduccionAnualRunner implements QuarkusApplication {
     @Override
     public int run(String... args) {
 
-        // int pnidversion = 101;
-        // int pnoportunidadobjetivo = 3153;
-        // double pncuota = 6.40411740557325;
-        // double pndeclinada = 10.0890784038171;
-        // double pnpce = 5.81635999830272;
-        // double pnarea = 4.0561533216062;
+        int pnidversion = 291;
+        int pnoportunidadobjetivo = 4055;
+        double pncuota = 20.1273693914138;
+        double pndeclinada = 6.34841831044748;
+        double pnpce = 36.8233025088598;
+        double pnarea = 3.34068122742337;
+        String fecha = null;
 
-        Integer pnidversion = 1;
-        Integer pnoportunidadobjetivo = 1852;
-        Integer pntipovalor = 2;
-        Integer pnmeses = 240;
-        double pnaleatorio = 0.339936256408691;
+        // int pnidversion = 275;
+        // int pnoportunidadobjetivo = 3918;
+        // double pncuota = 0.476092893;
+        // double pndeclinada = 18;
+        // double pnpce = 2.155497545;
+        // double pnarea = 2.743834229;
 
-        Integer percentil = 66;
+        // Integer pnidversion = 1;
+        // Integer pnoportunidadobjetivo = 1852;
+        // Integer pntipovalor = 2;
+        // Integer pnmeses = 240;
+        // double pnaleatorio = 0.339936256408691;
+
+        // Integer percentil = 66;
         Log.info("================started");
         try {
             // for (int i = 0; i < 20; i++) {
             long startTime = System.nanoTime();
 
-            List<EscaleraProduccionNdService.EscaleraProduccionNdResult> results = escaleraProduccionNdService
-                    .spcEscaleraProduccionNd(
+            // List<EscaleraProduccionMulti> results = dataBaseConnectorRepository
+            // .calculateEscaleraProduccionMulti(
+            // // pnidversion,
+            // // pnoportunidadobjetivo,
+            // // pntipovalor,
+            // // pnmeses,
+            // // pnaleatorio);
+            // pnoportunidadobjetivo,
+            // pnidversion,
+            // pncuota,
+            // pndeclinada,
+            // pnpce,
+            // pnarea,
+            // fecha);
+
+            // List<FechaInicioResult> results = fechaInicioMultiObjetivoService
+            // .sppFechaInicioMulti(
+
+            List<FechaInicioResult> results = fechaInicioService
+                    .calcularFechaInicio(
+
                             pnidversion,
                             pnoportunidadobjetivo,
-                            pntipovalor,
-                            pnmeses,
-                            pnaleatorio);
+                            pncuota,
+                            pndeclinada,
+                            pnpce,
+                            pnarea);
+            List<FechaInicioResult> resultsSecond = fechaInicioMultiObjetivoService
+                    .sppFechaInicioMulti(
 
-            Log.info("================ended");
+                            pnidversion,
+                            pnoportunidadobjetivo,
+                            pncuota,
+                            pndeclinada,
+                            pnpce,
+                            pnarea);
+            // List<FechaInicioResult> results = escaleraProduccionMultiService
+            // .calculateEscaleraProduccionMulti(
+
+            // pnidversion,
+            // pnoportunidadobjetivo,
+            // pncuota,
+            // pndeclinada,
+            // pnpce,
+            // pnarea,
+            // fecha);
+
+            Log.info("================first");
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
+
             // Log.info("Execution " + (i + 1) + " took " + duration + " ns");
 
             // }
             results.stream()
-                    .limit(108)
+                    // .limit(108)
+                    .forEach(row -> Log.info(row.toString()));
+            Log.info("================second");
+
+            resultsSecond.stream()
+                    // .limit(108)
                     .forEach(row -> Log.info(row.toString()));
 
             Log.info("Total number of results: " + results.size());
-
             return 0;
         } catch (
 
