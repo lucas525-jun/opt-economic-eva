@@ -432,52 +432,27 @@ public class EvaluacionEconomicaService {
                                                                                         * cantManifolds;
                                                                         inversionesAnioAnterior.setSistemaDeControl(
                                                                                         sistemaDeControlG);
-                                                                        var cubiertaProcesosG = infoInversion
-                                                                                        .getCubiertadeproces()
-                                                                                        * paridad.getParidad()
-                                                                                        * cantManifolds;
-                                                                        inversionesAnioAnterior.setCubiertaProcesos(
-                                                                                        cubiertaProcesosG);
-                                                                        var risersG = infoInversion.getRisers()
-                                                                                        * paridad.getParidad()
-                                                                                        * cantManifolds;
+                                                                        var cubiertaProcesosG = infoInversion.getCubiertadeproces() * paridad.getParidad() * cantManifolds;
+                                                                        inversionesAnioAnterior.setCubiertaProcesos(cubiertaProcesosG);
+                                                                        var risersG = infoInversion.getRisers() * paridad.getParidad() * cantManifolds;
                                                                         inversionesAnioAnterior.setRisers(risersG);
                                                                 } else {
-                                                                        var arbolesSubmarinosG = infoInversion
-                                                                                        .getArbolessubmarinos()
-                                                                                        * paridad.getParidad()
-                                                                                        * pozosTotales;
-                                                                        inversionesAnioActual.setArbolSubmarinos(
-                                                                                        arbolesSubmarinosG);
-                                                                        var manifoldsG = infoInversion.getManifolds()
-                                                                                        * paridad.getParidad()
-                                                                                        * cantManifolds;
+                                                                        var arbolesSubmarinosG = infoInversion.getArbolessubmarinos() * paridad.getParidad() * pozosTotales;
+                                                                        inversionesAnioActual.setArbolSubmarinos(arbolesSubmarinosG);
+                                                                        var manifoldsG = infoInversion.getManifolds() * paridad.getParidad() * cantManifolds;
                                                                         inversionesAnioActual.setManifolds(manifoldsG);
-                                                                        var estacionCompresionG = infoInversion
-                                                                                        .getEstacioncompresion()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioActual.setEstacionCompresion(
-                                                                                        estacionCompresionG);
-                                                                        var bateriaG = infoInversion.getBateria()
-                                                                                        * paridad.getParidad();
+                                                                        var estacionCompresionG = infoInversion.getEstacioncompresion() * paridad.getParidad();
+                                                                        inversionesAnioActual.setEstacionCompresion(estacionCompresionG);
+                                                                        var bateriaG = infoInversion.getBateria() * paridad.getParidad();
                                                                         inversionesAnioActual.setBateria(bateriaG);
-                                                                        var buqueTanqueCompraG = infoInversion
-                                                                                        .getBuquetanquecompra()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioActual.setBuqueTanqueCompra(
-                                                                                        buqueTanqueCompraG);
-                                                                        var buqueTanqueRentaG = infoInversion
-                                                                                        .getBuquetanquerenta()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioActual.setBuqueTanqueRenta(
-                                                                                        buqueTanqueRentaG);
+                                                                        var buqueTanqueCompraG = infoInversion.getBuquetanquecompra() * paridad.getParidad();
+                                                                        inversionesAnioActual.setBuqueTanqueCompra(buqueTanqueCompraG);
+                                                                        var buqueTanqueRentaG = infoInversion.getBuquetanquerenta() * paridad.getParidad();
+                                                                        inversionesAnioActual.setBuqueTanqueRenta(buqueTanqueRentaG);
                                                                 }
                                                         } else {
-                                                                ductos = infoInversion.getDucto()
-                                                                                * paridad.getParidad();
-                                                                plataformasDesarrollo = infoInversion
-                                                                                .getPlataformadesarrollo()
-                                                                                * paridad.getParidad();
+                                                                ductos = infoInversion.getDucto() * paridad.getParidad();
+                                                                plataformasDesarrollo = infoInversion.getPlataformadesarrollo() * paridad.getParidad();
                                                                 inversionesAnioActual.setDuctos(ductos);
                                                                 inversionesAnioActual.setPlataformaDesarrollo(
                                                                                 plataformasDesarrollo);
@@ -488,21 +463,21 @@ public class EvaluacionEconomicaService {
                                         var lineaDescarga = infoInversion.getLineadedescarga() * terminado.doubleValue()
                                                         * paridad.getParidad();
 
-                                        var futuroDesarrollo = costoOperacionMap.get(item.getAnio() + "-19")
+                                        var futuroDesarrollo = (costoOperacionMap.get(item.getAnio() + "-19")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad()) / 1000;
 
-                                        var mantenimientoPozos = costoOperacionMap.get(item.getAnio() + "-25")
+                                        var mantenimientoPozos = (costoOperacionMap.get(item.getAnio() + "-25")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad())/ 1000;
 
-                                        var mantenimientoInfraestructuraFutDes = costoOperacionMap
+                                        var mantenimientoInfraestructuraFutDes = (costoOperacionMap
                                                         .get(item.getAnio() + "-23")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad())/ 1000;
                                         /*
                                          * if(ductos == 0){
                                          * ductos = infoInversion.getDucto() * paridad.getParidad();
@@ -548,21 +523,21 @@ public class EvaluacionEconomicaService {
                                         assert infoInversion != null;
                                         var lineaDescarga = infoInversion.getLineadedescarga() * terminado.doubleValue()
                                                         * paridad.getParidad();
-                                        var futuroDesarrollo = costoOperacionMap.get(item.getAnio() + "-19")
+                                        var futuroDesarrollo = (costoOperacionMap.get(item.getAnio() + "-19")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad()) / 1000;
 
-                                        var mantenimientoPozos = costoOperacionMap.get(item.getAnio() + "-25")
+                                        var mantenimientoPozos = (costoOperacionMap.get(item.getAnio() + "-25")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad()) / 1000;
 
-                                        var mantenimientoInfraestructuraFutDes = costoOperacionMap
+                                        var mantenimientoInfraestructuraFutDes = (costoOperacionMap
                                                         .get(item.getAnio() + "-23")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad()) /1000;
 
                                         inversionesAnioActual.setLineaDescarga(lineaDescarga);
                                         inversionesAnioActual.setOperacionalFuturoDesarrollo(futuroDesarrollo);
@@ -602,21 +577,21 @@ public class EvaluacionEconomicaService {
                                         assert infoInversion != null;
                                         var lineaDescarga = infoInversion.getLineadedescarga() * terminado.doubleValue()
                                                         * paridad.getParidad();
-                                        var futuroDesarrollo = costoOperacionMap.get(item.getAnio() + "-19")
+                                        var futuroDesarrollo = (costoOperacionMap.get(item.getAnio() + "-19")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad()) / 1000;
 
-                                        var mantenimientoPozos = costoOperacionMap.get(item.getAnio() + "-25")
+                                        var mantenimientoPozos = (costoOperacionMap.get(item.getAnio() + "-25")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad()) / 1000;
 
-                                        var mantenimientoInfraestructuraFutDes = costoOperacionMap
+                                        var mantenimientoInfraestructuraFutDes = (costoOperacionMap
                                                         .get(item.getAnio() + "-23")
                                                         * produccionDiariaPromedio.get(item.getAnio()).getMbpce()
                                                         * yearDays
-                                                        * paridad.getParidad() / 1000;
+                                                        * paridad.getParidad()) / 1000;
 
                                         inversionesAnioActual.setLineaDescarga(lineaDescarga);
                                         inversionesAnioActual.setOperacionalFuturoDesarrollo(futuroDesarrollo);

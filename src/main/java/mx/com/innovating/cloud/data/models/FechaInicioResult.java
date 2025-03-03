@@ -20,5 +20,6 @@ public class FechaInicioResult {
     private Double diasPerf;
     private Double diasTerm;
     private Double dias;
+    private String tipoCalculo;
     private Integer id;
 }

@@ -9,10 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 
-import mx.com.innovating.cloud.data.models.FechaInicioResult;
-import mx.com.innovating.cloud.data.models.ProduccionPozos;
-import mx.com.innovating.cloud.data.models.NumEquipoResult;
-import mx.com.innovating.cloud.data.models.NumeroPozoAreaConvencionalResult;
+import mx.com.innovating.cloud.data.models.*;
 import mx.com.innovating.cloud.data.models.ProduccionPozos;
 import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
 import mx.com.innovating.cloud.data.calculator.NumEquipoService;
@@ -54,8 +51,10 @@ public class FechaInicioService {
         String tipoCalculo = obtenerTipoCalculo(pnIdVersion, pnOportunidadObjetivo);
 
         // Calculate number of wells based on tipo calculo
-        Integer varNPozos = calcularNumeroPozos(tipoCalculo, pnIdVersion, pnOportunidadObjetivo,
+        CalculoNumPozosResult calculoNumPozosResult = calcularNumeroPozos(tipoCalculo, pnIdVersion, pnOportunidadObjetivo,
                 pnCuota, pnDeclinada, pnPce, pnArea);
+
+        Integer varNPozos = calculoNumPozosResult.getNPozos();
 
         // Get equipment number
         NumEquipoResult numEquipo = numEquipoService.calcularNumEquipo(varNPozos);
@@ -83,7 +82,9 @@ public class FechaInicioService {
                 dateInfo.diasTerm,
                 varNDias,
                 varFechaInicio,
-                varFechaTermino);
+                varFechaTermino,
+                calculoNumPozosResult.getTipoCalculo()
+                );
     }
 
     @Transactional
@@ -125,7 +126,7 @@ public class FechaInicioService {
         return result.getNumPozo();
     }
 
-    private Integer calcularNumeroPozos(
+    private CalculoNumPozosResult calcularNumeroPozos(
             String tipoCalculo,
             Integer pnIdVersion,
             Integer pnOportunidadObjetivo,
@@ -138,11 +139,15 @@ public class FechaInicioService {
             case "Volumen":
                 List<ProduccionPozos> volumenResults = pozoVolumenService.calcularPozoVolumen(
                         pnIdVersion, pnOportunidadObjetivo, pnCuota, pnDeclinada, pnPce);
-                return (int) Math.ceil(volumenResults.get(0).getCvnumpozo());
 
-            case "Area":
+                Integer pv = (int) Math.ceil(volumenResults.get(0).getCvnumpozo());
+
+                return new CalculoNumPozosResult(pv, tipoCalculo);
+
+            case "Área":
                 Double numPozo = calcularNumeroPozoArea(pnIdVersion, pnOportunidadObjetivo, pnArea);
-                return (int) Math.ceil(numPozo);
+                Integer pa = (int) Math.ceil(numPozo);
+                return new CalculoNumPozosResult(pa, tipoCalculo);
 
             case "Ambos":
                 List<ProduccionPozos> volResults = pozoVolumenService.calcularPozoVolumen(
@@ -150,8 +155,12 @@ public class FechaInicioService {
                 Double pozoVolumen = Math.ceil(volResults.get(0).getCvnumpozo());
 
                 Double pozoArea = Math.ceil(calcularNumeroPozoArea(pnIdVersion, pnOportunidadObjetivo, pnArea));
-                return (int) Math.min(pozoVolumen, pozoArea);
 
+                if(pozoVolumen <= pozoArea) {
+                    return new CalculoNumPozosResult((int) Math.ceil(pozoVolumen), "Volumen");
+                }else{
+                    return new CalculoNumPozosResult((int) Math.ceil(pozoArea), "Área");
+                }
             default:
                 throw new IllegalArgumentException("Tipo calculo no reconocido: " + tipoCalculo);
         }
@@ -216,7 +225,9 @@ public class FechaInicioService {
             Double varNDiasTerm,
             Double varNDias,
             LocalDateTime varFechaInicio,
-            LocalDateTime varFechaTermino) {
+            LocalDateTime varFechaTermino,
+            String tipoCalculo
+            ) {
 
         List<FechaInicioResult> results = new ArrayList<>();
 
@@ -231,7 +242,9 @@ public class FechaInicioService {
                 1,
                 varNDiasPerf,
                 varNDiasTerm,
-                varNDias);
+                varNDias,
+                tipoCalculo
+                );
 
         // Recursive part (matching UNION ALL in CTE)
         LocalDateTime currentFechaInicio = varFechaTermino;
@@ -253,7 +266,9 @@ public class FechaInicioService {
                     idCte,
                     varNDiasPerf,
                     varNDiasTerm,
-                    varNDias);
+                    varNDias,
+                    tipoCalculo
+                    );
 
             currentFechaInicio = currentFechaTermino;
         }
@@ -271,7 +286,9 @@ public class FechaInicioService {
             int idCte,
             double diasPerf,
             double diasTerm,
-            double dias) {
+            double dias,
+            String tipoCalculo
+            ) {
 
         double monthFraction = calcularFraccionMes(fechaTermino);
         LocalDateTime fechaEntrada;
@@ -299,7 +316,9 @@ public class FechaInicioService {
                 diasPerf,
                 diasTerm,
                 dias,
-                idCte));
+                tipoCalculo,
+                idCte
+        ));
     }
 
     private double calcularFraccionMes(LocalDateTime date) {

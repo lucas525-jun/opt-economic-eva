@@ -173,7 +173,6 @@ public class DataBaseConnectorRepository {
                         " and idversion = " + pnidversion);
                 throw new SqlExecutionErrorException("FactorCalculo: No data found with provided parameters.");
             }
-            Log.info("factorcalculo : " + result.get());
             return result.get();
         } catch (Exception e) {
             Log.error("JDBC: getFactorCalculo exception executing SQL", e);
