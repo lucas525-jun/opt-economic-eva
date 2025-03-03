@@ -38,6 +38,7 @@ public class InformacionOportunidad extends PanacheEntityBase {
 	private String tipooportunidad;
 	private Integer idprograma;
 	private String programa;
+	private String plandesarrollo;
 	private Integer idversion;
 
 	public static InformacionOportunidad findByIdoportunidadobjetivo(Integer idOportunidad) {
