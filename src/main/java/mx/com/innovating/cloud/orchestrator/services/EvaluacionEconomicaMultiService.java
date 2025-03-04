@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.DoubleAdder;
@@ -1020,10 +1021,6 @@ public class EvaluacionEconomicaMultiService {
                 double maxCubiertaDeProceso = Double.MIN_VALUE;
                 FactorCalculoForMulti factorCalculoForMulti = new FactorCalculoForMulti();
                 factorCalculoForMulti.setIsMulti(false);
-                factorCalculoForMulti.setSumFc_aceite(0.0);
-                factorCalculoForMulti.setSumFc_condensado(0.0);
-                factorCalculoForMulti.setSumFc_gas(0.0);
-                factorCalculoForMulti.setSumPce(0.0);
                 for (int i = 0; i < paramList.size(); i++) {
                         List<Object> params = paramList.get(i);
 
@@ -1088,6 +1085,8 @@ public class EvaluacionEconomicaMultiService {
                         int idOportunidadObjetivo = getIntValue(params, 0);
 
                         if (i == 0) {
+                                // System.err.println("======================");
+                                // logObject("paramList", paramList);
                                 Object checkPCE0 = paramList.get(i + 0).get(4);
                                 Object checkPCE1 = paramList.get(i + 1).get(4);
                                 if (checkPCE0 instanceof String) {
@@ -1141,10 +1140,7 @@ public class EvaluacionEconomicaMultiService {
                                         fechaToUse, // fechaToUse
                                         oldPozosTerminadosValueToUse,
                                         lastYearPozosProduccion, lastProduccionDiariaPromedio);
-                        // if (i == 0) {
-                        // System.err.println("current PCE : " + pce);
-                        // System.err.println("next PCE : " + nextOrPreviewPce);
-                        // }
+
                         if (i == 0 && nextOrPreviewPce == 0) {
                                 return response;
                         }
@@ -1153,37 +1149,46 @@ public class EvaluacionEconomicaMultiService {
                                 FactorCalculo eachFactorCalculo = response.getFactorCalculo();
                                 // init
                                 factorCalculoForMulti.setIsMulti(true);
-                                factorCalculoForMulti
-                                                .setSumFc_aceite(factorCalculoForMulti.getSumFc_aceite() == null ? 0.0
-                                                                : factorCalculoForMulti.getSumFc_aceite());
-                                factorCalculoForMulti.setSumFc_gas(factorCalculoForMulti.getSumFc_gas() == null ? 0.0
-                                                : factorCalculoForMulti.getSumFc_gas());
+                                factorCalculoForMulti.setSumFc_aceite(
+                                                Objects.requireNonNullElse(factorCalculoForMulti.getSumFc_aceite(),
+                                                                BigDecimal.ZERO));
+                                factorCalculoForMulti.setSumFc_gas(
+                                                Objects.requireNonNullElse(factorCalculoForMulti.getSumFc_gas(),
+                                                                BigDecimal.ZERO));
                                 factorCalculoForMulti.setSumFc_condensado(
-                                                factorCalculoForMulti.getSumFc_condensado() == null ? 0.0
-                                                                : factorCalculoForMulti.getSumFc_condensado());
+                                                Objects.requireNonNullElse(factorCalculoForMulti.getSumFc_condensado(),
+                                                                BigDecimal.ZERO));
+                                BigDecimal pceBD = BigDecimal.valueOf(pce);
+
                                 // set
                                 factorCalculoForMulti.setSumFc_aceite(
-                                                factorCalculoForMulti.getSumFc_aceite() +
+                                                factorCalculoForMulti.getSumFc_aceite().add(
                                                                 (eachFactorCalculo.getFc_aceite() != null
-                                                                                ? eachFactorCalculo.getFc_aceite()
-                                                                                                * pce
-                                                                                : 0.0));
-                                factorCalculoForMulti.setSumFc_gas(
-                                                factorCalculoForMulti.getSumFc_gas() +
-                                                                (eachFactorCalculo.getFc_gas() != null
-                                                                                ? eachFactorCalculo.getFc_gas()
-                                                                                                * pce
-                                                                                : 0.0));
+                                                                                ? BigDecimal.valueOf(eachFactorCalculo
+                                                                                                .getFc_aceite())
+                                                                                                .multiply(pceBD)
+                                                                                : BigDecimal.ZERO)));
 
-                                // For fc_condensado
+                                factorCalculoForMulti.setSumFc_gas(
+                                                factorCalculoForMulti.getSumFc_gas().add(
+                                                                (eachFactorCalculo.getFc_gas() != null
+                                                                                ? BigDecimal.valueOf(eachFactorCalculo
+                                                                                                .getFc_gas())
+                                                                                                .multiply(pceBD)
+                                                                                : BigDecimal.ZERO)));
+
                                 factorCalculoForMulti.setSumFc_condensado(
-                                                factorCalculoForMulti.getSumFc_condensado()
-                                                                + (eachFactorCalculo.getFc_condensado() != null
-                                                                                ? eachFactorCalculo.getFc_condensado()
-                                                                                                * pce
-                                                                                : 0.0));
-                                factorCalculoForMulti.setSumPce(sumPCE);
+                                                factorCalculoForMulti.getSumFc_condensado().add(
+                                                                (eachFactorCalculo.getFc_condensado() != null
+                                                                                ? BigDecimal.valueOf(eachFactorCalculo
+                                                                                                .getFc_condensado())
+                                                                                                .multiply(pceBD)
+                                                                                : BigDecimal.ZERO)));
+                                BigDecimal sumPceBD = BigDecimal.valueOf(sumPCE);
+                                factorCalculoForMulti.setSumPce(sumPceBD);
+
                                 response.setFactorCalculoForMulti(factorCalculoForMulti);
+
                         }
 
                         if (i < paramList.size() - 1) {

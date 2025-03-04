@@ -1,10 +1,7 @@
 package mx.com.innovating.cloud.orchestrator.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
-import mx.com.innovating.cloud.data.models.FactorInversion;
-import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
 import mx.com.innovating.cloud.orchestrator.models.*;
 import mx.com.innovating.cloud.orchestrator.utilities.DataProcess;
 

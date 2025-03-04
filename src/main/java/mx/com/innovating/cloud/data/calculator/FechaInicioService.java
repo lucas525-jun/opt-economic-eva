@@ -144,6 +144,7 @@ public class FechaInicioService {
                         pnIdVersion, pnOportunidadObjetivo, pnCuota, pnDeclinada, pnPce);
                 return (int) Math.ceil(volumenResults.get(0).getCvnumpozo());
 
+            case "Área":
             case "Area":
                 Double numPozo = calcularNumeroPozoArea(pnIdVersion, pnOportunidadObjetivo, pnArea);
                 return (int) Math.ceil(numPozo);
