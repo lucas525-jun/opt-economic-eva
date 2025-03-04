@@ -599,10 +599,10 @@ public class DataProcess {
 		double reporte120 = 0.0;
 		double reporte121 = 0.0;
 		double reporte123 = 0.0;
-		reporte120 = factorCalculoForMulti.getSumFc_aceite();
-		reporte120 = factorCalculoForMulti.getSumFc_gas();
+		reporte120 = factorCalculoForMulti.getSumFc_aceite().doubleValue();
+		reporte121 = factorCalculoForMulti.getSumFc_gas().doubleValue();
 		for (int i = 0; i < produccionTotalMmbpce.length; i++) {
-			reporte123 = produccionTotalMmbpce[i];
+			reporte123 += produccionTotalMmbpce[i];
 		}
 
 		var perfDes = earliestEvaluacion.getInversiones().getPerforacionDes();
