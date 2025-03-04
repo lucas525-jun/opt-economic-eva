@@ -119,12 +119,11 @@ public class EscaleraProduccionService {
         int pi = 1;
 
         // Tope si es por area
-        Double numPozo = calcularNumeroPozoArea(pnidversion, pnoportunidadobjetivo, pnarea);
-        Integer pa = (int) Math.ceil(numPozo);
-        double prodMaxpp = pnpce / pa;
+        Double numeroPozoArea = calcularNumeroPozoArea(pnidversion, pnoportunidadobjetivo, pnarea);
+        double prodMaxpp = pnpce / numeroPozoArea;
         String tipoCalculo = fechaInicioResults.get(0).getTipoCalculo();
-        log.info("Calculo: {}", tipoCalculo);
-        log.info("ProdMaxpp: {}", prodMaxpp);
+        double rArea = numeroPozoArea - Math.floor(numeroPozoArea);
+        double fraccionArea = rArea * prodMaxpp;
 
         // First pass: Create all well sequences to get max idsec (z)
         List<SecuenciaPozo> secuenciaPozos = new ArrayList<>();
@@ -184,7 +183,6 @@ public class EscaleraProduccionService {
                     }
                 }else{
                     double acum = 0.0;
-                    log.info("ENTRO AL IF DE AREA");
                     double produccion;
                     // mientras que produccion sea menor a prodMaxpp se hcaen los calculos
                     for(int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
@@ -192,9 +190,17 @@ public class EscaleraProduccionService {
                         YearMonth yearMonth = YearMonth.from(currentDate);
                         DeclinadaPozo dp = declinadaPozo.get(mesIndex);
 
-                        produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * r;
-                        if(!(acum + produccion < prodMaxpp)){
-                            break;
+
+                        if(currentSeqId == z && rArea > 0) {
+                            produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * rArea;
+                            if(acum + produccion > fraccionArea){
+                                break;
+                            }
+                        }else{
+                            produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0);
+                            if(acum + produccion > prodMaxpp){
+                                break;
+                            }
                         }
 
                         acum += produccion;
