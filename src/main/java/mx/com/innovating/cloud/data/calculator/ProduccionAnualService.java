@@ -9,7 +9,7 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 
 import mx.com.innovating.cloud.data.models.VectorProduccion;
-import mx.com.innovating.cloud.data.models.EscaleraProduccion;
+import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
 import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
 
 import java.math.BigDecimal;
@@ -57,7 +57,7 @@ public class ProduccionAnualService {
                         double pnpce,
                         double pnarea) {
                 // Get escalera produccion data
-                List<EscaleraProduccion> escaleraResults = escaleraProduccionService
+                List<EscaleraProduccionMulti> escaleraResults = escaleraProduccionService
                                 .calculateEscaleraProduccion(pnidversion, vidoportunidadobjetivo,
                                                 pncuota, pndeclinada, pnpce, pnarea);
 
@@ -98,8 +98,10 @@ public class ProduccionAnualService {
                                                         key.vidoportunidadobjetivo, // vidoportunidadobjetivo
                                                         key.aanio, // aanio
                                                         totalMes.doubleValue(), // ctotalmes
-                                                        totalAnual.doubleValue() // ctotalanual
-                                        )).orElse(null);
+                                                        totalAnual.doubleValue(), // ctotalanual
+                                                        0.0,
+                                                        0.0,
+                                                        0.0)).orElse(null);
                                 })
                                 .filter(Objects::nonNull)
                                 .sorted(Comparator.comparing(VectorProduccion::getAanio))

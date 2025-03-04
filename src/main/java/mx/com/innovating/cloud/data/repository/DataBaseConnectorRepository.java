@@ -11,6 +11,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.ws.rs.PathParam;
+import java.util.Date;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 import mx.com.innovating.cloud.data.exceptions.SqlExecutionErrorException;
 
@@ -28,7 +29,7 @@ import mx.com.innovating.cloud.data.models.InformacionInversion;
 import mx.com.innovating.cloud.data.models.FactorInversion;
 import mx.com.innovating.cloud.data.models.CostoOperacion;
 import mx.com.innovating.cloud.data.models.Oportunidades;
-import mx.com.innovating.cloud.data.models.EscaleraProduccion;
+import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
 
 // Orchestrator models
 import mx.com.innovating.cloud.orchestrator.models.Areakmasignacion;
@@ -39,9 +40,10 @@ import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 
 // Service classes for calculations
 import mx.com.innovating.cloud.data.calculator.ProduccionAnualService;
+import mx.com.innovating.cloud.data.calculator.EscaleraProduccionMultiService;
 import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
 import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
-
+import mx.com.innovating.cloud.data.calculator.ProduccionAnualMultiService;
 // Exception handling
 import mx.com.innovating.cloud.data.exceptions.SqlExecutionErrorException;
 
@@ -66,7 +68,13 @@ public class DataBaseConnectorRepository {
     ProduccionAnualService produccionAnualService;
 
     @Inject
+    ProduccionAnualMultiService produccionAnualMultiService;
+
+    @Inject
     EscaleraProduccionService escaleraProduccionService;
+
+    @Inject
+    EscaleraProduccionMultiService escaleraProduccionMultiService;
 
     @Inject
     PozoVolumenService pozoVolumenService;
@@ -181,14 +189,28 @@ public class DataBaseConnectorRepository {
     }
 
     public List<VectorProduccion> getVectorProduccion(Integer pnoportunidadobjetivo, Integer pnidversion,
-            double pncuota, double pndeclinada, double pnpce, double pnarea) {
+            double pncuota, double pndeclinada, double pnpce, double pnarea, String fecha) {
         List<VectorProduccion> results = new ArrayList<>();
+        if (fecha != null && !"unexist".equals(fecha)) {
 
-        results = produccionAnualService.calculateProduccionAnual(
-                pnidversion, pnoportunidadobjetivo, pncuota,
-                pndeclinada, pnpce, pnarea);
+            results = produccionAnualMultiService.calculateProduccionAnualMulti(
+                    pnidversion, pnoportunidadobjetivo, pncuota,
+                    pndeclinada, pnpce, pnarea, fecha);
+        } else {
+            results = produccionAnualService.calculateProduccionAnual(
+                    pnidversion, pnoportunidadobjetivo, pncuota,
+                    pndeclinada, pnpce, pnarea);
+        }
 
         return results;
+    }
+
+    public List<VectorProduccion> getVectorProduccion(Integer pnoportunidadobjetivo, Integer pnidversion,
+            double pncuota, double pndeclinada, double pnpce, double pnarea) {
+
+        return getVectorProduccion(
+                pnoportunidadobjetivo, pnidversion, pncuota,
+                pndeclinada, pnpce, pnarea, null);
     }
 
     public List<ProduccionPozos> getProduccionPozo(Integer idOportunidad, Integer version, Double pncuota,
@@ -206,56 +228,96 @@ public class DataBaseConnectorRepository {
 
     }
 
-    public List<EscaleraProduccion> getEscaleraProduccion(Integer pnoportunidadobjetivo, Integer pnidversion,
-            double pncuota, double pndeclinada, double pnpce, double pnarea) {
-        List<EscaleraProduccion> results = new ArrayList<>();
+    public List<EscaleraProduccionMulti> getEscaleraProduccionMulti(Integer pnoportunidadobjetivo, Integer pnidversion,
+            double pncuota, double pndeclinada, double pnpce, double pnarea, String fecha) {
+        List<EscaleraProduccionMulti> results = new ArrayList<>();
 
-        results = escaleraProduccionService.calculateEscaleraProduccion(
+        results = escaleraProduccionMultiService.calculateEscaleraProduccionMulti(
+                pnidversion,
+                pnoportunidadobjetivo,
+                pncuota,
+                pndeclinada,
+                pnpce,
+                pnarea,
+                fecha);
+        return results;
+    }
+
+    public List<EscaleraProduccionMulti> getEscaleraProduccion(Integer pnoportunidadobjetivo, Integer pnidversion,
+            double pncuota, double pndeclinada, double pnpce, double pnarea) {
+        List<EscaleraProduccionMulti> allResults;
+
+        allResults = escaleraProduccionService.calculateEscaleraProduccion(
                 pnidversion,
                 pnoportunidadobjetivo,
                 pncuota,
                 pndeclinada,
                 pnpce,
                 pnarea);
-        return results;
 
+        return allResults;
     }
 
-    public List<EscaleraProduccion> getPozosPerforados(
+    public List<EscaleraProduccionMulti> getPozosPerforados(
+            Integer pnoportunidadobjetivo,
+            Integer pnidversion,
+            double pncuota,
+            double pndeclinada,
+            double pnpce,
+            double pnarea,
+            String fecha) {
+        try {
+            List<EscaleraProduccionMulti> allResults;
+
+            if (fecha == null || fecha.equals("unexist")) {
+                allResults = escaleraProduccionService.calculateEscaleraProduccion(
+                        pnidversion,
+                        pnoportunidadobjetivo,
+                        pncuota,
+                        pndeclinada,
+                        pnpce,
+                        pnarea);
+
+            } else {
+                allResults = escaleraProduccionMultiService
+                        .calculateEscaleraProduccionMulti(
+                                pnidversion,
+                                pnoportunidadobjetivo,
+                                pncuota,
+                                pndeclinada,
+                                pnpce,
+                                pnarea,
+                                fecha);
+            }
+
+            // First, find minimum vidconsecutivo for each pozo
+            Map<Integer, Integer> minConsecutivosPerPozo = allResults.stream()
+                    .collect(Collectors.groupingBy(
+                            EscaleraProduccionMulti::getIdpozo,
+                            Collectors.collectingAndThen(
+                                    Collectors.minBy(Comparator.comparing(EscaleraProduccionMulti::getIdconsecutivo)),
+                                    opt -> opt.map(EscaleraProduccionMulti::getIdconsecutivo).orElse(null))));
+
+            // Then filter the original results to match those minimums
+            return allResults.stream()
+                    .filter(result -> result.getIdconsecutivo().equals(
+                            minConsecutivosPerPozo.get(result.getIdpozo())))
+                    .sorted(Comparator.comparing(EscaleraProduccionMulti::getIdpozo))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            Log.error("Error in getPozosPerforados", e);
+            throw new SqlExecutionErrorException("Error in getPozosPerforados");
+        }
+    }
+
+    public List<EscaleraProduccionMulti> getPozosPerforados(
             Integer pnoportunidadobjetivo,
             Integer pnidversion,
             double pncuota,
             double pndeclinada,
             double pnpce,
             double pnarea) {
-        try {
-            // Get all escalera produccion results
-            List<EscaleraProduccion> allResults = escaleraProduccionService.calculateEscaleraProduccion(
-                    pnidversion,
-                    pnoportunidadobjetivo,
-                    pncuota,
-                    pndeclinada,
-                    pnpce,
-                    pnarea);
-
-            // First, find minimum vidconsecutivo for each pozo
-            Map<Integer, Integer> minConsecutivosPerPozo = allResults.stream()
-                    .collect(Collectors.groupingBy(
-                            EscaleraProduccion::getIdpozo,
-                            Collectors.collectingAndThen(
-                                    Collectors.minBy(Comparator.comparing(EscaleraProduccion::getIdconsecutivo)),
-                                    opt -> opt.map(EscaleraProduccion::getIdconsecutivo).orElse(null))));
-
-            // Then filter the original results to match those minimums
-            return allResults.stream()
-                    .filter(result -> result.getIdconsecutivo().equals(
-                            minConsecutivosPerPozo.get(result.getIdpozo())))
-                    .sorted(Comparator.comparing(EscaleraProduccion::getIdpozo))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            Log.error("Error in getPozosPerforados", e);
-            throw new SqlExecutionErrorException("Error in getPozosPerforados");
-        }
+        return getPozosPerforados(pnoportunidadobjetivo, pnidversion, pncuota, pndeclinada, pnpce, pnarea, null);
     }
 
     public List<PozosActivos> getPozosActivos(
@@ -265,20 +327,46 @@ public class DataBaseConnectorRepository {
             double pndeclinada,
             double pnpce,
             double pnarea) {
+        return getPozosActivos(pnoportunidadobjetivo, pnidversion, pncuota, pndeclinada, pnpce, pnarea, null);
+
+    }
+
+    public List<PozosActivos> getPozosActivos(
+            Integer pnoportunidadobjetivo,
+            Integer pnidversion,
+            double pncuota,
+            double pndeclinada,
+            double pnpce,
+            double pnarea,
+            String fecha) {
         try {
-            // Get all escalera produccion results
-            List<EscaleraProduccion> allResults = escaleraProduccionService.calculateEscaleraProduccion(
-                    pnidversion,
-                    pnoportunidadobjetivo,
-                    pncuota,
-                    pndeclinada,
-                    pnpce,
-                    pnarea);
+            List<EscaleraProduccionMulti> allResults;
+
+            if (fecha == null || fecha.equals("unexist")) {
+                allResults = escaleraProduccionService.calculateEscaleraProduccion(
+                        pnidversion,
+                        pnoportunidadobjetivo,
+                        pncuota,
+                        pndeclinada,
+                        pnpce,
+                        pnarea);
+
+            } else {
+                allResults = escaleraProduccionMultiService
+                        .calculateEscaleraProduccionMulti(
+                                pnidversion,
+                                pnoportunidadobjetivo,
+                                pncuota,
+                                pndeclinada,
+                                pnpce,
+                                pnarea,
+                                fecha);
+            }
 
             // Group by year and count
             Map<String, Long> countsByYear = allResults.stream()
                     .collect(Collectors.groupingBy(
-                            EscaleraProduccion::getAnio,
+                            EscaleraProduccionMulti::getAnio,
                             Collectors.counting()));
 
             // Convert to final format
@@ -451,19 +539,51 @@ public class DataBaseConnectorRepository {
             Double pndeclinada,
             Double pnpce,
             Double pnarea) {
-        try {
+        return getProduccionTotalMmbpce(
+                idOportunidad,
+                version,
+                pncuota,
+                pndeclinada,
+                pnpce,
+                pnarea,
+                null);
+    }
 
-            List<EscaleraProduccion> results = escaleraProduccionService.calculateEscaleraProduccion(
-                    version,
-                    idOportunidad,
-                    pncuota,
-                    pndeclinada,
-                    pnpce,
-                    pnarea);
+    public ProduccionTotalMmbpce getProduccionTotalMmbpce(
+            Integer idOportunidad,
+            Integer version,
+            Double pncuota,
+            Double pndeclinada,
+            Double pnpce,
+            Double pnarea,
+            String fecha) {
+        try {
+            List<EscaleraProduccionMulti> results;
+
+            if (fecha == null || fecha.equals("unexist")) {
+                results = escaleraProduccionService.calculateEscaleraProduccion(
+                        version,
+                        idOportunidad,
+                        pncuota,
+                        pndeclinada,
+                        pnpce,
+                        pnarea);
+
+            } else {
+                results = escaleraProduccionMultiService
+                        .calculateEscaleraProduccionMulti(
+                                version,
+                                idOportunidad,
+                                pncuota,
+                                pndeclinada,
+                                pnpce,
+                                pnarea,
+                                fecha);
+            }
 
             // Calculate the sum of vproduccion
             double total = results.stream()
-                    .mapToDouble(EscaleraProduccion::getProduccion)
+                    .mapToDouble(EscaleraProduccionMulti::getProduccion)
                     .sum();
 
             // Create and return ProduccionTotalMmbpce object
@@ -479,6 +599,46 @@ public class DataBaseConnectorRepository {
             }
 
             return produccionTotal;
+
+        } catch (Exception e) {
+            Log.error("JDBC: getProduccionTotalMmbpce exception executing SQL", e);
+            throw new SqlExecutionErrorException("JDBC getProduccionTotalMmbpce exception executing SQL");
+        }
+    }
+
+    public Date getfechaTerminoDate(
+            Integer idOportunidad,
+            Integer version,
+            Double pncuota,
+            Double pndeclinada,
+            Double pnpce,
+            Double pnarea,
+            String fecha) {
+        try {
+
+            List<EscaleraProduccionMulti> results = escaleraProduccionMultiService.calculateEscaleraProduccionMulti(
+                    version,
+                    idOportunidad,
+                    pncuota,
+                    pndeclinada,
+                    pnpce,
+                    pnarea,
+                    fecha);
+
+            if (results.size() == 0) {
+                Log.error("JDBC exception: getfechaTerminoDate  no present with idOportunidad = "
+                        + idOportunidad);
+                throw new SqlExecutionErrorException(
+                        "JDBC exception: getfechaTerminoDate  no present with idOportunidad = "
+                                + idOportunidad);
+            }
+
+            Date fechaTerminoDate = results.stream()
+                    .map(EscaleraProduccionMulti::getFecha)
+                    .max(Date::compareTo)
+                    .orElseThrow(() -> new SqlExecutionErrorException("No fecha found"));
+
+            return fechaTerminoDate;
 
         } catch (Exception e) {
             Log.error("JDBC: getProduccionTotalMmbpce exception executing SQL", e);

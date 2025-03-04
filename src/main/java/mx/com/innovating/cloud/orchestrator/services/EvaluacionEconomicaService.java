@@ -12,7 +12,7 @@ import io.quarkus.logging.Log;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 import mx.com.innovating.cloud.data.models.*;
 import mx.com.innovating.cloud.data.models.CostoOperacion;
-import mx.com.innovating.cloud.data.models.EscaleraProduccion;
+import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
 import mx.com.innovating.cloud.data.models.FactorInversion;
 import mx.com.innovating.cloud.data.models.FactorInversionDesarrollo;
 import mx.com.innovating.cloud.data.models.FactorInversionExploratorio;
@@ -117,7 +117,7 @@ public class EvaluacionEconomicaService {
                         }
 
                         // log.info(" 2 / 12 - getPozoPerforados");
-                        List<EscaleraProduccion> listTerminados = databaseConnectorClient.getPozosPerforados(
+                        List<EscaleraProduccionMulti> listTerminados = databaseConnectorClient.getPozosPerforados(
                                         idOportunidadObjetivo, version, cuota, declinada, pce, area); // getPozosTerminados(idOportunidad)
                                                                                                       // hecho
 

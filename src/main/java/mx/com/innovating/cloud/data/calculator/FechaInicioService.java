@@ -62,7 +62,10 @@ public class FechaInicioService {
 
         // Calculate entrada (ceiling of pozos/equipo)
         Integer varEntrada = (int) Math.ceil((double) varNPozos / varNEquipo);
-
+        if (varNPozos <= 1) {
+            varNEquipo = 1;
+            varEntrada = 1;
+        }
         // Get initial dates and durations
         QueryDateInfo dateInfo = obtenerInfoFechas(pnIdVersion, pnOportunidadObjetivo);
 
@@ -82,8 +85,7 @@ public class FechaInicioService {
                 dateInfo.diasTerm,
                 varNDias,
                 varFechaInicio,
-                varFechaTermino,
-                calculoNumPozosResult.getTipoCalculo()
+                varFechaTermino
                 );
     }
 
@@ -97,15 +99,16 @@ public class FechaInicioService {
                 LEFT JOIN catalogo.claveobjetivovw co ON
                     co.idoportunidad = o.idoportunidad
                     AND co.idversion = o.idversion
-                WHERE o.idversion = ?
-                AND co.idoportunidadobjetivo = ?
+                WHERE o.idversion = :idversion
+                AND co.idoportunidadobjetivo = :idoportunidadobjetivo
                 """;
 
         try {
             return (String) em.createNativeQuery(sql)
-                    .setParameter(1, pnIdVersion)
-                    .setParameter(2, pnOportunidadObjetivo)
+                    .setParameter("idversion", pnIdVersion)
+                    .setParameter("idoportunidadobjetivo", pnOportunidadObjetivo)
                     .getSingleResult();
+
         } catch (jakarta.persistence.NoResultException e) {
             Log.error("No tipo calculo found for idVersion=" + pnIdVersion +
                     " and idOportunidadObjetivo=" + pnOportunidadObjetivo);
@@ -145,6 +148,7 @@ public class FechaInicioService {
                 return new CalculoNumPozosResult(pv, tipoCalculo);
 
             case "Área":
+            case "Area":
                 Double numPozo = calcularNumeroPozoArea(pnIdVersion, pnOportunidadObjetivo, pnArea);
                 Integer pa = (int) Math.ceil(numPozo);
                 return new CalculoNumPozosResult(pa, tipoCalculo);
@@ -225,8 +229,7 @@ public class FechaInicioService {
             Double varNDiasTerm,
             Double varNDias,
             LocalDateTime varFechaInicio,
-            LocalDateTime varFechaTermino,
-            String tipoCalculo
+            LocalDateTime varFechaTermino
             ) {
 
         List<FechaInicioResult> results = new ArrayList<>();
@@ -242,8 +245,7 @@ public class FechaInicioService {
                 1,
                 varNDiasPerf,
                 varNDiasTerm,
-                varNDias,
-                tipoCalculo
+                varNDias
                 );
 
         // Recursive part (matching UNION ALL in CTE)
@@ -266,8 +268,7 @@ public class FechaInicioService {
                     idCte,
                     varNDiasPerf,
                     varNDiasTerm,
-                    varNDias,
-                    tipoCalculo
+                    varNDias
                     );
 
             currentFechaInicio = currentFechaTermino;
@@ -286,8 +287,7 @@ public class FechaInicioService {
             int idCte,
             double diasPerf,
             double diasTerm,
-            double dias,
-            String tipoCalculo
+            double dias
             ) {
 
         double monthFraction = calcularFraccionMes(fechaTermino);
@@ -316,7 +316,6 @@ public class FechaInicioService {
                 diasPerf,
                 diasTerm,
                 dias,
-                tipoCalculo,
                 idCte
         ));
     }

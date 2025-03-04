@@ -6,6 +6,11 @@ import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import mx.com.innovating.cloud.data.models.DeclinaExpoportunidadResult;
+import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
+import mx.com.innovating.cloud.data.models.FechaInicioResult;
+
+import mx.com.innovating.cloud.data.models.ProduccionPozos;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import mx.com.innovating.cloud.data.models.*;
@@ -19,7 +24,6 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @ApplicationScoped
 public class EscaleraProduccionService {
     @Inject
@@ -84,15 +88,15 @@ public class EscaleraProduccionService {
         }
     }
 
-    @Transactional
-    @CacheResult(cacheName = "escalera-produccion-cache")
-    public List<EscaleraProduccion> calculateEscaleraProduccion(
-            @CacheKey int pnidversion,
-            @CacheKey int pnoportunidadobjetivo,
-            @CacheKey double pncuota,
-            @CacheKey double pndeclinada,
-            @CacheKey double pnpce,
-            @CacheKey double pnarea) {
+    // @Transactional
+    // @CacheResult(cacheName = "escalera-produccion-cache")
+    public List<EscaleraProduccionMulti> calculateEscaleraProduccion(
+            int pnidversion,
+            int pnoportunidadobjetivo,
+            double pncuota,
+            double pndeclinada,
+            double pnpce,
+            double pnarea) {
 
         // Fetch declinada results
         List<DeclinaExpoportunidadResult> declinaResults = declinaExpService.calcularDeclinaExpoportunidad(
@@ -109,19 +113,20 @@ public class EscaleraProduccionService {
                 .collect(Collectors.toList());
 
         // Fetch fecha inicio results
-        List<FechaInicioResult> fechaInicioResults = fechaInicioService.calcularFechaInicio(
-                pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce, pnarea);
+        List<FechaInicioResult> fechaInicioResults;
+        fechaInicioResults = fechaInicioService.calcularFechaInicio(
+                        pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce, pnarea);
 
         // Calculate parameters similar to SPP
         int nmes = declinadaPozo.size() - 2;
-        List<EscaleraProduccion> results = new ArrayList<>();
+        List<EscaleraProduccionMulti> results = new ArrayList<>();
         int consecutiveId = 1;
         int pi = 1;
 
         // Tope si es por area
         Double numeroPozoArea = calcularNumeroPozoArea(pnidversion, pnoportunidadobjetivo, pnarea);
         double prodMaxpp = pnpce / numeroPozoArea;
-        String tipoCalculo = fechaInicioResults.get(0).getTipoCalculo();
+        String tipoCalculo = fechaInicioService.obtenerTipoCalculo(pnidversion, pnoportunidadobjetivo);
         double rArea = numeroPozoArea - Math.floor(numeroPozoArea);
         double fraccionArea = rArea * prodMaxpp;
 
@@ -154,7 +159,7 @@ public class EscaleraProduccionService {
                 String pozoName = "POZO " + idPozo;
                 int currentSeqId = secuenciaPozos.get(idPozo - 1).idsec;
 
-                if(Objects.equals(currentEntrada.getTipoCalculo(), "Volumen")){
+                if(Objects.equals(tipoCalculo, "Volumen")){
                     for (int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
                         LocalDate currentDate = varFecha.plusMonths(mesIndex);
                         YearMonth yearMonth = YearMonth.from(currentDate);
@@ -168,7 +173,7 @@ public class EscaleraProduccionService {
                             produccion = (dp.perfil * yearMonth.lengthOfMonth()) / 1000.0;
                         }
 
-                        results.add(new EscaleraProduccion(
+                        results.add(new EscaleraProduccionMulti(
                                 consecutiveId++,
                                 mesIndex + 1,
                                 idPozo,
@@ -179,32 +184,35 @@ public class EscaleraProduccionService {
                                 String.valueOf(currentDate.getYear()),
                                 currentDate.getMonthValue(),
                                 produccion,
+                                0.0,
+                                0.0,
+                                0.0,
                                 Date.valueOf(currentDate)));
                     }
-                }else{
+                } else {
                     double acum = 0.0;
                     double produccion;
                     // mientras que produccion sea menor a prodMaxpp se hcaen los calculos
-                    for(int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
+                    for (int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
                         LocalDate currentDate = varFecha.plusMonths(mesIndex);
                         YearMonth yearMonth = YearMonth.from(currentDate);
                         DeclinadaPozo dp = declinadaPozo.get(mesIndex);
 
 
-                        if(currentSeqId == z && rArea > 0) {
+                        if (currentSeqId == z && rArea > 0) {
                             produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * rArea;
-                            if(acum + produccion > fraccionArea){
+                            if (acum + produccion > fraccionArea) {
                                 break;
                             }
-                        }else{
+                        } else {
                             produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0);
-                            if(acum + produccion > prodMaxpp){
+                            if (acum + produccion > prodMaxpp) {
                                 break;
                             }
                         }
 
                         acum += produccion;
-                        results.add(new EscaleraProduccion(
+                        results.add(new EscaleraProduccionMulti(
                                 consecutiveId++,
                                 mesIndex + 1,
                                 idPozo,
@@ -215,6 +223,9 @@ public class EscaleraProduccionService {
                                 String.valueOf(currentDate.getYear()),
                                 currentDate.getMonthValue(),
                                 produccion,
+                                0.0,
+                                0.0,
+                                0.0,
                                 Date.valueOf(currentDate)
                         ));
                     }
@@ -225,9 +236,9 @@ public class EscaleraProduccionService {
 
         return results.stream()
                 .sorted(Comparator
-                        .comparing(EscaleraProduccion::getAnio)
-                        .thenComparing(EscaleraProduccion::getMes)
-                        .thenComparing(EscaleraProduccion::getIdpozo))
+                        .comparing(EscaleraProduccionMulti::getAnio)
+                        .thenComparing(EscaleraProduccionMulti::getMes)
+                        .thenComparing(EscaleraProduccionMulti::getIdpozo))
                 .collect(Collectors.toList());
     }
 

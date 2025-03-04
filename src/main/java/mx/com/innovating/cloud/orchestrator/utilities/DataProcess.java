@@ -1,5 +1,15 @@
 package mx.com.innovating.cloud.orchestrator.utilities;
 
+import lombok.extern.slf4j.Slf4j;
+import mx.com.innovating.cloud.data.models.FactorInversion;
+import mx.com.innovating.cloud.data.models.FactorInversionDesarrollo;
+import mx.com.innovating.cloud.data.models.FactorInversionExploratorio;
+import mx.com.innovating.cloud.data.models.Paridad;
+import mx.com.innovating.cloud.data.models.ProduccionTotalMmbpce;
+import mx.com.innovating.cloud.data.models.*;
+import mx.com.innovating.cloud.orchestrator.models.*;
+import org.apache.poi.ss.formula.functions.Irr;
+
 import java.math.BigDecimal;
 import java.time.Year;
 import java.util.ArrayList;
@@ -7,16 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import lombok.extern.slf4j.Slf4j;
-import mx.com.innovating.cloud.data.models.EscaleraProduccion;
-import mx.com.innovating.cloud.data.models.FactorInversion;
-import mx.com.innovating.cloud.data.models.FactorInversionDesarrollo;
-import mx.com.innovating.cloud.data.models.FactorInversionExploratorio;
-import mx.com.innovating.cloud.data.models.Paridad;
-import mx.com.innovating.cloud.data.models.ProduccionTotalMmbpce;
-import mx.com.innovating.cloud.orchestrator.models.*;
-import org.apache.poi.ss.formula.functions.Irr;
+import java.util.Comparator;
 
 @Slf4j
 public class DataProcess {
@@ -57,10 +58,6 @@ public class DataProcess {
 			terminacionDesarrollo = fiDesarrollo.getTerminacion() * paridad * terminado.doubleValue();
 			infraestructuraDesarrollo = fiDesarrollo.getInfraestructura() * paridad * terminado.doubleValue();
 		}
-
-		// REGLA DE INVERSIONES A FUTURO
-		// El calculo de inversion en futuro desarrollo debe realizarse en todos
-		// los años donde haya pozos perforados y/o terminados
 
 		var inversionDesarrollo = perforacionDesarrollo + terminacionDesarrollo + infraestructuraDesarrollo;
 		inversion.setDesarrolloSinOperacional(inversionDesarrollo);
@@ -223,7 +220,7 @@ public class DataProcess {
 		return produccionDiariaPromedioMap;
 	}
 
-	public static Map<Integer, BigDecimal> getPozosPerforadosByAnio(List<EscaleraProduccion> listTerminados,
+	public static Map<Integer, BigDecimal> getPozosPerforadosByAnio(List<EscaleraProduccionMulti> listTerminados,
 			String anioInicio) {
 
 		Map<Integer, BigDecimal> perforados = new HashMap<>();
@@ -247,7 +244,7 @@ public class DataProcess {
 		return perforados;
 	}
 
-	public static Map<Integer, BigDecimal> getPozosterminadosByAnio(List<EscaleraProduccion> listTerminados) {
+	public static Map<Integer, BigDecimal> getPozosterminadosByAnio(List<EscaleraProduccionMulti> listTerminados) {
 
 		Map<Integer, BigDecimal> terminados = new HashMap<>();
 		var bigDecimal = new BigDecimal(1);
@@ -263,7 +260,6 @@ public class DataProcess {
 	public static void finalProcessInversiones(List<EvaluacionEconomica> evaluacionEconomica) {
 
 		evaluacionEconomica.forEach(eval -> {
-			// if (eval.getInversiones().getTotal() == null) {
 
 			var exploratoriaTotal = (eval.getInversiones().getPerforacionExp() == null ? 0
 					: eval.getInversiones().getPerforacionExp())
@@ -314,7 +310,6 @@ public class DataProcess {
 	}
 
 	public static void calculaFlujoContable(List<EvaluacionEconomica> evaluacionEconomica) {
-
 		AtomicInteger flujo = new AtomicInteger();
 		evaluacionEconomica.forEach(eval -> {
 
@@ -386,7 +381,8 @@ public class DataProcess {
 			valorPresenteIngresosList.add(eval.getFlujoContable().getFlujosDescontadosIngresos());
 			valorPresenteCostosList.add(eval.getFlujoContable().getFlujosDescontadosCostos());
 			listTotalesInversiones.add(eval.getInversiones().getTotal());
-			listTotalesCostos.add(eval.getCostos() == null ? 0 : eval.getCostos().getTotal());
+			listTotalesCostos.add(eval.getCostos() == null || eval.getCostos().getTotal() == null ? 0.0
+					: eval.getCostos().getTotal());
 		});
 
 		var totalInversiones = 0.0;
@@ -398,10 +394,14 @@ public class DataProcess {
 
 		// log.info("::::: totalInversiones {}", totalInversiones);
 
-		var costosTotal = 0.0;
-		for (double totalCosto : listTotalesCostos) {
-			costosTotal += totalCosto;
-		}
+		// var costosTotal = 0.0;
+		// for (double totalCosto : listTotalesCostos) {
+		// costosTotal += totalCosto;
+		// }
+
+		var costosTotal = listTotalesCostos.stream()
+				.mapToDouble(total -> total == null ? 0.0 : total)
+				.sum();
 		var flujosDescontadosEfectivoTotal = 0.0;
 		for (double fdet : flujosDescontadosEfectivoList) {
 			flujosDescontadosEfectivoTotal += fdet;
@@ -474,8 +474,155 @@ public class DataProcess {
 			utilidadBpce = vpn / reporte123;
 			relacionCostoBeneficio = valorPresenteIngresos / valorPresenteEgresos;
 			costoOperacion = costosTotal / reporte123;
-			costoDescubrimiento720 = inversionExploratoria / pce;
+			if (inversionExploratoria != null) {
+				costoDescubrimiento720 = inversionExploratoria / pce;
+			} else {
+				costoDescubrimiento720 = 0.0;
+			}
+		}
 
+		return new FlujoContableTotal(vpn, tir, flujosDescontadosEfectivoTotal, valorPresenteInversion,
+				valorPresenteEgresos, valorPresenteIngresos, valorPresenteCostos, reporte708, reporte721, reporte722,
+				reporte723, utilidadBpce, relacionCostoBeneficio, costoDescubrimiento720, costoOperacion);
+
+	}
+
+	public static FlujoContableTotal calculaFlujosContablesTotalesForMulti(
+			List<EvaluacionEconomica> evaluacionEconomica,
+			double[] produccionTotalMmbpce, FactorCalculoForMulti factorCalculoForMulti, double pce) {
+		if (evaluacionEconomica == null || evaluacionEconomica.isEmpty()) {
+
+			log.warn("No evaluaciones found for processing");
+			return new FlujoContableTotal(); // or whatever default makes sense
+		}
+
+		List<Double> flujosNetosEfectivo = new ArrayList<>();
+		List<Double> flujosDescontadosEfectivoList = new ArrayList<>();
+		List<Double> valorPresenteInversionList = new ArrayList<>();
+		List<Double> valorPresenteEgresosList = new ArrayList<>();
+		List<Double> valorPresenteIngresosList = new ArrayList<>();
+		List<Double> valorPresenteCostosList = new ArrayList<>();
+
+		EvaluacionEconomica earliestEvaluacion = evaluacionEconomica.stream()
+				.min(Comparator.comparingInt(e -> Integer.parseInt(e.getAnio())))
+				.orElseThrow(() -> new IllegalStateException("No evaluaciones available"));
+
+		double inversionExploratoria = earliestEvaluacion.getInversiones().getExploratoria();
+
+		double desarrolloSinOperacional = 0.0;
+
+		for (int i = 0; i < evaluacionEconomica.size(); i++) {
+			Double eachDesarrolloSinOperacional = evaluacionEconomica.get(i).getInversiones()
+					.getDesarrolloSinOperacional();
+			if (eachDesarrolloSinOperacional != null) {
+				desarrolloSinOperacional += eachDesarrolloSinOperacional;
+			}
+		}
+
+		List<Double> listTotalesInversiones = new ArrayList<>();
+
+		List<Double> listTotalesCostos = new ArrayList<>();
+
+		evaluacionEconomica.forEach(eval -> {
+			flujosNetosEfectivo.add(eval.getFlujoContable().getFlujosNetosEfectivo());
+			flujosDescontadosEfectivoList.add(eval.getFlujoContable().getFlujosDescontadosEfectivo());
+			valorPresenteInversionList.add(eval.getFlujoContable().getFlujosDescontadosInversion());
+			valorPresenteEgresosList.add(eval.getFlujoContable().getFlujosDescontadosEgresos());
+			valorPresenteIngresosList.add(eval.getFlujoContable().getFlujosDescontadosIngresos());
+			valorPresenteCostosList.add(eval.getFlujoContable().getFlujosDescontadosCostos());
+			listTotalesInversiones.add(eval.getInversiones().getTotal());
+			listTotalesCostos.add(eval.getCostos() == null || eval.getCostos().getTotal() == null ? 0.0
+					: eval.getCostos().getTotal());
+		});
+
+		var totalInversiones = 0.0;
+		for (Double total : listTotalesInversiones) {
+			totalInversiones += total == null ? 0 : total;
+		}
+
+		totalInversiones += desarrolloSinOperacional;
+
+		var costosTotal = listTotalesCostos.stream()
+				.mapToDouble(total -> total == null ? 0.0 : total)
+				.sum();
+		var flujosDescontadosEfectivoTotal = 0.0;
+		for (double fdet : flujosDescontadosEfectivoList) {
+			flujosDescontadosEfectivoTotal += fdet;
+		}
+		var valorPresenteInversion = 0.0;
+		for (double vpi : valorPresenteInversionList) {
+			valorPresenteInversion += vpi;
+		}
+		var valorPresenteEgresos = 0.0;
+		for (double vpe : valorPresenteEgresosList) {
+			valorPresenteEgresos += vpe;
+		}
+		var valorPresenteIngresos = 0.0;
+		for (double vpIngresos : valorPresenteIngresosList) {
+			valorPresenteIngresos += vpIngresos;
+		}
+		var valorPresenteCostos = 0.0;
+		for (double vpc : valorPresenteCostosList) {
+			valorPresenteCostos += vpc;
+		}
+
+		var inversionInicial = flujosNetosEfectivo.get(0);
+
+		// log.info("::::: inversionInicial {}", inversionInicial);
+
+		var vpn = calculaVpn(inversionInicial, flujosNetosEfectivo, 0.10);
+
+		Double tir = 0.0;
+		var reporte708 = 0.0;
+		var reporte721 = 0.0;
+		var reporte722 = 0.0;
+		var reporte723 = 0.0;
+		var utilidadBpce = 0.0;
+		var relacionCostoBeneficio = 0.0;
+		var costoDescubrimiento720 = 0.0;
+		var costoOperacion = 0.0;
+
+		if (pce != 0.0) {
+
+			double[] flujosDeCajaArray = flujosNetosEfectivo.stream()
+					.mapToDouble(Double::doubleValue)
+					.toArray();
+
+			tir = Irr.irr(flujosDeCajaArray, 0.10) * 100;
+			if (Double.isNaN(tir)) {
+				// log.info("::::: evaluacionEconomica data {}", evaluacionEconomica);
+				// log.info("::::: tir calculo final {}", tir);
+			}
+		} else {
+			tir = 0.0;
+		}
+		double reporte120 = 0.0;
+		double reporte121 = 0.0;
+		double reporte123 = 0.0;
+		reporte120 = factorCalculoForMulti.getSumFc_aceite().doubleValue();
+		reporte121 = factorCalculoForMulti.getSumFc_gas().doubleValue();
+		for (int i = 0; i < produccionTotalMmbpce.length; i++) {
+			reporte123 += produccionTotalMmbpce[i];
+		}
+
+		var perfDes = earliestEvaluacion.getInversiones().getPerforacionDes();
+
+		if (perfDes == null) {
+			perfDes = 0.0;
+		}
+		if (perfDes != 0.0) {
+			reporte708 = vpn / valorPresenteInversion;
+			reporte721 = totalInversiones / reporte120;
+			reporte722 = totalInversiones / reporte121;
+			reporte723 = totalInversiones / reporte123;
+			utilidadBpce = vpn / reporte123;
+			relacionCostoBeneficio = valorPresenteIngresos / valorPresenteEgresos;
+			costoOperacion = costosTotal / reporte123;
+			if (pce != 0.0 && inversionExploratoria != 0.0) {
+				costoDescubrimiento720 = inversionExploratoria / pce;
+			} else {
+				costoDescubrimiento720 = 0.0;
+			}
 		}
 
 		return new FlujoContableTotal(vpn, tir, flujosDescontadosEfectivoTotal, valorPresenteInversion,
