@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 public class CalculoNumPozosResult {
 
-    private Integer nPozos;
+    private Double nPozos;
     private String tipoCalculo;
 
 }
