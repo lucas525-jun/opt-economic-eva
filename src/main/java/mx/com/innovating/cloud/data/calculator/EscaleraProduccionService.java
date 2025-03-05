@@ -127,6 +127,7 @@ public class EscaleraProduccionService {
         Double numeroPozoArea = calcularNumeroPozoArea(pnidversion, pnoportunidadobjetivo, pnarea);
         double prodMaxpp = pnpce / numeroPozoArea;
         String tipoCalculo = fechaInicioService.obtenerTipoCalculo(pnidversion, pnoportunidadobjetivo);
+        CalculoNumPozosResult calculoNumPozosResult = fechaInicioService.calcularNumeroPozos(tipoCalculo, pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce, pnarea);
         double rArea = numeroPozoArea - Math.floor(numeroPozoArea);
         double fraccionArea = rArea * prodMaxpp;
 
@@ -159,7 +160,7 @@ public class EscaleraProduccionService {
                 String pozoName = "POZO " + idPozo;
                 int currentSeqId = secuenciaPozos.get(idPozo - 1).idsec;
 
-                if(Objects.equals(tipoCalculo, "Volumen")){
+                if(Objects.equals(calculoNumPozosResult.getTipoCalculo(), "Volumen")){
                     for (int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
                         LocalDate currentDate = varFecha.plusMonths(mesIndex);
                         YearMonth yearMonth = YearMonth.from(currentDate);

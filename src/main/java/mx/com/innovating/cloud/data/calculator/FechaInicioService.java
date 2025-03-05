@@ -129,7 +129,7 @@ public class FechaInicioService {
         return result.getNumPozo();
     }
 
-    private CalculoNumPozosResult calcularNumeroPozos(
+    protected CalculoNumPozosResult calcularNumeroPozos(
             String tipoCalculo,
             Integer pnIdVersion,
             Integer pnOportunidadObjetivo,
