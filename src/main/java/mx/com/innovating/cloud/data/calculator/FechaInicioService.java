@@ -54,7 +54,7 @@ public class FechaInicioService {
         CalculoNumPozosResult calculoNumPozosResult = calcularNumeroPozos(tipoCalculo, pnIdVersion, pnOportunidadObjetivo,
                 pnCuota, pnDeclinada, pnPce, pnArea);
 
-        Integer varNPozos = calculoNumPozosResult.getNPozos();
+        Integer varNPozos = (int) Math.ceil(calculoNumPozosResult.getNPozos());
 
         // Get equipment number
         NumEquipoResult numEquipo = numEquipoService.calcularNumEquipo(varNPozos);
@@ -143,14 +143,13 @@ public class FechaInicioService {
                 List<ProduccionPozos> volumenResults = pozoVolumenService.calcularPozoVolumen(
                         pnIdVersion, pnOportunidadObjetivo, pnCuota, pnDeclinada, pnPce);
 
-                Integer pv = (int) Math.ceil(volumenResults.get(0).getCvnumpozo());
+                Double pv = volumenResults.get(0).getCvnumpozo();
 
                 return new CalculoNumPozosResult(pv, tipoCalculo);
 
             case "Área":
             case "Area":
-                Double numPozo = calcularNumeroPozoArea(pnIdVersion, pnOportunidadObjetivo, pnArea);
-                Integer pa = (int) Math.ceil(numPozo);
+                Double pa = calcularNumeroPozoArea(pnIdVersion, pnOportunidadObjetivo, pnArea);
                 return new CalculoNumPozosResult(pa, tipoCalculo);
 
             case "Ambos":
@@ -161,9 +160,9 @@ public class FechaInicioService {
                 Double pozoArea = Math.ceil(calcularNumeroPozoArea(pnIdVersion, pnOportunidadObjetivo, pnArea));
 
                 if(pozoVolumen <= pozoArea) {
-                    return new CalculoNumPozosResult((int) Math.ceil(pozoVolumen), "Volumen");
+                    return new CalculoNumPozosResult(pozoVolumen, "Volumen");
                 }else{
-                    return new CalculoNumPozosResult((int) Math.ceil(pozoArea), "Área");
+                    return new CalculoNumPozosResult(pozoArea, "Área");
                 }
             default:
                 throw new IllegalArgumentException("Tipo calculo no reconocido: " + tipoCalculo);

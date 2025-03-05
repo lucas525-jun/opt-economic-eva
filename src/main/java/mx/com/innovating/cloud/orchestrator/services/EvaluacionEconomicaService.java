@@ -183,6 +183,9 @@ public class EvaluacionEconomicaService {
                         FactorCalculo factorCalculo = databaseConnectorClient.getFactorCalculo(idOportunidadObjetivo,
                                         version);
 
+                        CalculoNumPozosResult calculoPozosTotales = databaseConnectorClient.getPozosTotales(version, idOportunidadObjetivo, cuota, declinada, pce, area);
+
+
                         // log.info("Obteniendo la informacion de los pozos perforados");
                         assert listTerminados != null;
                         Map<Integer, BigDecimal> pozosPerforados = DataProcess.getPozosPerforadosByAnio(listTerminados,
@@ -389,7 +392,7 @@ public class EvaluacionEconomicaService {
                                         // EvaluacionEconomica(Integer.toString(anioAnteriorInversionDesarrollo),
                                         // null, null, null, inversionesDesarrolloAnioAnterior, null, null));
                                         // }
-                                        double pozosTotales = 13.9;
+                                        double pozosTotales = calculoPozosTotales.getNPozos();
                                         assert infoInversion != null;
 
                                         double cantManifolds = Math.ceil(pozosTotales / 6.0);

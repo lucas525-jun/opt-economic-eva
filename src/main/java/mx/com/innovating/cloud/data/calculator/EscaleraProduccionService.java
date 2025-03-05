@@ -243,6 +243,12 @@ public class EscaleraProduccionService {
                 .collect(Collectors.toList());
     }
 
+    public CalculoNumPozosResult calcularNumPozosTotales(Integer idVersion, Integer idOportunidadObjetivo, Double pnArea, Double pncuota, Double pndeclinada, Double pnpce) {
+        String tipoCalculo = fechaInicioService.obtenerTipoCalculo(idVersion, idOportunidadObjetivo);
+
+        return fechaInicioService.calcularNumeroPozos(tipoCalculo, idVersion, idOportunidadObjetivo, pncuota, pndeclinada, pnpce, pnArea);
+    }
+
     private Double calcularNumeroPozoArea(
             Integer pnIdVersion,
             Integer pnOportunidadObjetivo,

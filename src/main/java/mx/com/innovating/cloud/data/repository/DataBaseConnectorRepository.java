@@ -12,24 +12,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.ws.rs.PathParam;
 import java.util.Date;
+
+import mx.com.innovating.cloud.data.calculator.*;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 import mx.com.innovating.cloud.data.exceptions.SqlExecutionErrorException;
 
 // Core domain models from mx.com.innovating.cloud.data.models
-import mx.com.innovating.cloud.data.models.OportunidadPlanDesarrollo;
-import mx.com.innovating.cloud.data.models.PozosActivos;
-import mx.com.innovating.cloud.data.models.VectorProduccion;
-import mx.com.innovating.cloud.data.models.ProduccionPozos;
-import mx.com.innovating.cloud.data.models.PrecioHidrocarburo;
-import mx.com.innovating.cloud.data.models.Paridad;
-import mx.com.innovating.cloud.data.models.FactorInversionExploratorio;
-import mx.com.innovating.cloud.data.models.FactorInversionDesarrollo;
-import mx.com.innovating.cloud.data.models.ProduccionTotalMmbpce;
-import mx.com.innovating.cloud.data.models.InformacionInversion;
-import mx.com.innovating.cloud.data.models.FactorInversion;
-import mx.com.innovating.cloud.data.models.CostoOperacion;
-import mx.com.innovating.cloud.data.models.Oportunidades;
-import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
+import mx.com.innovating.cloud.data.models.*;
 
 // Orchestrator models
 import mx.com.innovating.cloud.orchestrator.models.Areakmasignacion;
@@ -39,11 +28,6 @@ import mx.com.innovating.cloud.orchestrator.models.FactorCalculo;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 
 // Service classes for calculations
-import mx.com.innovating.cloud.data.calculator.ProduccionAnualService;
-import mx.com.innovating.cloud.data.calculator.EscaleraProduccionMultiService;
-import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
-import mx.com.innovating.cloud.data.calculator.PozoVolumenService;
-import mx.com.innovating.cloud.data.calculator.ProduccionAnualMultiService;
 // Exception handling
 import mx.com.innovating.cloud.data.exceptions.SqlExecutionErrorException;
 
@@ -547,6 +531,17 @@ public class DataBaseConnectorRepository {
                 pnpce,
                 pnarea,
                 null);
+    }
+
+    public CalculoNumPozosResult getPozosTotales(
+            Integer pnIdVersion,
+            Integer pnOportunidadObjetivo,
+            Double pnCuota,
+            Double pnDeclinada,
+            Double pnPce,
+            Double pnArea){
+
+        return escaleraProduccionService.calcularNumPozosTotales(pnIdVersion, pnOportunidadObjetivo, pnCuota, pnDeclinada, pnPce, pnArea);
     }
 
     public ProduccionTotalMmbpce getProduccionTotalMmbpce(
