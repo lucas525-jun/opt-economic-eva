@@ -169,7 +169,7 @@ public class FechaInicioService {
         }
     }
 
-    private static class QueryDateInfo {
+    public static class QueryDateInfo {
         String anio;
         Double diasPerf;
         Double diasTerm;
