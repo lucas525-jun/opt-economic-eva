@@ -249,6 +249,8 @@ public class EvaluacionEconomicaMultiService {
                         // log.info(" 14 / 14 - getfechaTerminoDate");
                         Date fechaTermino = databaseConnectorClient.getfechaTerminoDate(
                                         idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha);
+                        
+                        CalculoNumPozosResult calculoPozosTotales = databaseConnectorClient.getPozosTotales(version, idOportunidadObjetivo, cuota, declinada, pce, area);
 
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                         String fechaTerminoStr = formatter.format(fechaTermino);
@@ -490,7 +492,7 @@ public class EvaluacionEconomicaMultiService {
                                                                 null, null, null, inversionesAnioAnterior, null, null));
                                         }
 
-                                        double pozosTotales = 13.9;
+                                        double pozosTotales = calculoPozosTotales.getNPozos();
                                         assert infoInversion != null;
 
                                         double cantManifolds = Math.ceil(pozosTotales / 6.0);
