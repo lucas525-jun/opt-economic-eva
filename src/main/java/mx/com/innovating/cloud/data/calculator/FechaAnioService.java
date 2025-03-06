@@ -11,6 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.Year;
+
 
 @ApplicationScoped
 public class FechaAnioService {
@@ -170,10 +173,13 @@ public class FechaAnioService {
                         for (Object[] row : secondData) {
                                 int equipoPerforacion = ((Number) row[0]).intValue();
                                 String fechaDesarrollo = (String) row[1];
+                                int extractedYear = LocalDate.parse(fechaDesarrollo).getYear(); 
+                                
                                 double totalTraslado = ((Number) row[2]).doubleValue();
                                 double lapsoTerminacion = ((Number) row[3]).doubleValue();
+                                int daysInYear = Year.of(extractedYear).isLeap() ? 366 : 365;
 
-                                int pozos = (int) Math.floor(365 / (totalTraslado + lapsoTerminacion))
+                                int pozos = (int) Math.floor(daysInYear / (totalTraslado + lapsoTerminacion))
                                                 * equipoPerforacion;
 
                                 int npozo;
