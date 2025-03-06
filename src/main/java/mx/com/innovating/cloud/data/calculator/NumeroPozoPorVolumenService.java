@@ -11,8 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mx.com.innovating.cloud.data.models.VolumetriaOportunidad;
-import mx.com.innovating.cloud.data.calculator.HiperbolicoAnualService;
 
+import java.time.Year;
 import java.util.List;
 
 @ApplicationScoped
@@ -63,13 +63,17 @@ public class NumeroPozoPorVolumenService {
             Integer pnmeses,
             Integer percentil) {
 
-        // Calculate w_eur exactly as in SPP: sum(ppmbpce)*365/1000
         List<HiperbolicoAnualService.HiperbolicoAnualResult> hiperbolicoResults = hiperbolicoAnualService
                 .sppHiperbolicoAnual(pnidversion, pnoportunidadobjetivo, pntipovalor, pnmeses);
 
+
         Double w_eur = hiperbolicoResults.stream()
-                .mapToDouble(result -> result.getPpmbpce())
-                .sum() * 365.0 / 1000.0;
+            .mapToDouble(result -> {
+                int extractedYear = Integer.parseInt(result.getPanio());
+                int daysInYear = Year.of(extractedYear).isLeap() ? 366 : 365; 
+                return result.getPpmbpce() * daysInYear / 1000.0; 
+            })
+            .sum();
 
         // Get volumetria data and calculate w_pozoporvolumen exactly as in SPP:
         // pce/w_eur

@@ -10,23 +10,21 @@ import jakarta.transaction.Transactional;
 
 import mx.com.innovating.cloud.data.models.VectorProduccion;
 import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
-import mx.com.innovating.cloud.data.calculator.EscaleraProduccionService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.DoubleSummaryStatistics;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.time.Year;
 
 @ApplicationScoped
 public class ProduccionAnualService {
 
         private static final BigDecimal THOUSAND = BigDecimal.valueOf(1000);
-        private static final BigDecimal DAYS_IN_YEAR = BigDecimal.valueOf(365);
 
         @Inject
         EntityManager em;
@@ -77,31 +75,34 @@ public class ProduccionAnualService {
 
                 // Transform to VectorProduccion with precise calculations
                 return groupedProduction.entrySet().stream()
-                                .map(entry -> {
-                                        ProductionKey key = entry.getKey();
-                                        BigDecimal sumProduccion = entry.getValue();
-
-                                        // Precise monthly and annual calculations
-                                        BigDecimal totalMes = sumProduccion.multiply(THOUSAND)
-                                                        .setScale(10, RoundingMode.HALF_EVEN);
-                                        BigDecimal totalAnual = totalMes.divide(DAYS_IN_YEAR, 10,
-                                                        RoundingMode.HALF_EVEN);
-
-                                        // Find matching catalog entry
-                                        Optional<Object[]> catalogInfo = catalogData.stream()
-                                                        .filter(row -> (Integer) row[2] == key.vidoportunidadobjetivo)
-                                                        .findFirst();
-
-                                        return catalogInfo.map(info -> new VectorProduccion(
-                                                        (String) info[0], // voportunidad
-                                                        (String) info[1], // vobjetivo
-                                                        key.vidoportunidadobjetivo, // vidoportunidadobjetivo
-                                                        key.aanio, // aanio
-                                                        totalMes.doubleValue(), // ctotalmes
-                                                        totalAnual.doubleValue(), // ctotalanual
-                                                        0.0,
-                                                        0.0,
-                                                        0.0)).orElse(null);
+                        .map(entry -> {
+                                ProductionKey key = entry.getKey();
+                                BigDecimal sumProduccion = entry.getValue();
+                        
+                                // Extract year dynamically
+                                int extractedYear = Integer.parseInt(key.aanio);
+                                BigDecimal daysInYear = BigDecimal.valueOf(Year.of(extractedYear).isLeap() ? 366 : 365);
+                        
+                                // Precise monthly and annual calculations
+                                BigDecimal totalMes = sumProduccion.multiply(THOUSAND)
+                                                .setScale(10, RoundingMode.HALF_EVEN);
+                                BigDecimal totalAnual = totalMes.divide(daysInYear, 10, RoundingMode.HALF_EVEN); // Dynamic year calculation
+                        
+                                // Find matching catalog entry
+                                Optional<Object[]> catalogInfo = catalogData.stream()
+                                                .filter(row -> (Integer) row[2] == key.vidoportunidadobjetivo)
+                                                .findFirst();
+                        
+                                return catalogInfo.map(info -> new VectorProduccion(
+                                                (String) info[0], // voportunidad
+                                                (String) info[1], // vobjetivo
+                                                key.vidoportunidadobjetivo, // vidoportunidadobjetivo
+                                                key.aanio, // aanio
+                                                totalMes.doubleValue(), // ctotalmes
+                                                totalAnual.doubleValue(), // ctotalanual
+                                                0.0,
+                                                0.0,
+                                                0.0)).orElse(null);
                                 })
                                 .filter(Objects::nonNull)
                                 .sorted(Comparator.comparing(VectorProduccion::getAanio))
