@@ -6,9 +6,10 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import mx.com.innovating.cloud.data.models.DeclinaExpoportunidadResult;
 import mx.com.innovating.cloud.data.models.FechaInicioResult;
-
+import mx.com.innovating.cloud.data.models.NumeroPozoAreaConvencionalResult;
 import mx.com.innovating.cloud.data.models.ProduccionPozos;
 import mx.com.innovating.cloud.data.models.EscaleraProduccionMulti;
+
 
 import java.net.URLDecoder;
 import java.time.LocalDate;
@@ -32,10 +33,16 @@ public class EscaleraProduccionMultiService {
     FechaInicioMultiObjetivoService fechaInicioMultiObjetivoService;
 
     @Inject
+    FechaInicioService fechaInicioService;
+
+    @Inject
     PozoVolumenService pozoVolumenService;
 
     @Inject
     FactoresCalculatorService factoresCalculatorService;
+    
+    @Inject
+    NumeroPozoAreaConvencionalService numeroPozoAreaConvencionalService;
 
     private static class DeclinadaPozo {
         private final int idsecuencia;
@@ -163,6 +170,13 @@ public class EscaleraProduccionMultiService {
         List<EscaleraProduccionMulti> results = new ArrayList<>();
         int consecutiveId = 1;
         int pi = 1;
+        
+        // Tope si es por area
+        Double numeroPozoArea = calcularNumeroPozoArea(pnidversion, pnoportunidadobjetivo, pnarea);
+        double prodMaxpp = pnpce / numeroPozoArea;
+        String tipoCalculo = fechaInicioService.obtenerTipoCalculo(pnidversion, pnoportunidadobjetivo);
+        double rArea = numeroPozoArea - Math.floor(numeroPozoArea);
+        double fraccionArea = rArea * prodMaxpp;
 
         // First pass: Create all well sequences to get max idsec (z)
         List<SecuenciaPozo> secuenciaPozos = new ArrayList<>();
@@ -194,39 +208,86 @@ public class EscaleraProduccionMultiService {
                 String pozoName = "POZO " + idPozo;
                 int currentSeqId = secuenciaPozos.get(idPozo - 1).idsec;
 
-                for (int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
-                    LocalDate currentDate = varFecha.plusMonths(mesIndex);
-                    YearMonth yearMonth = YearMonth.from(currentDate);
-                    DeclinadaPozo dp = declinadaPozo.get(mesIndex);
+                if(Objects.equals(tipoCalculo, "Volumen")){
+                    for (int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
+                        LocalDate currentDate = varFecha.plusMonths(mesIndex);
+                        YearMonth yearMonth = YearMonth.from(currentDate);
+                        DeclinadaPozo dp = declinadaPozo.get(mesIndex);
 
-                    // Calculate base production
-                    double produccion;
-                    if (currentSeqId == z && r > 0) {
-                        produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * r;
-                    } else {
-                        produccion = (dp.perfil * yearMonth.lengthOfMonth()) / 1000.0;
+                        // Calculate base production
+                        double produccion;
+                        if (currentSeqId == z && r > 0) {
+                            produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * r;
+                        } else {
+                            produccion = (dp.perfil * yearMonth.lengthOfMonth()) / 1000.0;
+                        }
+
+                        // Calculate derived productions
+                        double prodAceite = produccion * fcaceite;
+                        double prodGas = produccion * fcgas;
+                        double prodCondensado = produccion * fccondensado;
+
+                        results.add(new EscaleraProduccionMulti(
+                                consecutiveId++,
+                                mesIndex + 1,
+                                idPozo,
+                                pozoName,
+                                dp.perfil,
+                                yearMonth.lengthOfMonth(),
+                                dp.idoportunidadobjetivo,
+                                String.valueOf(currentDate.getYear()),
+                                currentDate.getMonthValue(),
+                                produccion,
+                                prodAceite,
+                                prodGas,
+                                prodCondensado,
+                                Date.valueOf(currentDate)));
                     }
+                } else {
+                    double acum = 0.0;
+                    double produccion;
+                    // mientras que produccion sea menor a prodMaxpp se hacen los calculos
+                    for (int mesIndex = 0; mesIndex <= nmes; mesIndex++) {
+                        LocalDate currentDate = varFecha.plusMonths(mesIndex);
+                        YearMonth yearMonth = YearMonth.from(currentDate);
+                        DeclinadaPozo dp = declinadaPozo.get(mesIndex);
 
-                    // Calculate derived productions
-                    double prodAceite = produccion * fcaceite;
-                    double prodGas = produccion * fcgas;
-                    double prodCondensado = produccion * fccondensado;
+                        if (currentSeqId == z && rArea > 0) {
+                            produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0) * rArea;
+                            if (acum + produccion > fraccionArea) {
+                                break;
+                            }
+                        } else {
+                            produccion = ((dp.perfil * yearMonth.lengthOfMonth()) / 1000.0);
+                            if (acum + produccion > prodMaxpp) {
+                                break;
+                            }
+                        }
 
-                    results.add(new EscaleraProduccionMulti(
-                            consecutiveId++,
-                            mesIndex + 1,
-                            idPozo,
-                            pozoName,
-                            dp.perfil,
-                            yearMonth.lengthOfMonth(),
-                            dp.idoportunidadobjetivo,
-                            String.valueOf(currentDate.getYear()),
-                            currentDate.getMonthValue(),
-                            produccion,
-                            prodAceite,
-                            prodGas,
-                            prodCondensado,
-                            Date.valueOf(currentDate)));
+                        acum += produccion;
+                        
+                        // Calculate derived productions
+                        double prodAceite = produccion * fcaceite;
+                        double prodGas = produccion * fcgas;
+                        double prodCondensado = produccion * fccondensado;
+
+                        results.add(new EscaleraProduccionMulti(
+                                consecutiveId++,
+                                mesIndex + 1,
+                                idPozo,
+                                pozoName,
+                                dp.perfil,
+                                yearMonth.lengthOfMonth(),
+                                dp.idoportunidadobjetivo,
+                                String.valueOf(currentDate.getYear()),
+                                currentDate.getMonthValue(),
+                                produccion,
+                                prodAceite,
+                                prodGas,
+                                prodCondensado,
+                                Date.valueOf(currentDate)
+                        ));
+                    }
                 }
             }
             pi = pf + 1;
@@ -239,4 +300,17 @@ public class EscaleraProduccionMultiService {
                         .thenComparing(EscaleraProduccionMulti::getIdpozo))
                 .collect(Collectors.toList());
     }
+    
+    private Double calcularNumeroPozoArea(
+            Integer pnIdVersion,
+            Integer pnOportunidadObjetivo,
+            Double pnArea) {
+        NumeroPozoAreaConvencionalResult result = numeroPozoAreaConvencionalService.calcularNumeroPozoAreaConvencional(
+                pnIdVersion,
+                pnOportunidadObjetivo,
+                pnArea);
+
+        return result.getNumPozo();
+    }
+    
 }

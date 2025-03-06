@@ -8,16 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.quarkus.cache.CacheKey;
-import io.quarkus.cache.CacheResult;
-import jakarta.transaction.Transactional;
 import mx.com.innovating.cloud.data.models.FechaInicioResult;
+import mx.com.innovating.cloud.data.models.CalculoNumPozosResult;
 
 @ApplicationScoped
 public class FechaInicioMultiObjetivoService {
@@ -29,56 +25,13 @@ public class FechaInicioMultiObjetivoService {
     PozoVolumenService pozoVolumenService;
 
     @Inject
+    FechaInicioService fechaInicioService;
+
+    @Inject
     NumeroPozoAreaConvencionalService numeroPozoAreaService;
 
     @Inject
     NumEquipoService numEquipoService;
-
-    @Transactional
-    @CacheResult(cacheName = "tipo-calculo-cache")
-    public String getTipoCalculo(
-            @CacheKey Integer pnidversion,
-            @CacheKey Integer pnoportunidadobjetivo) {
-        String query = """
-                    SELECT DISTINCT tipocalculo
-                    FROM catalogo.oportunidadvw
-                    WHERE idversion = :idversion AND idoportunidad =
-                    (SELECT idoportunidad FROM catalogo.claveobjetivovw
-                     WHERE idoportunidadobjetivo = :idoportunidadobjetivo
-                     AND idversion = :idversion)
-                """;
-
-        return (String) em.createNativeQuery(query)
-                .setParameter("idversion", pnidversion)
-                .setParameter("idoportunidadobjetivo", pnoportunidadobjetivo)
-                .getSingleResult();
-    }
-
-    @Transactional
-    @CacheResult(cacheName = "clave-objetivo-details-cache")
-    public ClaveObjetivoDetails getClaveObjetivoDetails(
-            @CacheKey Integer pnoportunidadobjetivo,
-            @CacheKey Integer pnidversion) {
-        String query = """
-                    SELECT fechainicio,
-                           duracionperfpozodesarrollo,
-                           duraciontermpozodesarrollo
-                    FROM catalogo.claveobjetivovw
-                    WHERE idoportunidadobjetivo = :idoportunidadobjetivo
-                    AND idversion = :idversion
-                    LIMIT 1
-                """;
-
-        Object[] result = (Object[]) em.createNativeQuery(query)
-                .setParameter("idoportunidadobjetivo", pnoportunidadobjetivo)
-                .setParameter("idversion", pnidversion)
-                .getSingleResult();
-
-        return new ClaveObjetivoDetails(
-                result[0].toString(),
-                ((Number) result[1]).doubleValue(),
-                ((Number) result[2]).doubleValue());
-    }
 
     public List<FechaInicioResult> sppFechaInicioMulti(
             Integer pnidversion,
@@ -107,47 +60,24 @@ public class FechaInicioMultiObjetivoService {
             LocalDateTime fecha) {
 
         try {
-            String vartipocalculo = getTipoCalculo(pnidversion, pnoportunidadobjetivo);
+            String vartipocalculo = fechaInicioService.obtenerTipoCalculo(pnidversion, pnoportunidadobjetivo);
+            CalculoNumPozosResult calculoNumPozosResult = fechaInicioService.calcularNumeroPozos(vartipocalculo, pnidversion, pnoportunidadobjetivo,
+            pncuota, pndeclinada, pnpce, pnarea);
+            Integer varNPozos = (int) Math.ceil(calculoNumPozosResult.getNPozos());
+            
+            Integer varnequipo = numEquipoService.calcularNumEquipo(varNPozos).getVEquipo();
+            Integer varentrada = (int) Math.ceil((double) varNPozos / varnequipo);
 
-            Integer varnpozos;
-            switch (vartipocalculo) {
-                case "Volumen":
-                    varnpozos = (int) Math.ceil(pozoVolumenService.calcularPozoVolumen(
-                            pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce)
-                            .get(0).getCvnumpozo());
-                    break;
-                case "Area":
-                    varnpozos = (int) Math.ceil(numeroPozoAreaService.calcularNumeroPozoAreaConvencional(
-                            pnidversion, pnoportunidadobjetivo, pnarea).getNumPozo());
-                    break;
-                case "Ambos":
-                    Integer pozoVolumen = (int) Math.ceil(pozoVolumenService.calcularPozoVolumen(
-                            pnidversion, pnoportunidadobjetivo, pncuota, pndeclinada, pnpce)
-                            .get(0).getCvnumpozo());
-
-                    Integer pozoArea = (int) Math.ceil(numeroPozoAreaService.calcularNumeroPozoAreaConvencional(
-                            pnidversion, pnoportunidadobjetivo, pnarea).getNumPozo());
-
-                    varnpozos = Math.min(pozoVolumen, pozoArea);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid calculation type: " + vartipocalculo);
-            }
-
-            Integer varnequipo = numEquipoService.calcularNumEquipo(varnpozos).getVEquipo();
-            Integer varentrada = (int) Math.ceil((double) varnpozos / varnequipo);
-
-            if (varnpozos <= 1) {
+            if (varNPozos <= 1) {
                 varnequipo = 1;
                 varentrada = 1;
             }
 
-            ClaveObjetivoDetails claveObjetivoDetails = getClaveObjetivoDetails(
-                    pnoportunidadobjetivo, pnidversion);
+            FechaInicioService.QueryDateInfo claveObjetivoDetails = fechaInicioService.obtenerInfoFechas(pnidversion, pnoportunidadobjetivo);
 
-            String varanio = claveObjetivoDetails.getFechaInicio();
-            Double varndiasperf = claveObjetivoDetails.getDuracionPerfPozoDesarrollo();
-            Double varndiasterm = claveObjetivoDetails.getDuracionTermPozoDesarrollo();
+            String varanio = claveObjetivoDetails.anio;
+            Double varndiasperf = claveObjetivoDetails.diasPerf;
+            Double varndiasterm = claveObjetivoDetails.diasTerm;
             Double varndias = varndiasperf + varndiasterm;
 
             LocalDateTime varfechainicio;
@@ -168,7 +98,7 @@ public class FechaInicioMultiObjetivoService {
             for (int currentIdCte = 1; currentIdCte <= varentrada; currentIdCte++) {
                 Integer currentNPozo;
                 if (currentIdCte == varentrada) {
-                    currentNPozo = varnpozos;
+                    currentNPozo = varNPozos;
                 } else {
                     currentNPozo = varnequipo * currentIdCte;
                 }
@@ -230,13 +160,6 @@ public class FechaInicioMultiObjetivoService {
         return dayFraction > 0.5 ? (date.getMonthValue() == 12 ? date.getYear() + 1 : date.getYear()) : date.getYear();
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class ClaveObjetivoDetails {
-        private String fechaInicio;
-        private Double duracionPerfPozoDesarrollo;
-        private Double duracionTermPozoDesarrollo;
-    }
 
     @Data
     @AllArgsConstructor
