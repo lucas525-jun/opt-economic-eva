@@ -14,6 +14,7 @@ import mx.com.innovating.cloud.data.calculator.EscaleraProduccionMultiService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Year;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +27,6 @@ import java.util.stream.Collectors;
 public class ProduccionAnualMultiService {
 
         private static final BigDecimal THOUSAND = BigDecimal.valueOf(1000);
-        private static final BigDecimal DAYS_IN_YEAR = BigDecimal.valueOf(365);
 
         @Inject
         EntityManager em;
@@ -106,18 +106,21 @@ public class ProduccionAnualMultiService {
                                         ProductionKey key = entry.getKey();
                                         ProductionAggregates aggregates = entry.getValue();
 
+                                        // Extract year dynamically
+                                        int extractedYear = Integer.parseInt(key.aanio);
+                                        BigDecimal daysInYear = BigDecimal.valueOf(Year.of(extractedYear).isLeap() ? 366 : 365);
+
                                         // Precise calculations for all production types
                                         BigDecimal totalMes = aggregates.produccion.multiply(THOUSAND)
                                                         .setScale(10, RoundingMode.HALF_EVEN);
-                                        BigDecimal totalAnual = totalMes.divide(DAYS_IN_YEAR, 10,
-                                                        RoundingMode.HALF_EVEN);
+                                        BigDecimal totalAnual = totalMes.divide(daysInYear, 10, RoundingMode.HALF_EVEN);
 
                                         BigDecimal totalAceiteAnual = aggregates.prodAceite.multiply(THOUSAND)
-                                                        .divide(DAYS_IN_YEAR, 10, RoundingMode.HALF_EVEN);
+                                                        .divide(daysInYear, 10, RoundingMode.HALF_EVEN);
                                         BigDecimal totalGasAnual = aggregates.prodGas.multiply(THOUSAND)
-                                                        .divide(DAYS_IN_YEAR, 10, RoundingMode.HALF_EVEN);
+                                                        .divide(daysInYear, 10, RoundingMode.HALF_EVEN);
                                         BigDecimal totalCondensadoAnual = aggregates.prodCondensado.multiply(THOUSAND)
-                                                        .divide(DAYS_IN_YEAR, 10, RoundingMode.HALF_EVEN);
+                                                        .divide(daysInYear, 10, RoundingMode.HALF_EVEN);
 
                                         // Find matching catalog entry
                                         Optional<Object[]> catalogInfo = catalogData.stream()
