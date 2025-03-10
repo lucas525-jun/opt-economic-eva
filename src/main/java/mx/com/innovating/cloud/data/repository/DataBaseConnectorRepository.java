@@ -541,7 +541,7 @@ public class DataBaseConnectorRepository {
             Double pnPce,
             Double pnArea){
 
-        return escaleraProduccionService.calcularNumPozosTotales(pnIdVersion, pnOportunidadObjetivo, pnCuota, pnDeclinada, pnPce, pnArea);
+        return escaleraProduccionService.calcularNumPozosTotales(pnIdVersion, pnOportunidadObjetivo, pnArea, pnCuota, pnDeclinada, pnPce);
     }
 
     public ProduccionTotalMmbpce getProduccionTotalMmbpce(
