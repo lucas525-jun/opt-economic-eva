@@ -519,8 +519,7 @@ public class EvaluacionEconomicaMultiService {
                                                                 var anioInicio = Integer
                                                                                 .parseInt(basicAnioInicio);
 
-                                                                if (anioInicioPerfexploratorio
-                                                                                + plan.getDuracion() == anioInicio) {
+                                                                if (anioInicioPerfexploratorio + plan.getDuracion() == anioInicio) {
                                                                         ductos = infoInversion.getDucto()
                                                                                         * paridad.getParidad();
 
