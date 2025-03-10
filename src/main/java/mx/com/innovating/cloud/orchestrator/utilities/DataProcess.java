@@ -631,7 +631,7 @@ public class DataProcess {
 
 	}
 
-	private static Double calculaVpn(Double inversionInicial, List<Double> flujo, Double taza) {
+	private static Double calculaVpn(Double inversionInicial, List<Double> flujo, Double tasa) {
 		// Crear una copia del flujo sin el primer elemento
 		List<Double> flujosNetosEfectivo = flujo.subList(1, flujo.size());
 
@@ -641,7 +641,7 @@ public class DataProcess {
 		for (int i = 0; i < flujosNetosEfectivo.size(); i++) {
 			// log.info("::::: flujo {} - {}", i + 1, flujosNetosEfectivo.get(i)); // Flujo
 			// desplazado en el tiempo
-			calc += flujosNetosEfectivo.get(i) / Math.pow((1 + taza), (i + 1));
+			calc += flujosNetosEfectivo.get(i) / Math.pow((1 + tasa), (i + 1));
 		}
 
 		return calc + inversionInicial;
