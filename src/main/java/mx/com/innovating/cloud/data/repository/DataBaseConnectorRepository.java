@@ -731,22 +731,31 @@ public class DataBaseConnectorRepository {
     @Transactional
     @CacheResult(cacheName = "oportunidades-by-version-cache")
     public List<Oportunidades> getOportunidadesByNombreVersion(@CacheKey String nombreVersion) {
-
         try {
             final var queryString = """
-                    SELECT idoportunidadobjetivo, idoportunidad, oportunidad, b.nombreversion FROM catalogo.claveobjetivovw a
+                    SELECT idoportunidad, oportunidad, b.nombreversion FROM catalogo.claveobjetivovw a
                     JOIN catalogo.versiontbl b ON a.idversion = b.idversion
                     where nombreversion = :nombreVersion
+                    group by idoportunidad, oportunidad, b.nombreversion
                     """;
-
-            return em.createNativeQuery(queryString, Oportunidades.class)
+    
+            List<Object[]> results = em.createNativeQuery(queryString)
                     .setParameter("nombreVersion", nombreVersion)
-                    .getResultStream().toList();
+                    .getResultList();
+    
+            return results.stream()
+                    .map(result -> {
+                        Oportunidades oportunidad = new Oportunidades();
+                        oportunidad.setIdoportunidad((Integer) result[0]);
+                        oportunidad.setOportunidad((String) result[1]);
+                        oportunidad.setNombreVersion((String) result[2]);
+                        return oportunidad;
+                    })
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             Log.error("JDBC: getOportunidadesByNombreVersion exception executing SQL", e);
             throw new SqlExecutionErrorException("JDBC getOportunidadesByNombreVersion exception executing SQL");
         }
-
     }
 
     @Transactional
