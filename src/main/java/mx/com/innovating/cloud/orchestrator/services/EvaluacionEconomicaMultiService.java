@@ -19,6 +19,7 @@ import mx.com.innovating.cloud.data.models.*;
 import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
 import mx.com.innovating.cloud.orchestrator.models.*;
 import mx.com.innovating.cloud.orchestrator.utilities.DataProcess;
+import mx.com.innovating.cloud.data.calculator.FechaInicioService;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,6 @@ import java.util.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.DoubleAdder;
 
 @Slf4j
 @ApplicationScoped
@@ -45,6 +45,10 @@ public class EvaluacionEconomicaMultiService {
 
         @Inject
         EvaluacionMerger evaluacionMerger;
+
+        
+        @Inject
+        FechaInicioService fechaInicioService;
 
         private static ThreadLocal<double[]> produccionTotalMmbpceArrayThreadLocal = new ThreadLocal<>();
 
@@ -250,7 +254,6 @@ public class EvaluacionEconomicaMultiService {
                         Date fechaTermino = databaseConnectorClient.getfechaTerminoDate(
                                         idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha);
                         
-                        CalculoNumPozosResult calculoPozosTotales = databaseConnectorClient.getPozosTotales(version, idOportunidadObjetivo, cuota, declinada, pce, area);
 
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                         String fechaTerminoStr = formatter.format(fechaTermino);
@@ -388,6 +391,15 @@ public class EvaluacionEconomicaMultiService {
                         // log.info("Generando Respuesta");
                         List<EvaluacionEconomica> evaluacionEconomica = new ArrayList<>();
                         assert listActivos != null;
+                        
+                        CalculoNumPozosResult calculoPozosTotales = databaseConnectorClient.getPozosTotales(version, idOportunidadObjetivo, cuota, declinada, pce, area);
+                        
+                        double pozosTotales = calculoPozosTotales.getNPozos();
+                        // System.err.println("from : indexNumber : " + indexNumber + ", idOportunidadObjetivo : " + idOportunidadObjetivo + ", pce : " + pce + ", pozosTotales : " + pozosTotales);
+                       
+                        double cantManifolds = Math.ceil(pozosTotales / 6.0);
+                        
+
 
                         listActivos.forEach(item -> {
                                 var anioActualInteger = Integer.parseInt(item.getAnio());
@@ -472,6 +484,9 @@ public class EvaluacionEconomicaMultiService {
                                                 }
                                         });
 
+                                        
+
+                                        assert infoInversion != null;
                                         var inversionesAnioAnterior = new Inversiones();
 
                                         if (!existe.get()) {
@@ -487,108 +502,144 @@ public class EvaluacionEconomicaMultiService {
                                                 inversionesAnioAnterior.setDesarrollo(
                                                                 invDesarrollo.getDesarrolloSinOperacional());
 
+                                                
                                                 evaluacionEconomica.add(new EvaluacionEconomica(
-                                                                Integer.toString(anioCompare),
-                                                                null, null, null, inversionesAnioAnterior, null, null));
+                                                                        Integer.toString(anioCompare),
+                                                                        null, null, null, inversionesAnioAnterior, null, null));
+                                                        
                                         }
-
-                                        double pozosTotales = calculoPozosTotales.getNPozos();
-                                        assert infoInversion != null;
-
-                                        double cantManifolds = Math.ceil(pozosTotales / 6.0);
-                                        double ductos = 0;
-                                        double plataformasDesarrollo = 0;
+                                        
+                                        
+                                        double ductos = 0.0;
+                                        double plataformasDesarrollo = 0.0;
+                                        double duracionMax = planDesarrollo.stream().mapToDouble(OportunidadPlanDesarrollo::getDuracion).max().orElseThrow(() -> new NoSuchElementException("La lista está vacía"));
 
                                         for (OportunidadPlanDesarrollo plan : planDesarrollo) {
 
-                                                String nombreVersion = plan.getNombreVersion();
-                                                char lastChar = nombreVersion.charAt(nombreVersion.length() - 1); // Obtiene
-                                                                                                                  // el
+                                                // String nombreVersion = plan.getNombreVersion();
+                                                // char lastChar = nombreVersion.charAt(nombreVersion.length() - 1); // Obtiene
+                                                //                                                                   // el
                                                                                                                   // último
                                                                                                                   // carácter
-                                                if (Character.isDigit(lastChar)) { // Verifica si el último carácter es
-                                                                                   // un dígito
+                                                // if (Character.isDigit(lastChar)) { // Verifica si el último carácter es
+                                                //                                    // un dígito
 
-                                                        int lastDigit = Character.getNumericValue(lastChar); // Convierte
+                                                        // int lastDigit = Character.getNumericValue(lastChar); // Convierte
                                                         // el
                                                         // carácter
                                                         // a número
-                                                        if (lastDigit >= 2) { // Para versiones 2 o superiores
-                                                                var anioInicioPerfexploratorio = Integer.parseInt(
-                                                                                oportunity.getFechainicioperfexploratorio());
-                                                                var anioInicio = Integer
-                                                                                .parseInt(basicAnioInicio);
+                                                if (duracionMax >= 2) { 
+                                                        var anioInicioPerfexploratorio = Integer.parseInt(
+                                                                        oportunity.getFechainicioperfexploratorio());
+                                                        var anioInicio = Integer
+                                                                        .parseInt(basicAnioInicio);
+                                                        if (anioInicioPerfexploratorio
+                                                                        + plan.getDuracion() == anioInicio) {
 
-                                                                if (anioInicioPerfexploratorio + plan.getDuracion() == anioInicio) {
-                                                                        ductos = infoInversion.getDucto()
-                                                                                        * paridad.getParidad();
-
-                                                                        plataformasDesarrollo = infoInversion
-                                                                                        .getPlataformadesarrollo()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioAnterior.setDuctos(ductos);
-                                                                        inversionesAnioAnterior.setPlataformaDesarrollo(
-                                                                                        plataformasDesarrollo);
-
-                                                                        var sistemaDeControlG = infoInversion
-                                                                                        .getSistemasdecontrol()
-                                                                                        * paridad.getParidad()
-                                                                                        * cantManifolds;
-                                                                        inversionesAnioAnterior.setSistemaDeControl(
-                                                                                        sistemaDeControlG);
-                                                                        var cubiertaProcesosG = infoInversion
-                                                                                        .getCubiertadeproces()
-                                                                                        * paridad.getParidad()
-                                                                                        * cantManifolds;
-                                                                        inversionesAnioAnterior.setCubiertaProcesos(
-                                                                                        cubiertaProcesosG);
-                                                                        var risersG = infoInversion.getRisers()
-                                                                                        * paridad.getParidad()
-                                                                                        * cantManifolds;
-                                                                        inversionesAnioAnterior.setRisers(risersG);
-                                                                } else {
-                                                                        var arbolesSubmarinosG = infoInversion
-                                                                                        .getArbolessubmarinos()
-                                                                                        * paridad.getParidad()
-                                                                                        * pozosTotales;
-                                                                        inversionesAnioActual.setArbolSubmarinos(
-                                                                                        arbolesSubmarinosG);
-                                                                        var manifoldsG = infoInversion.getManifolds()
-                                                                                        * paridad.getParidad()
-                                                                                        * cantManifolds;
-                                                                        inversionesAnioActual.setManifolds(manifoldsG);
-                                                                        var estacionCompresionG = infoInversion
-                                                                                        .getEstacioncompresion()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioActual.setEstacionCompresion(
-                                                                                        estacionCompresionG);
-                                                                        var bateriaG = infoInversion.getBateria()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioActual.setBateria(bateriaG);
-                                                                        var buqueTanqueCompraG = infoInversion
-                                                                                        .getBuquetanquecompra()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioActual.setBuqueTanqueCompra(
-                                                                                        buqueTanqueCompraG);
-                                                                        var buqueTanqueRentaG = infoInversion
-                                                                                        .getBuquetanquerenta()
-                                                                                        * paridad.getParidad();
-                                                                        inversionesAnioActual.setBuqueTanqueRenta(
-                                                                                        buqueTanqueRentaG);
-                                                                }
-                                                        } else {
-                                                                ductos = infoInversion.getDucto()
+                                                                
+                                                                double ductosForInit = infoInversion.getDucto()
                                                                                 * paridad.getParidad();
 
-                                                                plataformasDesarrollo = infoInversion
+                                                                double plataformasDesarrolloForInit = infoInversion
                                                                                 .getPlataformadesarrollo()
                                                                                 * paridad.getParidad();
-                                                                inversionesAnioActual.setDuctos(ductos);
-                                                                inversionesAnioActual.setPlataformaDesarrollo(
-                                                                                plataformasDesarrollo);
+                                                                inversionesAnioAnterior.setDuctos(ductosForInit);
+                                                                inversionesAnioAnterior.setPlataformaDesarrollo(
+                                                                        plataformasDesarrolloForInit);
+
+                                                                var sistemaDeControlG = infoInversion
+                                                                                .getSistemasdecontrol()
+                                                                                * paridad.getParidad()
+                                                                                * cantManifolds;
+                                                                inversionesAnioAnterior.setSistemaDeControl(
+                                                                                sistemaDeControlG);
+                                                                var cubiertaProcesosG = infoInversion
+                                                                                .getCubiertadeproces()
+                                                                                * paridad.getParidad()
+                                                                                * cantManifolds;
+                                                                inversionesAnioAnterior.setCubiertaProcesos(
+                                                                        cubiertaProcesosG);
+                                                                double risersG = infoInversion.getRisers()
+                                                                * paridad.getParidad()
+                                                                * cantManifolds;
+                                                                
+                                                                inversionesAnioAnterior.setRisers(risersG);
+
+                                                                // if (!existe.get()) {
+
+                                                                //         inversionesAnioAnterior.setDesarrolloSinOperacional(
+                                                                //                         invDesarrollo.getDesarrolloSinOperacional());
+                                                                //         inversionesAnioAnterior
+                                                                //                         .setPerforacionDes(invDesarrollo.getPerforacionDes());
+                                                                //         inversionesAnioAnterior
+                                                                //                         .setTerminacionDes(invDesarrollo.getTerminacionDes());
+                                                                //         inversionesAnioAnterior.setInfraestructuraDes(
+                                                                //                         invDesarrollo.getInfraestructuraDes());
+                                                                //         inversionesAnioAnterior.setDesarrollo(
+                                                                //                         invDesarrollo.getDesarrolloSinOperacional());
+
+                                                                        
+                                                                //         evaluacionEconomica.add(new EvaluacionEconomica(
+                                                                //                                 Integer.toString(anioCompare),
+                                                                //                                 null, null, null, inversionesAnioAnterior, null, null));
+                                                                                
+                                                                // } else {
+                                                                        // evaluacionEconomica.forEach(evaluacion -> {
+                                                                        //         if (evaluacion.getAnio().equals(Integer.toString(anioCompare))) {
+                                                                        //                 evaluacion.getInversiones().setDuctos(ductosForInit);
+                                                                        //                 evaluacion.getInversiones().setPlataformaDesarrollo(plataformasDesarrolloForInit);
+                                                                        //                 evaluacion.getInversiones().setSistemaDeControl(sistemaDeControlG);
+                                                                        //                 evaluacion.getInversiones().setCubiertaProcesos(cubiertaProcesosG);
+                                                                        //                 evaluacion.getInversiones().setRisers(risersG);
+                                                                        //         }
+                                                                        // });
+                                                                
+                                                                // }
+                                                                        
+                                                        } else {
+                                                                var arbolesSubmarinosG = infoInversion
+                                                                                .getArbolessubmarinos()
+                                                                                * paridad.getParidad()
+                                                                                * pozosTotales;
+                                                                inversionesAnioActual.setArbolSubmarinos(
+                                                                                arbolesSubmarinosG);
+                                                                var manifoldsG = infoInversion.getManifolds()
+                                                                                * paridad.getParidad()
+                                                                                * cantManifolds;
+                                                                inversionesAnioActual.setManifolds(manifoldsG);
+                                                                var estacionCompresionG = infoInversion
+                                                                                .getEstacioncompresion()
+                                                                                * paridad.getParidad();
+                                                                inversionesAnioActual.setEstacionCompresion(
+                                                                                estacionCompresionG);
+                                                                var bateriaG = infoInversion.getBateria()
+                                                                                * paridad.getParidad();
+                                                                inversionesAnioActual.setBateria(bateriaG);
+                                                                var buqueTanqueCompraG = infoInversion
+                                                                                .getBuquetanquecompra()
+                                                                                * paridad.getParidad();
+                                                                inversionesAnioActual.setBuqueTanqueCompra(
+                                                                                buqueTanqueCompraG);
+                                                                var buqueTanqueRentaG = infoInversion
+                                                                                .getBuquetanquerenta()
+                                                                                * paridad.getParidad();
+                                                                inversionesAnioActual.setBuqueTanqueRenta(
+                                                                                buqueTanqueRentaG);
                                                         }
+                                                } else {
+                                                        ductos = infoInversion.getDucto()
+                                                                        * paridad.getParidad();
+
+                                                        plataformasDesarrollo = infoInversion
+                                                                        .getPlataformadesarrollo()
+                                                                        * paridad.getParidad();
+                                                        inversionesAnioActual.setDuctos(ductos);
+                                                        inversionesAnioActual.setPlataformaDesarrollo(
+                                                                        plataformasDesarrollo);
                                                 }
                                         }
+                                        // logObject("inversionesAnioAnterior : ", inversionesAnioAnterior);
+                                        // logObject("evaluacionEconomica : ", evaluacionEconomica);
 
                                         var lineaDescarga = infoInversion.getLineadedescarga() * terminado.doubleValue()
                                                         * paridad.getParidad();
@@ -624,7 +675,6 @@ public class EvaluacionEconomicaMultiService {
                                                                                 .getMbpce()
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
-                                                // logObject("produccionDiariaPromedio : ", produccionDiariaPromedio);
                                                 // System.err.println("mantenimientoInfraestructuraFutDes"
                                                 // + mantenimientoInfraestructuraFutDes);
                                                 // System.err.println("fecha : " + fecha);
@@ -638,7 +688,6 @@ public class EvaluacionEconomicaMultiService {
                                         inversionesAnioActual.setMantenimientoDePozos(mantenimientoPozos);
                                         inversionesAnioActual.setMantenimientoInfraestructuraFuturoDesarrollo(
                                                         mantenimientoInfraestructuraFutDes);
-
                                 } else if (adjustedPozosPerforados.containsKey(anioActualInteger)) {
                                         perforado = adjustedPozosPerforados.get(anioActualInteger);
 
@@ -714,6 +763,7 @@ public class EvaluacionEconomicaMultiService {
                                         inversionesAnioActual.setMantenimientoDePozos(mantenimientoPozos);
                                         inversionesAnioActual.setMantenimientoInfraestructuraFuturoDesarrollo(
                                                         mantenimientoInfraestructuraFutDes);
+                                                        // logObject("2 : ", inversionesAnioActual);
                                 } else if (pozosTerminados.containsKey(anioActualInteger)) {
 
                                         terminado = pozosTerminados.get(anioActualInteger);
@@ -791,6 +841,7 @@ public class EvaluacionEconomicaMultiService {
                                         inversionesAnioActual.setMantenimientoDePozos(mantenimientoPozos);
                                         inversionesAnioActual.setMantenimientoInfraestructuraFuturoDesarrollo(
                                                         mantenimientoInfraestructuraFutDes);
+                                                        // logObject("3 : ", inversionesAnioActual);
 
                                 }
 
@@ -1087,7 +1138,6 @@ public class EvaluacionEconomicaMultiService {
 
                         if (i == 0) {
                                 // System.err.println("======================");
-                                // logObject("paramList", paramList);
                                 Object checkPCE0 = paramList.get(i + 0).get(4);
                                 Object checkPCE1 = paramList.get(i + 1).get(4);
                                 if (checkPCE0 instanceof String) {
@@ -1118,7 +1168,7 @@ public class EvaluacionEconomicaMultiService {
                                         getIntValue(params, 1), // version
                                         getDoubleValue(params, 2), // cuota
                                         getDoubleValue(params, 3), // declinada
-                                        pce, // pce (assuming pce is already defined)
+                                        pce, // pce 
                                         getDoubleValue(params, 5), // area
                                         maxPlataformadesarrollo, // plataformadesarrollo
                                         getDoubleValue(params, 7), // lineadedescarga
