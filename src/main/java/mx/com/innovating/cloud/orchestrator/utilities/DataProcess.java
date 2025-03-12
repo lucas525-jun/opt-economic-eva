@@ -374,13 +374,13 @@ public class DataProcess {
 		List<Double> listTotalesCostos = new ArrayList<>();
 
 		evaluacionEconomica.forEach(eval -> {
-			flujosNetosEfectivo.add(eval.getFlujoContable().getFlujosNetosEfectivo());
-			flujosDescontadosEfectivoList.add(eval.getFlujoContable().getFlujosDescontadosEfectivo());
-			valorPresenteInversionList.add(eval.getFlujoContable().getFlujosDescontadosInversion());
-			valorPresenteEgresosList.add(eval.getFlujoContable().getFlujosDescontadosEgresos());
-			valorPresenteIngresosList.add(eval.getFlujoContable().getFlujosDescontadosIngresos());
-			valorPresenteCostosList.add(eval.getFlujoContable().getFlujosDescontadosCostos());
-			listTotalesInversiones.add(eval.getInversiones().getTotal());
+			flujosNetosEfectivo.add(eval.getFlujoContable().getFlujosNetosEfectivo() != null ? eval.getFlujoContable().getFlujosNetosEfectivo() : 0.0);
+			flujosDescontadosEfectivoList.add(eval.getFlujoContable().getFlujosDescontadosEfectivo() != null ? eval.getFlujoContable().getFlujosDescontadosEfectivo() : 0.0);
+			valorPresenteInversionList.add(eval.getFlujoContable().getFlujosDescontadosInversion() != null ? eval.getFlujoContable().getFlujosDescontadosInversion() : 0.0);
+			valorPresenteEgresosList.add(eval.getFlujoContable().getFlujosDescontadosEgresos() != null ? eval.getFlujoContable().getFlujosDescontadosEgresos() : 0.0);
+			valorPresenteIngresosList.add(eval.getFlujoContable().getFlujosDescontadosIngresos() != null ? eval.getFlujoContable().getFlujosDescontadosIngresos() : 0.0);
+			valorPresenteCostosList.add(eval.getFlujoContable().getFlujosDescontadosCostos() != null ? eval.getFlujoContable().getFlujosDescontadosCostos() : 0.0);
+			listTotalesInversiones.add(eval.getInversiones().getTotal() != null ? eval.getInversiones().getTotal() : 0.0);
 			listTotalesCostos.add(eval.getCostos() == null || eval.getCostos().getTotal() == null ? 0.0
 					: eval.getCostos().getTotal());
 		});
