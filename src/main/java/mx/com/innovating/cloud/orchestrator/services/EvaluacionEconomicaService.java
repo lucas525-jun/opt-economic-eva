@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Year;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 
 import io.quarkus.logging.Log;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
@@ -171,6 +172,23 @@ public class EvaluacionEconomicaService {
                         // log.info(" 11 / 12 - getPozosActivos");
                         List<PozosActivos> listActivos = databaseConnectorClient.getPozosActivos(idOportunidadObjetivo,
                                         version, cuota, declinada, pce, area);
+                        int anioMin = listActivos.stream()
+                                .map(p -> Integer.parseInt(p.getAnio()))
+                                .min(Comparator.naturalOrder())
+                                .orElse(0);
+                        if(anioMin >  Integer.parseInt(oportunity.getFechainicioperfexploratorio()) + 1){
+                                int inicioVacio = Integer.parseInt(oportunity.getFechainicioperfexploratorio()) + 1;
+
+                                BigDecimal value = new BigDecimal(0);
+                                List<PozosActivos> pozosFaltantes = IntStream.rangeClosed(inicioVacio, anioMin - 2)
+                                        .filter(anio -> listActivos.stream().noneMatch(pozo -> pozo.getAnio().equals(String.valueOf(anio))))
+                                        .mapToObj( anio -> new PozosActivos(String.valueOf(anio), value))
+                                        .toList();
+
+                                listActivos.addAll(pozosFaltantes);
+
+                                listActivos.sort(Comparator.comparing(pozo -> Integer.parseInt(pozo.getAnio())));
+                        }
 
                         // log.info(" 12 / 12 - getFactorInversion");
                         FactorInversion factorInversion = databaseConnectorClient
@@ -257,8 +275,7 @@ public class EvaluacionEconomicaService {
                                 if (pozosTerminados.containsKey(anioActualInteger)) {
                                         terminado = pozosTerminados.get(anioActualInteger);
                                 }
-                                if (pozosPerforados.containsKey(anioActualInteger)
-                                                && item.getAnio().equals(oportunity.getFechainicio())) {
+                                if (pozosPerforados.containsKey(anioActualInteger) && item.getAnio().equals(oportunity.getFechainicio())) {
 
                                         perforado = pozosPerforados.get(anioActualInteger).subtract(new BigDecimal(1));
 
@@ -589,6 +606,8 @@ public class EvaluacionEconomicaService {
                         DataProcess.finalProcessInversiones(evaluacionEconomica);
 
                         DataProcess.calculaFlujoContable(evaluacionEconomica);
+
+                        evaluacionEconomica.sort(Comparator.comparing(EvaluacionEconomica::getAnio));
 
                         var flujosContablesTotales = DataProcess.calculaFlujosContablesTotales(evaluacionEconomica,
                                         produccionTotalMmbpce, factorInversion, pce);
