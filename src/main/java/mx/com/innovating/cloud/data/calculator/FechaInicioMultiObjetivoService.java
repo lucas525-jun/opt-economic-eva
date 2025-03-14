@@ -143,7 +143,9 @@ public class FechaInicioMultiObjetivoService {
 
         double dayFraction = (double) (dayOfMonth - 1) / daysInMonth;
 
-        return dayFraction > 0.5 ? nextMonthStart : date;
+        // return dayFraction > 0.5 ? nextMonthStart : date;
+        return dayFraction > 0.5 ? date.plusMonths(1) : date;
+
     }
 
     private int getFinalMonth(LocalDateTime date) {

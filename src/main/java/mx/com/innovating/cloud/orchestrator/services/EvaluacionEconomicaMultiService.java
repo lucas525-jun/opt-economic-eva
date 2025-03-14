@@ -158,6 +158,8 @@ public class EvaluacionEconomicaMultiService {
                                         flujosContablesTotales, null, null, 0, null);
 
                 } else {
+                        Boolean multiFlag = true;
+
                         // log.info("PCE distinto de 0. Ejecutando flujo completo.");
 
                         // log.info(" 1 / 12 - getPozoPerforados");
@@ -166,7 +168,7 @@ public class EvaluacionEconomicaMultiService {
 
                         // log.info(" 2 / 12 - getPozoPerforados");
                         List<EscaleraProduccionMulti> listTerminados = databaseConnectorClient.getPozosPerforados(
-                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha);
+                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha, multiFlag);
 
                         // log.info(" 3 / 12 - getFactorInversionExploratorio");
                         FactorInversionExploratorio fiExploratoria = new FactorInversionExploratorio();
@@ -178,9 +180,6 @@ public class EvaluacionEconomicaMultiService {
                                 fiExploratoria.setPerforacion(0.0);
                                 fiExploratoria.setTerminacion(0.0);
                         }
-                        // log.info("-------------------------------------------------");
-                        // log.info("fiExploratoria" + fiExploratoria.getInfraestructura());
-
                         // log.info(" 4 / 12 - getFactorInversionDesarrollo");
 
                         FactorInversionDesarrollo fiDesarrollo = new FactorInversionDesarrollo(); // enviar de micro
@@ -203,8 +202,12 @@ public class EvaluacionEconomicaMultiService {
                         infoInversion.setRisers(risers);
                         infoInversion.setManifolds(manifolds);
                         infoInversion.setCubiertadeproces(cubiertaDeProceso);
+                        infoInversion.setBuquetanquecompra(buquetaqueCompra);
+                        infoInversion.setBuquetanquerenta(buquetaqueRenta);
                         if (indexNumber > 0) {
                                 if (fecha != null && !"unexist".equals(fecha)) {
+                                        infoInversion.setArbolessubmarinos(0.0);
+                                        infoInversion.setSistemasdecontrol(0.0);
                                         infoInversion.setDucto(0.0);
                                         infoInversion.setBateria(0.0);
                                         infoInversion.setPlataformadesarrollo(0.0);
@@ -212,11 +215,11 @@ public class EvaluacionEconomicaMultiService {
                                         infoInversion.setRisers(0.0);
                                         infoInversion.setManifolds(0.0);
                                         infoInversion.setCubiertadeproces(0.0);
+                                        infoInversion.setBuquetanquecompra(0.0);
+                                        infoInversion.setBuquetanquerenta(0.0);
                                 }
                         }
 
-                        infoInversion.setBuquetanquecompra(buquetaqueCompra);
-                        infoInversion.setBuquetanquerenta(buquetaqueRenta);
 
                         // log.info(" 6 / 12 - getCostoOperacion");
                         List<CostoOperacion> listCostoOperacion = databaseConnectorClient
@@ -224,7 +227,7 @@ public class EvaluacionEconomicaMultiService {
 
                         // log.info(" 7 / 12 - getProduccionTotalMmbpce");
                         ProduccionTotalMmbpce produccionTotalMmbpce = databaseConnectorClient.getProduccionTotalMmbpce(
-                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha);
+                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha, multiFlag);
                         produccionTotalMmbpceArray[indexNumber] = produccionTotalMmbpce.getProduccionTotalMmbpce();
 
                         // log.info(" 8 / 12 - getParidad");
@@ -232,15 +235,14 @@ public class EvaluacionEconomicaMultiService {
                                         Integer.valueOf(oportunity.getFechainicioperfexploratorio()));
                         // log.info(" 9 / 12 - getVectorProduccion");
                         List<VectorProduccion> listVectorProduccion = databaseConnectorClient.getVectorProduccion(
-                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha);
-
+                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha, multiFlag);
                         // log.info(" 10 / 12 - getPrecioHidrocarburo");
                         List<PrecioHidrocarburo> listPrecios = databaseConnectorClient
                                         .getPrecioHidrocarburo(idOportunidadObjetivo, oportunity.getIdprograma(), version);
 
                         // log.info(" 11 / 12 - getPozosActivos");
                         List<PozosActivos> listActivos = databaseConnectorClient.getPozosActivos(idOportunidadObjetivo,
-                                        version, cuota, declinada, pce, area, fecha);
+                                        version, cuota, declinada, pce, area, fecha, multiFlag);
 
                         // log.info(" 12 / 12 - getFactorInversion");
                         FactorInversion factorInversion = databaseConnectorClient
@@ -252,7 +254,7 @@ public class EvaluacionEconomicaMultiService {
 
                         // log.info(" 14 / 14 - getfechaTerminoDate");
                         Date fechaTermino = databaseConnectorClient.getfechaTerminoDate(
-                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha);
+                                        idOportunidadObjetivo, version, cuota, declinada, pce, area, fecha, multiFlag);
                         
 
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -321,8 +323,9 @@ public class EvaluacionEconomicaMultiService {
                         }
 
                         final String basicAnioInicio = basicAnioInicioString;
-                        String previousYear = indexNumber == 0 ? oportunity.getFechainicioperfexploratorio()
-                                        : String.valueOf(Integer.parseInt(basicAnioInicio) - 1);
+                        // String previousYear = indexNumber == 0 ? oportunity.getFechainicioperfexploratorio()
+                        //                 : String.valueOf(Integer.parseInt(basicAnioInicio) - 1);
+                        String previousYear = oportunity.getFechainicioperfexploratorio();
 
                         // log.info("Obteniendo la informacion de los pozos perforados");
                         assert listTerminados != null;
@@ -388,7 +391,6 @@ public class EvaluacionEconomicaMultiService {
                         Map<String, Costos> costosMap = DataProcess.calculaCostosByAnio(costoOperacionMap,
                                         produccionDiariaPromedio, paridad);
 
-                        // log.info("Generando Respuesta");
                         List<EvaluacionEconomica> evaluacionEconomica = new ArrayList<>();
                         assert listActivos != null;
                         
@@ -535,10 +537,11 @@ public class EvaluacionEconomicaMultiService {
                                                                         .parseInt(basicAnioInicio);
                                                         if (anioInicioPerfexploratorio
                                                                         + plan.getDuracion() == anioInicio) {
-
                                                                 
                                                                 double ductosForInit = infoInversion.getDucto()
                                                                                 * paridad.getParidad();
+                                                                // System.err.println("ducto : " + infoInversion.getDucto());
+                                                                // System.err.println("paridad.getParidad() : " + paridad.getParidad());
 
                                                                 double plataformasDesarrolloForInit = infoInversion
                                                                                 .getPlataformadesarrollo()
@@ -564,37 +567,6 @@ public class EvaluacionEconomicaMultiService {
                                                                 * cantManifolds;
                                                                 
                                                                 inversionesAnioAnterior.setRisers(risersG);
-
-                                                                // if (!existe.get()) {
-
-                                                                //         inversionesAnioAnterior.setDesarrolloSinOperacional(
-                                                                //                         invDesarrollo.getDesarrolloSinOperacional());
-                                                                //         inversionesAnioAnterior
-                                                                //                         .setPerforacionDes(invDesarrollo.getPerforacionDes());
-                                                                //         inversionesAnioAnterior
-                                                                //                         .setTerminacionDes(invDesarrollo.getTerminacionDes());
-                                                                //         inversionesAnioAnterior.setInfraestructuraDes(
-                                                                //                         invDesarrollo.getInfraestructuraDes());
-                                                                //         inversionesAnioAnterior.setDesarrollo(
-                                                                //                         invDesarrollo.getDesarrolloSinOperacional());
-
-                                                                        
-                                                                //         evaluacionEconomica.add(new EvaluacionEconomica(
-                                                                //                                 Integer.toString(anioCompare),
-                                                                //                                 null, null, null, inversionesAnioAnterior, null, null));
-                                                                                
-                                                                // } else {
-                                                                        // evaluacionEconomica.forEach(evaluacion -> {
-                                                                        //         if (evaluacion.getAnio().equals(Integer.toString(anioCompare))) {
-                                                                        //                 evaluacion.getInversiones().setDuctos(ductosForInit);
-                                                                        //                 evaluacion.getInversiones().setPlataformaDesarrollo(plataformasDesarrolloForInit);
-                                                                        //                 evaluacion.getInversiones().setSistemaDeControl(sistemaDeControlG);
-                                                                        //                 evaluacion.getInversiones().setCubiertaProcesos(cubiertaProcesosG);
-                                                                        //                 evaluacion.getInversiones().setRisers(risersG);
-                                                                        //         }
-                                                                        // });
-                                                                
-                                                                // }
                                                                         
                                                         } else {
                                                                 var arbolesSubmarinosG = infoInversion
@@ -1059,9 +1031,9 @@ public class EvaluacionEconomicaMultiService {
                 lastYearPozosProduccion.clear();
                 lastProduccionDiariaPromedio.clear();
                 ObjectMapper mapper = new ObjectMapper();
-                double maxInfraDES = Double.MIN_VALUE;
-                double maxPerfDES = Double.MIN_VALUE;
-                double maxTermDES = Double.MIN_VALUE;
+                double maxInfra = Double.MIN_VALUE;
+                double maxPerf = Double.MIN_VALUE;
+                double maxTerm = Double.MIN_VALUE;
                 double maxPCE = Double.MIN_VALUE;
 
                 double maxPlataformadesarrollo = Double.MIN_VALUE;
@@ -1071,15 +1043,16 @@ public class EvaluacionEconomicaMultiService {
                 double maxManifolds = Double.MIN_VALUE;
                 double maxRisers = Double.MIN_VALUE;
                 double maxCubiertaDeProceso = Double.MIN_VALUE;
+                double maxSistemaDeControl = Double.MIN_VALUE;
                 FactorCalculoForMulti factorCalculoForMulti = new FactorCalculoForMulti();
                 factorCalculoForMulti.setIsMulti(false);
                 for (int i = 0; i < paramList.size(); i++) {
                         List<Object> params = paramList.get(i);
 
                         double currentPCE = getDoubleValue(params, 4);
-                        double currentInfraDES = getDoubleValue(params, 11);
-                        double currentPerfDES = getDoubleValue(params, 12);
-                        double currentTermDES = getDoubleValue(params, 13);
+                        double currentInfra = getDoubleValue(params, 11);
+                        double currentPerf = getDoubleValue(params, 12);
+                        double currentTerm = getDoubleValue(params, 13);
 
                         double currentDucto = getDoubleValue(params, 9);
                         double currentBateria = getDoubleValue(params, 10);
@@ -1087,6 +1060,7 @@ public class EvaluacionEconomicaMultiService {
                         double currentEstacioncompresion = getDoubleValue(params, 8);
                         double currentManifolds = getDoubleValue(params, 18);
                         double currentRisers = getDoubleValue(params, 19);
+                        double currentSistemaDeControl = getDoubleValue(params, 20);
                         double currentCubiertaDeProceso = getDoubleValue(params, 21);
 
                         sumPCE += currentPCE;
@@ -1094,17 +1068,20 @@ public class EvaluacionEconomicaMultiService {
                         if (currentPCE > maxPCE) {
                                 maxPCE = currentPCE;
                         }
-                        if (currentInfraDES > maxInfraDES) {
-                                maxInfraDES = currentInfraDES;
+                        if (currentInfra > maxInfra) {
+                                maxInfra = currentInfra;
                         }
-                        if (currentPerfDES > maxPerfDES) {
-                                maxPerfDES = currentPerfDES;
+                        if (currentPerf > maxPerf) {
+                                maxPerf = currentPerf;
                         }
-                        if (currentTermDES > maxTermDES) {
-                                maxTermDES = currentTermDES;
+                        if (currentTerm > maxTerm) {
+                                maxTerm = currentTerm;
                         }
                         if (currentDucto > maxDucto) {
                                 maxDucto = currentDucto;
+                        }
+                        if (currentSistemaDeControl > maxSistemaDeControl) {
+                                maxSistemaDeControl = currentSistemaDeControl;
                         }
                         if (currentBateria > maxBateria) {
                                 maxBateria = currentBateria;
@@ -1175,16 +1152,16 @@ public class EvaluacionEconomicaMultiService {
                                         maxEstacioncompresion, // estacioncompresion
                                         maxDucto, // ducto
                                         maxBateria, // bateria
-                                        maxInfraDES, // maxInfraDES
-                                        maxPerfDES, // maxPerfDES
-                                        maxTermDES, // maxTermDES
+                                        maxInfra, // maxInfra
+                                        maxPerf, // maxPerf
+                                        maxTerm, // maxTerm
                                         getDoubleValue(params, 14), // infraDES
                                         getDoubleValue(params, 15), // perfDES
                                         getDoubleValue(params, 16), // termDES
                                         getDoubleValue(params, 17), // arbolesSubmarinos
                                         maxManifolds, // manifolds
                                         maxRisers, // risers
-                                        getDoubleValue(params, 20), // sistemaDeControl
+                                        maxSistemaDeControl, // sistemaDeControl
                                         maxCubiertaDeProceso, // cubiertaDeProceso
                                         getDoubleValue(params, 22), // buquetaqueCompra
                                         getDoubleValue(params, 23), // buquetaqueRenta
