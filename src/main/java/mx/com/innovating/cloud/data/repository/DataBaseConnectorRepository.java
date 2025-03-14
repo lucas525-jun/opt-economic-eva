@@ -173,10 +173,9 @@ public class DataBaseConnectorRepository {
     }
 
     public List<VectorProduccion> getVectorProduccion(Integer pnoportunidadobjetivo, Integer pnidversion,
-            double pncuota, double pndeclinada, double pnpce, double pnarea, String fecha) {
+            double pncuota, double pndeclinada, double pnpce, double pnarea, String fecha, Boolean multiFlag) {
         List<VectorProduccion> results = new ArrayList<>();
-        if (fecha != null && !"unexist".equals(fecha)) {
-
+        if (multiFlag) {
             results = produccionAnualMultiService.calculateProduccionAnualMulti(
                     pnidversion, pnoportunidadobjetivo, pncuota,
                     pndeclinada, pnpce, pnarea, fecha);
@@ -194,7 +193,7 @@ public class DataBaseConnectorRepository {
 
         return getVectorProduccion(
                 pnoportunidadobjetivo, pnidversion, pncuota,
-                pndeclinada, pnpce, pnarea, null);
+                pndeclinada, pnpce, pnarea, null, false);
     }
 
     public List<ProduccionPozos> getProduccionPozo(Integer idOportunidad, Integer version, Double pncuota,
@@ -249,11 +248,12 @@ public class DataBaseConnectorRepository {
             double pndeclinada,
             double pnpce,
             double pnarea,
-            String fecha) {
+            String fecha,
+            Boolean multiFLag) {
         try {
             List<EscaleraProduccionMulti> allResults;
 
-            if (fecha == null || fecha.equals("unexist")) {
+            if (!multiFLag) {
                 allResults = escaleraProduccionService.calculateEscaleraProduccion(
                         pnidversion,
                         pnoportunidadobjetivo,
@@ -301,7 +301,7 @@ public class DataBaseConnectorRepository {
             double pndeclinada,
             double pnpce,
             double pnarea) {
-        return getPozosPerforados(pnoportunidadobjetivo, pnidversion, pncuota, pndeclinada, pnpce, pnarea, null);
+        return getPozosPerforados(pnoportunidadobjetivo, pnidversion, pncuota, pndeclinada, pnpce, pnarea, null, false);
     }
 
     public List<PozosActivos> getPozosActivos(
@@ -311,7 +311,7 @@ public class DataBaseConnectorRepository {
             double pndeclinada,
             double pnpce,
             double pnarea) {
-        return getPozosActivos(pnoportunidadobjetivo, pnidversion, pncuota, pndeclinada, pnpce, pnarea, null);
+        return getPozosActivos(pnoportunidadobjetivo, pnidversion, pncuota, pndeclinada, pnpce, pnarea, null, false);
 
     }
 
@@ -322,11 +322,12 @@ public class DataBaseConnectorRepository {
             double pndeclinada,
             double pnpce,
             double pnarea,
-            String fecha) {
+            String fecha,
+            Boolean multiFlag) {
         try {
             List<EscaleraProduccionMulti> allResults;
 
-            if (fecha == null || fecha.equals("unexist")) {
+            if (!multiFlag) {
                 allResults = escaleraProduccionService.calculateEscaleraProduccion(
                         pnidversion,
                         pnoportunidadobjetivo,
@@ -530,7 +531,8 @@ public class DataBaseConnectorRepository {
                 pndeclinada,
                 pnpce,
                 pnarea,
-                null);
+                null,
+                false);
     }
 
     public CalculoNumPozosResult getPozosTotales(
@@ -551,11 +553,12 @@ public class DataBaseConnectorRepository {
             Double pndeclinada,
             Double pnpce,
             Double pnarea,
-            String fecha) {
+            String fecha,
+            Boolean multiFlag) {
         try {
             List<EscaleraProduccionMulti> results;
 
-            if (fecha == null || fecha.equals("unexist")) {
+            if (!multiFlag) {
                 results = escaleraProduccionService.calculateEscaleraProduccion(
                         version,
                         idOportunidad,
@@ -608,7 +611,8 @@ public class DataBaseConnectorRepository {
             Double pndeclinada,
             Double pnpce,
             Double pnarea,
-            String fecha) {
+            String fecha,
+            Boolean multiFlag) {
         try {
 
             List<EscaleraProduccionMulti> results = escaleraProduccionMultiService.calculateEscaleraProduccionMulti(
