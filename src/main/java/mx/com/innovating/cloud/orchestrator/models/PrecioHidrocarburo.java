@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 public class PrecioHidrocarburo {
 
 	private Integer idhidrocarburo;
-	private Integer idoportunidadobjetivo;
+	private Long idoportunidadobjetivo;
 	private String hidrocarburo;
-	private String anioprecio;
+	private String fecha;
 	private Double precio;
 
 }

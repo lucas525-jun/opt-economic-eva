@@ -220,7 +220,7 @@ public class EvaluacionEconomicaMultiService {
 
                         // log.info(" 6 / 12 - getCostoOperacion");
                         List<CostoOperacion> listCostoOperacion = databaseConnectorClient
-                                        .getCostoOperacion(oportunity.getIdproyecto());
+                                        .getCostoOperacion(idOportunidadObjetivo);
 
                         // log.info(" 7 / 12 - getProduccionTotalMmbpce");
                         ProduccionTotalMmbpce produccionTotalMmbpce = databaseConnectorClient.getProduccionTotalMmbpce(
@@ -236,7 +236,7 @@ public class EvaluacionEconomicaMultiService {
 
                         // log.info(" 10 / 12 - getPrecioHidrocarburo");
                         List<PrecioHidrocarburo> listPrecios = databaseConnectorClient
-                                        .getPrecioHidrocarburo(idOportunidadObjetivo, oportunity.getIdprograma());
+                                        .getPrecioHidrocarburo(idOportunidadObjetivo, oportunity.getIdprograma(), version);
 
                         // log.info(" 11 / 12 - getPozosActivos");
                         List<PozosActivos> listActivos = databaseConnectorClient.getPozosActivos(idOportunidadObjetivo,
@@ -371,7 +371,7 @@ public class EvaluacionEconomicaMultiService {
                         Map<String, Double> preciosMap = new HashMap<>();
                         assert listPrecios != null;
                         listPrecios.forEach(
-                                        item -> preciosMap.put(item.getAnioprecio() + "-" + item.getIdhidrocarburo(),
+                                        item -> preciosMap.put(item.getFecha() + "-" + item.getIdhidrocarburo(),
                                                         item.getPrecio()));
 
                         // log.info("Calculando Ingresos");

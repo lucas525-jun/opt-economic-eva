@@ -374,28 +374,32 @@ public class DataBaseConnectorRepository {
     @CacheResult(cacheName = "precio-hidrocarburo-cache")
 
     public List<PrecioHidrocarburo> getPrecioHidrocarburo(@CacheKey Integer idOportunidad,
-            @CacheKey Integer idPrograma) {
+            @CacheKey Integer idPrograma, @CacheKey Integer idVersion) {
 
         try {
             final var queryString = """
-                    SELECT
+                    SELECT DISTINCT 
                         idhidrocarburo,
                         idoportunidadobjetivo,
                         hidrocarburo,
-                        anioprecio,
+                        fecha,
                         precio
                     FROM
-                        catalogo.volumetriaoportunidadfactoresper50vw
+                        catalogo.preciooportunidadvw
                     WHERE
+                        idversion = :idVersion
+                    AND
                         idoportunidadobjetivo = :idOportunidad
                     AND
                         idtipovalor = 2
                     AND
                         idprograma = :idPrograma
-                    ORDER BY anioprecio ASC
+                    ORDER BY fecha;
                     """;
             return em.createNativeQuery(queryString, PrecioHidrocarburo.class)
-                    .setParameter("idOportunidad", idOportunidad).setParameter("idPrograma", idPrograma)
+                    .setParameter("idVersion", idVersion)
+                    .setParameter("idOportunidad", idOportunidad)
+                    .setParameter("idPrograma", idPrograma)
                     .getResultStream().toList();
         } catch (Exception e) {
             Log.error("JDBC: getPrecioHidrocarburo exception executing SQL", e);
@@ -709,17 +713,17 @@ public class DataBaseConnectorRepository {
 
     @Transactional
     @CacheResult(cacheName = "costo-operacion-cache")
-    public List<CostoOperacion> getCostoOperacion(@CacheKey Integer idProyecto) {
+    public List<CostoOperacion> getCostoOperacion(@CacheKey Integer idOportunidad) {
 
         try {
             final var queryString = """
-                    SELECT idcostooperacion, costooperacion, fecha, gasto
-                    FROM costo.operacionproyectovw
-                    WHERE idproyecto = :idProyecto
-                    AND idtipovalor=2
+                        select idcostooperacion, costooperacion, fecha, gasto
+                        from gasto.operacionoportunidadvw
+                        where idoportunidadobjetivo=:idOportunidad 
+                        and idtipovalor=2
                     """;
             List<CostoOperacion> result = em.createNativeQuery(queryString, CostoOperacion.class)
-                    .setParameter("idProyecto", idProyecto).getResultStream().toList();
+                    .setParameter("idOportunidad", idOportunidad).getResultStream().toList();
             return result;
         } catch (Exception e) {
             Log.error("JDBC: getCostoOperacion exception executing SQL", e);

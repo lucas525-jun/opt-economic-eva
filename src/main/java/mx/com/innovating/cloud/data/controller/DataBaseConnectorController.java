@@ -98,11 +98,11 @@ public class DataBaseConnectorController {
 	//}
 
 	@GET
-	@Path("/getCostoOperacion/{idProyecto}")
-	public Response listCostoOperacion(@PathParam("idProyecto") Integer idProyecto) {
-		var result = dbRepository.getCostoOperacion(idProyecto);
+	@Path("/getCostoOperacion/{idOportunidad}")
+	public Response listCostoOperacion(@PathParam("idOportunidad") Integer idOportunidad) {
+		var result = dbRepository.getCostoOperacion(idOportunidad);
 		if(result.isEmpty()){
-			throw new SqlNotFoundException("CostoOperacion: Value no present with idProyecto = " + idProyecto);
+			throw new SqlNotFoundException("CostoOperacion: Value no present with idProyecto = " + idOportunidad);
 		}
 		return Response.ok(result).build();
 	}
@@ -130,10 +130,10 @@ public class DataBaseConnectorController {
 	}
 
 	@GET
-	@Path("/getPrecioHidrocarburo/{idOportunidad}/programa/{idPrograma}")
+	@Path("/getPrecioHidrocarburo/{idOportunidad}/programa/{idPrograma}/version/{idVersion}")
 	public Response listPrecioHidrocarburo(@PathParam("idOportunidad") Integer idOportunidad,
-										   @PathParam("idPrograma") Integer idPrograma) {
-		var result = dbRepository.getPrecioHidrocarburo(idOportunidad, idPrograma);
+										   @PathParam("idPrograma") Integer idPrograma, @PathParam("idVersion") Integer idVersion) {
+		var result = dbRepository.getPrecioHidrocarburo(idOportunidad, idPrograma, idVersion);
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("PrecioHidrocarburo: Value no present with idOportunidad = " + idOportunidad);
 		}
