@@ -627,8 +627,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-19", 
+                                                                idOportunidadObjetivo);
                                         }
                                         if (costoOperacionMap.containsKey(item.getAnio() + "-25")) {
                                                 mantenimientoPozos = costoOperacionMap.get(item.getAnio() + "-25")
@@ -637,8 +638,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-25", 
+                                                                idOportunidadObjetivo);
                                         }
                                         if (costoOperacionMap.containsKey(item.getAnio() + "-23")) {
                                                 mantenimientoInfraestructuraFutDes = costoOperacionMap
@@ -647,13 +649,11 @@ public class EvaluacionEconomicaMultiService {
                                                                                 .getMbpce()
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
-                                                // System.err.println("mantenimientoInfraestructuraFutDes"
-                                                // + mantenimientoInfraestructuraFutDes);
-                                                // System.err.println("fecha : " + fecha);
-                                                // System.err.println("year : " + basicAnioInicio);
+                                                
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-23", 
+                                                                idOportunidadObjetivo);
                                         }
                                         inversionesAnioActual.setLineaDescarga(lineaDescarga);
                                         inversionesAnioActual.setOperacionalFuturoDesarrollo(futuroDesarrollo);
@@ -703,8 +703,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-19", 
+                                                                idOportunidadObjetivo);
                                         }
                                         if (costoOperacionMap.containsKey(item.getAnio() + "-25")) {
 
@@ -714,8 +715,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-25", 
+                                                                idOportunidadObjetivo);
                                         }
                                         if (costoOperacionMap.containsKey(item.getAnio() + "-23")) {
 
@@ -726,8 +728,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-23", 
+                                                                idOportunidadObjetivo);
                                         }
 
                                         inversionesAnioActual.setLineaDescarga(lineaDescarga);
@@ -782,8 +785,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-19", 
+                                                                idOportunidadObjetivo);
                                         }
 
                                         if (costoOperacionMap.containsKey(item.getAnio() + "-25")) {
@@ -793,8 +797,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-25", 
+                                                                idOportunidadObjetivo);
                                         }
                                         if (costoOperacionMap.containsKey(item.getAnio() + "-23")) {
                                                 mantenimientoInfraestructuraFutDes = costoOperacionMap
@@ -804,8 +809,9 @@ public class EvaluacionEconomicaMultiService {
                                                                 * yearDays
                                                                 * paridad.getParidad() / 1000;
                                         } else {
-                                                log.error("No existen datos para el año {}: {}", "costo",
-                                                                item.getAnio());
+                                                log.error("No existen datos para el año {}: {}, idOportunidadObjetivo: {}", "costo", 
+                                                                item.getAnio() + "-23", 
+                                                                idOportunidadObjetivo);
                                         }
 
                                         inversionesAnioActual.setLineaDescarga(lineaDescarga);

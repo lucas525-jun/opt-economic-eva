@@ -741,10 +741,10 @@ public class DataBaseConnectorRepository {
     public List<Oportunidades> getOportunidadesByNombreVersion(@CacheKey String nombreVersion) {
         try {
             final var queryString = """
-                    SELECT idoportunidad, oportunidad, b.nombreversion FROM catalogo.claveobjetivovw a
+                    SELECT idoportunidad, idoportunidadobjetivo, oportunidad, b.nombreversion FROM catalogo.claveobjetivovw a
                     JOIN catalogo.versiontbl b ON a.idversion = b.idversion
                     where nombreversion = :nombreVersion
-                    group by idoportunidad, oportunidad, b.nombreversion
+                    group by idoportunidad, idoportunidadobjetivo, oportunidad, b.nombreversion
                     """;
     
             List<Object[]> results = em.createNativeQuery(queryString)
@@ -755,8 +755,9 @@ public class DataBaseConnectorRepository {
                     .map(result -> {
                         Oportunidades oportunidad = new Oportunidades();
                         oportunidad.setIdoportunidad((Integer) result[0]);
-                        oportunidad.setOportunidad((String) result[1]);
-                        oportunidad.setNombreVersion((String) result[2]);
+                        oportunidad.setIdoportunidadobjetivo((Integer) result[1]);
+                        oportunidad.setOportunidad((String) result[2]);
+                        oportunidad.setNombreVersion((String) result[3]);
                         return oportunidad;
                     })
                     .collect(Collectors.toList());
