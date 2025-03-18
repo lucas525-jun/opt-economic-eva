@@ -1,7 +1,5 @@
 package mx.com.innovating.cloud.data.controller;
 
-import java.io.IOException;
-
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -10,11 +8,6 @@ import jakarta.ws.rs.core.Response;
 import mx.com.innovating.cloud.data.entities.InformacionOportunidad;
 import mx.com.innovating.cloud.data.exceptions.SqlNotFoundException;
 import mx.com.innovating.cloud.data.repository.DataBaseConnectorRepository;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.logging.Logger;
 
 @Path("/api/v1/connector")
 @Produces(MediaType.APPLICATION_JSON)
@@ -23,9 +16,6 @@ public class DataBaseConnectorController {
 
 	@Inject
 	DataBaseConnectorRepository dbRepository;
-
-
-
 
 	@GET
 	@Path("/getPlanDesarrollo")
@@ -51,31 +41,12 @@ public class DataBaseConnectorController {
 	@Path("/getOportunidades")
 	public Response listOportunidadesByNombreVersion(@NotNull @QueryParam("nombreVersion") String nombreVersion) {
 		var result = dbRepository.getOportunidadesByNombreVersion(nombreVersion);
+
 		if(result.isEmpty()){
 			throw new SqlNotFoundException("OportunidadesByNombreVersion: Value no present with nombreVersion = " + nombreVersion);
 		}
 		return Response.ok(result).build();
 	}
-
-	//@GET
-	//@Path("/getProduccionPozo/{idOportunidad}/version/{version}")
-	//public Response listProduccionPozo(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version){
-	//	var result = dbRepository.getProduccionPozo(idOportunidad, version);
-	//	if(result.isEmpty()){
-	//		throw new SqlNotFoundException("ProduccionPozo: Value no present");
-	//	}
-	//	return Response.ok(result).build();
-	//}
-
-	//@GET
-	//@Path("/getEscaleraProduccion/{idOportunidad}/version/{version}")
-	//public Response listEscaleraProduccion(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
-	//	var result = dbRepository.getEscaleraProduccion(idOportunidad, version);
-	//	if(result.isEmpty()){
-	//		throw new SqlNotFoundException("EscaleraProduccion: Value no present with idOportunidad = " + idOportunidad);
-	//}
-	//return Response.ok(result).build();
-	//}
 
 	@GET
 	@Path("/getPozosPerforados/{idOportunidad}/version/{version}/{cuota}/{declinada}/{pce}/{area}")
@@ -86,16 +57,6 @@ public class DataBaseConnectorController {
 		}
 		return Response.ok(result).build();
 	}
-
-	//@GET
-	//@Path("/getPozosActivos/{idOportunidad}/version/{version}")
-	//public Response listPozosActivos(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
-	//	var result = dbRepository.getPozosActivos(idOportunidad, version);
-	//	if(result.isEmpty()){
-	//		throw new SqlNotFoundException("PozosActivos: Value no present with idOportunidad = " + idOportunidad);
-	//	}
-	//	return Response.ok(result).build();
-	//}
 
 	@GET
 	@Path("/getCostoOperacion/{idOportunidad}")
@@ -173,18 +134,6 @@ public class DataBaseConnectorController {
 			throw new SqlNotFoundException("FactorInversionDesarrollo: Value no present with idOportunidad = " + idOportunidad);
 		}
 	}
-
-
-	//@GET
-	//@Path("/getProduccionTotalMmbpce/{idOportunidad}/version/{version}")
-	//public Response produccionTotalMmbpce(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version) {
-	//	var result = dbRepository.getProduccionTotalMmbpce(idOportunidad, version);
-	//	if(result != null){
-	//		return Response.ok(result).build();
-	//	} else {
-	//throw new SqlNotFoundException("JDBC exception: Value no present with idOportunidad = " + idOportunidad);
-	//	}
-	//}
 
 	@GET
 	@Path("/getInformacionInversion/{idOportunidad}")
