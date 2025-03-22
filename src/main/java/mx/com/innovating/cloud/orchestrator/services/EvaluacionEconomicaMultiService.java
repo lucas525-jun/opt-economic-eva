@@ -153,7 +153,6 @@ public class EvaluacionEconomicaMultiService {
 
                         Double areamasignacion = databaseConnectorClient
                                         .getAreakmasignacion(idOportunidadObjetivo, version).getAreakmasignacion();
-
                         return new EvaluacionResponse(areamasignacion, pce, oportunity, evaluacionEconomica,
                                         flujosContablesTotales, null, null, 0, null);
 
@@ -1113,38 +1112,17 @@ public class EvaluacionEconomicaMultiService {
 
                 }
                 List<Integer> idOportunidadObjetivoList = new ArrayList<>();
+
                 for (int i = 0; i < paramList.size(); i++) {
                         List<Object> params = paramList.get(i);
                         String fechaToUse = (i == 0) ? "unexist" : currentFecha;
                         int oldPozosTerminadosValueToUse = (i == 0) ? 0 : currentOldPozosTerminadosValue;
                         int idOportunidadObjetivo = getIntValue(params, 0);
-
-                        if (i == 0) {
-                                // System.err.println("======================");
-                                Object checkPCE0 = paramList.get(i + 0).get(4);
-                                Object checkPCE1 = paramList.get(i + 1).get(4);
-                                if (checkPCE0 instanceof String) {
-                                        System.out.println("0st idOportunidadObjetivo : " + idOportunidadObjetivo);
-                                        System.out.println("checkPCE0 : " + checkPCE0);
-                                }
-                                if (checkPCE1 instanceof String) {
-                                        System.out.println("1st idOportunidadObjetivo : " + getIntValue(params, 1));
-                                        System.out.println("checkPCE1 : " + checkPCE1);
-                                }
-                        }
-
-                        double pce = parseToDouble(params.get(4));
-                        double nextOrPreviewPce = 0.0;
-                        if (i == 0) {
-                                nextOrPreviewPce = parseToDouble(paramList.get(i + 1).get(4));
-                        } else {
-                                nextOrPreviewPce = parseToDouble(paramList.get(i - 1).get(4));
-                        }
-
+                        double pce = getDoubleValue(params, 4);
+                        int nextOrPreviewPce = 1;
+                        if(i == paramList.size() - 1)
+                                nextOrPreviewPce = 0;
                         idOportunidadObjetivoList.add(idOportunidadObjetivo);
-                        if (i != 0 && pce == 0.0) {
-                                break;
-                        }
                         EvaluacionResponse response = getInfoPozosService(
                                         i,
                                         idOportunidadObjetivo, // idOportunidadObjetivo
@@ -1174,12 +1152,10 @@ public class EvaluacionEconomicaMultiService {
                                         fechaToUse, // fechaToUse
                                         oldPozosTerminadosValueToUse,
                                         lastYearPozosProduccion, lastProduccionDiariaPromedio);
-
-                        if (i == 0 && nextOrPreviewPce == 0) {
+                        if(paramList.size() == 1) {
                                 return response;
                         }
-
-                        if (response.getFactorCalculo() != null && pce != 0 && nextOrPreviewPce != 0) {
+                        if (response.getFactorCalculo() != null && nextOrPreviewPce != 0) {
                                 FactorCalculo eachFactorCalculo = response.getFactorCalculo();
                                 // init
                                 factorCalculoForMulti.setIsMulti(true);
@@ -1295,7 +1271,7 @@ public class EvaluacionEconomicaMultiService {
                                                 }
                                         }
 
-                                        if (pce != 0 && nextOrPreviewPce != 0) {
+                                        if (pce != 0) {
                                                 if (!freshFlag) {
                                                         if (overLapFlag == true) {
                                                                 evaluacionList.removeIf(
@@ -1333,12 +1309,7 @@ public class EvaluacionEconomicaMultiService {
                                         response.setEvaluacionEconomica(evaluacionList);
                                 }
                         }
-                        try {
-                                mapper.writeValue(new File("response_each_" + i + "___.json"),
-                                                response);
-                        } catch (IOException e) {
-                                log.error("Error saving merged responses to JSON", e);
-                        }
+                        
                         responses.add(response);
                 }
 
@@ -1357,11 +1328,6 @@ public class EvaluacionEconomicaMultiService {
                 EvaluacionResponse mergedResult = evaluacionMerger.mergeEvaluaciones(responses,
                                 produccionTotalMmbpceArray, sumPCE, maxPCE, factorCalculoForMulti);
 
-                try {
-                        mapper.writeValue(new File("all_responses.json"), mergedResult);
-                } catch (IOException e) {
-                        log.error("Error saving merged responses to JSON", e);
-                }
                 return mergedResult;
         }
 
