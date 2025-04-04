@@ -112,7 +112,7 @@ public class EvaluacionMerger {
                 add(base.getPozosTerminados(), other.getPozosTerminados()));
     }
 
-    private ProduccionDiariaPromedio mergeProduccionDiaria(ProduccionDiariaPromedio base,
+    public ProduccionDiariaPromedio mergeProduccionDiaria(ProduccionDiariaPromedio base,
             ProduccionDiariaPromedio other) {
         if (base == null)
             return other;
