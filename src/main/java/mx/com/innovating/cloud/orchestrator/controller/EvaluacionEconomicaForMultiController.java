@@ -8,6 +8,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import mx.com.innovating.cloud.orchestrator.models.EvaluacionResponse;
 import mx.com.innovating.cloud.orchestrator.services.EvaluacionEconomicaMultiService;
+import mx.com.innovating.cloud.orchestrator.services.ProductionProfileService;
 
 import java.util.List;
 
@@ -19,23 +20,20 @@ public class EvaluacionEconomicaForMultiController {
 	@Inject
 	EvaluacionEconomicaMultiService evaluacionEconomicaMultiService;
 
+	@Inject
+	ProductionProfileService productionProfileService;
+
 	@POST
 	@Path("/getEvaluacionEconomicaMulti")
 	public EvaluacionResponse evaluacionEconomicaMulti(List<List<Object>> parameterList) {
 		EvaluacionResponse result = evaluacionEconomicaMultiService.processMultipleEvaluaciones(parameterList);
+		return result;
+	}
 
-		// if (result.getEvaluacionEconomica() != null &&
-		// result.getEvaluacionEconomica().size() > 1) {
-		// double ducto =
-		// result.getEvaluacionEconomica().get(0).getInversiones().getDuctos();
-
-		// double ducto2 =
-		// result.getEvaluacionEconomica().get(1).getInversiones().getDuctos();
-		// System.err.println("ducto: " + ducto);
-		// System.err.println("ducto2: " + ducto2);
-		// } else {
-		// }
-
+	@POST
+	@Path("/getEvaluacionPerfilDeProduccion")
+	public EvaluacionResponse evaluacionPerfilDeProducción(List<List<Object>> parameterList) {
+		EvaluacionResponse result = productionProfileService.processMultipleEvaluaciones(parameterList);
 		return result;
 	}
 
