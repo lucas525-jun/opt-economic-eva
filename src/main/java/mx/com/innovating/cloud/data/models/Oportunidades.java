@@ -13,5 +13,6 @@ public class Oportunidades {
     private int idoportunidad;
     private String oportunidad;
     private String nombreVersion;
+    private int idtipooportunidad;
 
 }
