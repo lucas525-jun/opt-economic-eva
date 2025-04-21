@@ -70,21 +70,20 @@ public class DataBaseConnectorRepository {
             @CacheKey Integer idVersion) {
         try {
             final var queryString = """
-                    SELECT distinct o.idoportunidad,
-                    o.oportunidad,
-                    r.idoportunidadobjetivo,
-                    pd.idplandesarrollo,
-                    pp.plandesarrollo,
-                    pd.idinversion,
-                    i.inversion,
-                    pd.duracion ,
-                    o.idversion
-                    FROM catalogo.relinversionplantbl pd
-                    JOIN catalogo.oportunidadtbl o ON pd.idplandesarrollo = o.idplandesarrollo
-                    JOIN catalogo.plandesarrollotbl pp ON pd.idplandesarrollo = pp.idplandesarrollo
-                    JOIN catalogo.inversiontbl i ON pd.idinversion = i.idinversion
-                    JOIN catalogo.reloportunidadobjetivotbl r ON  r.idoportunidad = o.idoportunidad AND r.idversion = o.idversion
-                    JOIN catalogo.versiontbl v ON v.idversion = :idVersion where r.idoportunidadobjetivo = :idOportunidad
+                    select
+					    idoportunidad, 
+                        oportunidad, 
+                        idoportunidadobjetivo, 
+                        idplandesarrollo, 
+                        plandesarrollo, 
+                        idinversion, 
+                        inversion, 
+                        duracion, 
+                        idversion					
+					from 
+					catalogo.plandesarrollooportunidadw 
+                    where
+                     idversion = :idVersion and idoportunidadobjetivo = :idOportunidad
                     """;
             List<OportunidadPlanDesarrollo> result = em.createNativeQuery(queryString, OportunidadPlanDesarrollo.class)
                     .setParameter("idOportunidad", idOportunidad)
