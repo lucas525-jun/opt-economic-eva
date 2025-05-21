@@ -415,18 +415,15 @@ public class EvaluacionEconomicaService {
 
                                         double duracionMax = planDesarrollo.stream().mapToDouble(OportunidadPlanDesarrollo::getDuracion).max().orElseThrow(() -> new NoSuchElementException("La lista está vacía"));
 
+                                        var anioInicioPerfexploratorio = Integer.parseInt(oportunity.getFechainicioperfexploratorio());
+                                        var anioInicio = Integer.parseInt(oportunity.getFechainicio());
                                         for (OportunidadPlanDesarrollo plan : planDesarrollo) {
-
                                                 if (duracionMax >= 2) { // Para versiones 2 o superiores
-                                                        var anioInicioPerfexploratorio = Integer.parseInt(oportunity.getFechainicioperfexploratorio());
-                                                        var anioInicio = Integer.parseInt(oportunity.getFechainicio());
-
                                                         if (anioInicioPerfexploratorio + plan.getDuracion() == anioInicio) {
                                                                 ductos = infoInversion.getDucto() * paridad.getParidad();
                                                                 plataformasDesarrollo = infoInversion.getPlataformadesarrollo() * paridad.getParidad();
                                                                 inversionesAnioAnterior.setDuctos(ductos);
                                                                 inversionesAnioAnterior.setPlataformaDesarrollo(plataformasDesarrollo);
-
                                                                 var sistemaDeControlG = infoInversion.getSistemasdecontrol() * paridad.getParidad() * cantManifolds;
                                                                 inversionesAnioAnterior.setSistemaDeControl(sistemaDeControlG);
                                                                 var cubiertaProcesosG = infoInversion.getCubiertadeproces() * paridad.getParidad() * cantManifolds;
@@ -450,6 +447,14 @@ public class EvaluacionEconomicaService {
                                                 } else {
                                                         ductos = infoInversion.getDucto() * paridad.getParidad();
                                                         plataformasDesarrollo = infoInversion.getPlataformadesarrollo() * paridad.getParidad();
+                                                        if(anioInicioPerfexploratorio + plan.getDuracion() == anioInicio){
+                                                                inversionesAnioAnterior.setDuctos(ductos);
+                                                                inversionesAnioAnterior.setPlataformaDesarrollo(plataformasDesarrollo);
+                                                                var arbolesSubmarinosG = infoInversion.getArbolessubmarinos() * paridad.getParidad() * pozosTotales;
+                                                                inversionesAnioActual.setArbolSubmarinos(arbolesSubmarinosG);
+                                                                var manifoldsG = infoInversion.getManifolds() * paridad.getParidad() * cantManifolds;
+                                                                inversionesAnioActual.setManifolds(manifoldsG);
+                                                        }
                                                         inversionesAnioActual.setDuctos(ductos);
                                                         inversionesAnioActual.setPlataformaDesarrollo(plataformasDesarrollo);
                                                 }
