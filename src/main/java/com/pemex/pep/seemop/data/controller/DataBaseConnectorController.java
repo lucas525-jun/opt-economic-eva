@@ -38,17 +38,6 @@ public class DataBaseConnectorController {
 	}
 
 	@GET
-	@Path("/getOportunidades")
-	public Response listOportunidadesByNombreVersion(@NotNull @QueryParam("nombreVersion") String nombreVersion) {
-		var result = dbRepository.getOportunidadesByNombreVersion(nombreVersion);
-
-		if(result.isEmpty()){
-			throw new SqlNotFoundException("OportunidadesByNombreVersion: Value no present with nombreVersion = " + nombreVersion);
-		}
-		return Response.ok(result).build();
-	}
-
-	@GET
 	@Path("/getPozosPerforados/{idOportunidad}/version/{version}/{cuota}/{declinada}/{pce}/{area}")
 	public Response listPozosPerforados(@PathParam("idOportunidad") Integer idOportunidad, @PathParam("version") Integer version, @PathParam("cuota") double cuota, @PathParam("declinada") double declinada, @PathParam("pce") double pce, @PathParam("area") double area) {
 		var result = dbRepository.getPozosPerforados(idOportunidad, version, cuota, declinada, pce, area);
