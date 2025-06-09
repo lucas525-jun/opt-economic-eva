@@ -3,7 +3,6 @@ package com.pemex.pep.seemop.orchestrator.services;
 import com.pemex.pep.seemop.orchestrator.models.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import com.pemex.pep.seemop.data.entities.InformacionOportunidad;
-import mx.com.innovating.cloud.orchestrator.models.*;
 import com.pemex.pep.seemop.orchestrator.utilities.DataProcess;
 
 import java.math.BigDecimal;

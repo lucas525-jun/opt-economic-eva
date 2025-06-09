@@ -9,7 +9,6 @@ import io.quarkus.runtime.QuarkusApplication;
 
 import java.util.List;
 
-import mx.com.innovating.cloud.data.models.*;
 import com.pemex.pep.seemop.data.repository.DataBaseConnectorRepository;
 
 // @QuarkusMain

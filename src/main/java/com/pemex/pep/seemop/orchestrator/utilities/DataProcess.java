@@ -8,8 +8,6 @@ import com.pemex.pep.seemop.data.models.Paridad;
 import com.pemex.pep.seemop.data.models.ProduccionTotalMmbpce;
 import com.pemex.pep.seemop.orchestrator.models.*;
 import lombok.extern.slf4j.Slf4j;
-import mx.com.innovating.cloud.data.models.*;
-import mx.com.innovating.cloud.orchestrator.models.*;
 import org.apache.poi.ss.formula.functions.Irr;
 
 import java.math.BigDecimal;

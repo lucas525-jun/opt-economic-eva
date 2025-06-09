@@ -1,6 +1,7 @@
 package com.pemex.pep.seemop.data.repository;
 
 import com.pemex.pep.seemop.data.calculator.*;
+// Core domain models from mx.com.innovating.cloud.data.models
 import com.pemex.pep.seemop.data.models.*;
 import io.quarkus.logging.Log;
 
@@ -12,16 +13,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-
 import java.util.Date;
-
-import mx.com.innovating.cloud.data.calculator.*;
 import com.pemex.pep.seemop.data.entities.InformacionOportunidad;
 import com.pemex.pep.seemop.data.exceptions.SqlExecutionErrorException;
-
-// Core domain models from mx.com.innovating.cloud.data.models
-import mx.com.innovating.cloud.data.models.*;
-
 // Orchestrator models
 import com.pemex.pep.seemop.orchestrator.models.Areakmasignacion;
 import com.pemex.pep.seemop.orchestrator.models.FactorCalculo;

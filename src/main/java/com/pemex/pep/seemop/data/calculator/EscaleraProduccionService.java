@@ -5,8 +5,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
-import mx.com.innovating.cloud.data.models.*;
-
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.sql.Date;

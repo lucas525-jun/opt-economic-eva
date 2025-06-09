@@ -17,9 +17,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import com.pemex.pep.seemop.data.entities.InformacionOportunidad;
-import mx.com.innovating.cloud.data.models.*;
 import com.pemex.pep.seemop.data.repository.DataBaseConnectorRepository;
-import mx.com.innovating.cloud.orchestrator.models.*;
 import com.pemex.pep.seemop.orchestrator.utilities.DataProcess;
 import com.pemex.pep.seemop.data.calculator.FechaInicioService;
 

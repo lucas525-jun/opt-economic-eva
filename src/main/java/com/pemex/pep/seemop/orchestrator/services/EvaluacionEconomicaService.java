@@ -20,9 +20,7 @@ import com.pemex.pep.seemop.data.models.VectorProduccion;
 import com.pemex.pep.seemop.orchestrator.models.*;
 import io.quarkus.logging.Log;
 import com.pemex.pep.seemop.data.entities.InformacionOportunidad;
-import mx.com.innovating.cloud.data.models.*;
 import com.pemex.pep.seemop.data.repository.DataBaseConnectorRepository;
-import mx.com.innovating.cloud.orchestrator.models.*;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
