@@ -729,38 +729,6 @@ public class DataBaseConnectorRepository {
     }
 
     @Transactional
-    @CacheResult(cacheName = "oportunidades-by-version-cache")
-    public List<Oportunidades> getOportunidadesByNombreVersion(@CacheKey String nombreVersion) {
-        try {
-            final var queryString = """
-                    SELECT idoportunidad, idoportunidadobjetivo, oportunidad, b.nombreversion, a.idtipooportunidad FROM catalogo.claveobjetivovw a
-                    JOIN catalogo.versiontbl b ON a.idversion = b.idversion
-                    where nombreversion = :nombreVersion
-                    group by idoportunidad, idoportunidadobjetivo, oportunidad, b.nombreversion, a.idtipooportunidad 
-                    """;
-    
-            List<Object[]> results = em.createNativeQuery(queryString)
-                    .setParameter("nombreVersion", nombreVersion)
-                    .getResultList();
-    
-            return results.stream()
-                    .map(result -> {
-                        Oportunidades oportunidad = new Oportunidades();
-                        oportunidad.setIdoportunidad((Integer) result[0]);
-                        oportunidad.setIdoportunidadobjetivo((Integer) result[1]);
-                        oportunidad.setOportunidad((String) result[2]);
-                        oportunidad.setNombreVersion((String) result[3]);
-                        oportunidad.setIdtipooportunidad((Integer) result[4]);
-                        return oportunidad;
-                    })
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            Log.error("JDBC: getOportunidadesByNombreVersion exception executing SQL", e);
-            throw new SqlExecutionErrorException("JDBC getOportunidadesByNombreVersion exception executing SQL");
-        }
-    }
-
-    @Transactional
     @CacheResult(cacheName = "info-oportunidad-cache")
     public InformacionOportunidad getInfoOportunidad(@CacheKey Integer idOportunidad) {
         return InformacionOportunidad.findByIdoportunidadobjetivo(idOportunidad);
