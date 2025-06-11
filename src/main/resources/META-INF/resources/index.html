@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+<head><script src="/assets/js/color-modes.js"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Adrian López">
+    <meta name="generator" content="Adrian López">
+    <title>Evaluacion Economica - PEMEX - ICS</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbar-fixed/">
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+
+    <link href="/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          user-select: none;
+        }
+
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+
+        .b-example-divider {
+          width: 100%;
+          height: 3rem;
+          background-color: rgba(0, 0, 0, .1);
+          border: solid rgba(0, 0, 0, .15);
+          border-width: 1px 0;
+          box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .b-example-vr {
+          flex-shrink: 0;
+          width: 1.5rem;
+          height: 100vh;
+        }
+
+        .bi {
+          vertical-align: -.125em;
+          fill: currentColor;
+        }
+
+        .nav-scroller {
+          position: relative;
+          z-index: 2;
+          height: 2.75rem;
+          overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+          display: flex;
+          flex-wrap: nowrap;
+          padding-bottom: 1rem;
+          margin-top: -1px;
+          overflow-x: auto;
+          text-align: center;
+          white-space: nowrap;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .btn-bd-primary {
+          --bd-violet-bg: #712cf9;
+          --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+          --bs-btn-font-weight: 600;
+          --bs-btn-color: var(--bs-white);
+          --bs-btn-bg: var(--bd-violet-bg);
+          --bs-btn-border-color: var(--bd-violet-bg);
+          --bs-btn-hover-color: var(--bs-white);
+          --bs-btn-hover-bg: #6528e0;
+          --bs-btn-hover-border-color: #6528e0;
+          --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+          --bs-btn-active-color: var(--bs-btn-hover-color);
+          --bs-btn-active-bg: #5a23c8;
+          --bs-btn-active-border-color: #5a23c8;
+        }
+
+        .bd-mode-toggle {
+          z-index: 1500;
+        }
+
+        .bd-mode-toggle .dropdown-menu .active .bi {
+          display: block !important;
+        }
+
+        body {
+          min-height: 75rem;
+          padding-top: 4.5rem;
+        }
+    </style>
+
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+    <symbol id="check2" viewBox="0 0 16 16">
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+    </symbol>
+    <symbol id="circle-half" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+    </symbol>
+    <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+        <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+    </symbol>
+    <symbol id="sun-fill" viewBox="0 0 16 16">
+        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+    </symbol>
+</svg>
+
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Evaluacion Economica</a>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="idOportunidadObjetivo" id="idOportunidadObjetivo">
+                <input class="form-control me-2" type="search" placeholder="version" id="versionOportunidad">
+                <button class="btn btn-outline-success" type="button" onclick="ejecuta()">Ejecutar</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <h2>Informaci&oacuten Oportunidad</h2>
+    <div class="table-responsive small" id="principal">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <th >proyecto</th>
+                <th >oportunidad</th>
+                <th >objetivo</th>
+                <th >fechainicioperfexploratorio</th>
+                <th >fechainicio</th>
+                <th >duracionperfpozodesarrollo</th>
+                <th >duraciontermpozodesarrollo</th>
+                <th >hidrocarburo</th>
+                <th >tipooportunidad</th>
+                <th >idprograma</th>
+                <th >programa</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <h2>Informaci&oacuten Pozos</h2>
+    <div class="table-responsive small" id="pozosDiv">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <th >---</th><th >2024</th><th >2025</th><th >2026</th><th >2027</th>
+                <th >2028</th><th >2029</th><th >2030</th><th >2031</th><th >2032</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+                <td>X</td><td>X</td><td>X</td><td>X</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <h2>Producci&oacute;n Diaria Promedio</h2>
+    <div class="table-responsive small" id="pdpDiv">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <th >---</th><th >2024</th><th >2025</th><th >2026</th><th >2027</th>
+                <th >2028</th><th >2029</th><th >2030</th><th >2031</th><th >2032</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <h2>Ingresos</h2>
+    <div class="table-responsive small" id="ingresosDiv">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <th >---</th><th >2024</th><th >2025</th><th >2026</th><th >2027</th>
+                <th >2028</th><th >2029</th><th >2030</th><th >2031</th><th >2032</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <h2>Inversiones</h2>
+    <div class="table-responsive small" id="inversionesDiv">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <th >---</th><th >2024</th><th >2025</th><th >2026</th><th >2027</th>
+                <th >2028</th><th >2029</th><th >2030</th><th >2031</th><th >2032</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <h2>Costos</h2>
+    <div class="table-responsive small" id="costosDiv">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <th >---</th><th >2024</th><th >2025</th><th >2026</th><th >2027</th>
+                <th >2028</th><th >2029</th><th >2030</th><th >2031</th><th >2032</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <h2>Flujos Contables</h2>
+    <div class="table-responsive small" id="flujosDiv">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <th >---</th><th >2024</th><th >2025</th><th >2026</th><th >2027</th>
+                <th >2028</th><th >2029</th><th >2030</th><th >2031</th><th >2032</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+                <td>X</td><td>X</td><td>X</td><td>X</td><td>X</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <h2>Resultados</h2>
+    <div class="table-responsive small" id="resultadosDiv">
+        <table class="table table-striped table-bordered table-sm">
+            <tr><th >vpn</th><td>---</td></tr>
+            <tr><th >tir</th><td>---</td></tr>
+            <tr><th >flujosDescontadosEfectivoTotal</th><td>---</td></tr>
+            <tr><th >valorPresenteInversion</th><td>---</td></tr>
+            <tr><th >valorPresenteEgresos</th><td>---</td></tr>
+            <tr><th >valorPresenteIngresos</th><td>---</td></tr>
+            <tr><th >valorPresenteCostos</th><td>---</td></tr>
+            <tr><th >reporte708</th><td>---</td></tr>
+            <tr><th >reporte721</th><td>---</td></tr>
+            <tr><th >reporte722</th><td>---</td></tr>
+            <tr><th >reporte723</th><td>---</td></tr>
+            <tr><th >utilidadBpce</th><td>---</td></tr>
+            <tr><th >relacionCostoBeneficio</th><td>---</td></tr>
+            <tr><th >costoDescubrimiento</th><td>---</td></tr>
+            <tr><th >costoOperacion</th><td>---</td></tr>
+        </table>
+    </div>
+    <hr style="padding: 50px 0px">
+</main>
+<script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script>
+    function ejecuta(){
+
+        if($("#idOportunidadObjetivo").val()==""){
+              alert("El campo idOportunidadObjetivo no puede estar vacio")
+              $("#idOportunidadObjetivo").focus();
+        } else if($("#versionOportunidad").val()==""){
+              alert("El campo version no puede estar vacio")
+              $("#versionOportunidad").focus();
+        }else{
+            $(document).ready( function (){
+             $.ajax({
+                   beforeSend: function(){
+                     $("#principal").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                     $("#pozosDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                     $("#pdpDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                     $("#ingresosDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                     $("#inversionesDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                     $("#costosDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                     $("#flujosDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                     $("#resultadosDiv").html("<div class=\"col-xs-12 text-center\"><img src='img/loader.gif' width='100px'></img></div>");
+                   },
+                   url: 'http://localhost:8084/api/v1/getEvaluacionEconomica/' + $("#idOportunidadObjetivo").val() + '/version/' + $("#versionOportunidad").val(),
+                   type: 'GET',
+                   success: function(res){
+
+                       var infoOportunidad = res.infoOportunidad;
+
+                       var table = '<table class="table table-striped table-bordered table-sm"><thead><tr>';
+                       table += '<th >proyecto</th><th >oportunidad</th><th >objetivo</th><th >fechainicioperfexploratorio</th>';
+                       table += '<th >fechainicio</th><th >duracionperfpozodesarrollo</th>';
+                       table += '<th >duraciontermpozodesarrollo</th><th >hidrocarburo</th><th >tipooportunidad</th><th >programa</th>';
+                       table += '</tr></thead>';
+                       table += '<tbody><tr>';
+                       table += '<td>'+ infoOportunidad.proyecto +'</td><td>'+ infoOportunidad.oportunidad +'</td><td>'+ infoOportunidad.objetivo +'</td><td>'+ infoOportunidad.fechainicioperfexploratorio +'</td>';
+                       table += '<td>'+ infoOportunidad.fechainicio +'</td><td>'+ infoOportunidad.duracionperfpozodesarrollo.toFixed(2) +'</td><td>'+ infoOportunidad.duraciontermpozodesarrollo +'</td>';
+                       table += '<td>'+ infoOportunidad.hidrocarburo +'</td><td>'+ infoOportunidad.tipooportunidad +'</td><td>'+ infoOportunidad.programa +'</td>';
+                       table += '</tr></tbody>';
+                       table += '</table>';
+                       $("#principal").html(table);
+
+                       var evaluacionList = res.evaluacionEconomica;
+
+                       var table2 = '<table class="table table-striped table-bordered table-sm">';
+
+                       var fila1 = '<tr>';
+                       var fila2 = '<tr>';
+                       var fila3 = '<tr>';
+                       var fila4 = '<tr>';
+
+                       var table3 = '<table class="table table-striped table-bordered table-sm">';
+
+                       var fila1_3 = '<tr>';
+                       var fila2_3 = '<tr>';
+                       var fila3_3 = '<tr>';
+                       var fila4_3 = '<tr>';
+                       var fila5_3 = '<tr>';
+                       var fila6_3 = '<tr>';
+                       var fila7_3 = '<tr>';
+                       var fila8_3 = '<tr>';
+                       var fila9_3 = '<tr>';
+                       var fila10_3 = '<tr>';
+                       var fila11_3 = '<tr>';
+
+                       var table4 = '<table class="table table-striped table-bordered table-sm">';
+
+                       var fila1_4 = '<tr>';
+                       var fila2_4 = '<tr>';
+                       var fila3_4 = '<tr>';
+                       var fila4_4 = '<tr>';
+                       var fila5_4 = '<tr>';
+                       var fila6_4 = '<tr>';
+                       var fila7_4 = '<tr>';
+                       var fila8_4 = '<tr>';
+                       var fila9_4 = '<tr>';
+
+                       var table5 = '<table class="table table-striped table-bordered table-sm">';
+
+                       var fila1_5 = '<tr>';
+                       var fila2_5 = '<tr>';
+                       var fila3_5 = '<tr>';
+                       var fila4_5 = '<tr>';
+                       var fila5_5 = '<tr>';
+                       var fila6_5 = '<tr>';
+                       var fila7_5 = '<tr>';
+                       var fila8_5 = '<tr>';
+                       var fila9_5 = '<tr>';
+                       var fila10_5 = '<tr>';
+                       var fila11_5 = '<tr>';
+                       var fila12_5 = '<tr>';
+                       var fila13_5 = '<tr>';
+                       var fila14_5 = '<tr>';
+                       var fila15_5 = '<tr>';
+
+                       var table6 = '<table class="table table-striped table-bordered table-sm">';
+
+                       var fila1_6 = '<tr>';
+                       var fila2_6 = '<tr>';
+                       var fila3_6 = '<tr>';
+                       var fila4_6 = '<tr>';
+                       var fila5_6 = '<tr>';
+                       var fila6_6 = '<tr>';
+                       var fila7_6 = '<tr>';
+                       var fila8_6 = '<tr>';
+                       var fila9_6 = '<tr>';
+                       var fila10_6 = '<tr>';
+                       var fila11_6 = '<tr>';
+                       var fila12_6 = '<tr>';
+                       var fila13_6 = '<tr>';
+                       var fila14_6 = '<tr>';
+
+                       var table7 = '<table class="table table-striped table-bordered table-sm">';
+
+                       var fila1_7 = '<tr>';
+                       var fila2_7 = '<tr>';
+                       var fila3_7 = '<tr>';
+                       var fila4_7 = '<tr>';
+                       var fila5_7 = '<tr>';
+                       var fila6_7 = '<tr>';
+                       var fila7_7 = '<tr>';
+                       var fila8_7 = '<tr>';
+
+                       evaluacionList.forEach( function(valor, indice, array) {
+                           if(indice == 0){
+                               fila1 += '<th >---</th>';
+                               fila2 += '<th >Perforados</th>';
+                               fila3 += '<th >Terminados</th>';
+                               fila4 += '<th >Activos</th>';
+
+                               fila1_3 += '<th >---</th>';
+                               fila2_3 += '<th >mbpce</th>';
+                               fila3_3 += '<th >aceiteTotal</th>';
+                               fila4_3 += '<th >aceiteExtraPesado</th>';
+                               fila5_3 += '<th >aceitePesado</th>';
+                               fila6_3 += '<th >aceiteLigero</th>';
+                               fila7_3 += '<th >aceiteSuperLigero</th>';
+                               fila8_3 += '<th >gasTotal</th>';
+                               fila9_3 += '<th >gasHumedo</th>';
+                               fila10_3 += '<th >gasSeco</th>';
+                               fila11_3 += '<th >condensado</th>';
+
+                               fila1_4 += '<th >---</th>';
+                               fila2_4 += '<th >total</th>';
+                               fila3_4 += '<th >aceiteExtraPesado</th>';
+                               fila4_4 += '<th >aceitePesado</th>';
+                               fila5_4 += '<th >aceiteLigero</th>';
+                               fila6_4 += '<th >aceiteSuperLigero</th>';
+                               fila7_4 += '<th >gasHumedo</th>';
+                               fila8_4 += '<th >gasSeco</th>';
+                               fila9_4 += '<th >condensado</th>';
+
+                               fila1_5 += '<th >---</th>';
+                               fila2_5 += '<th >total</th>';
+                               fila3_5 += '<th >exploratoria</th>';
+                               fila4_5 += '<th >perforacionExp</th>';
+                               fila5_5 += '<th >terminacionExp</th>';
+                               fila6_5 += '<th >infraestructuraExp</th>';
+                               fila7_5 += '<th >desarrolloSinOperacional</th>';
+                               fila8_5 += '<th >perforacionDes</th>';
+                               fila9_5 += '<th >terminacionDes</th>';
+                               fila10_5 += '<th >infraestructuraDes</th>';
+                               fila11_5 += '<th >lineaDescarga</th>';
+                               fila12_5 += '<th >ductos</th>';
+                               fila13_5 += '<th >plataformaDesarrollo</th>';
+                               fila14_5 += '<th >operacionalFuturoDesarrollo</th>';
+                               fila15_5 += '<th >desarrollo</th>';
+
+                               fila1_6 += '<th >---</th>';
+                               fila2_6 += '<th >total</th>';
+                               fila3_6 += '<th >fijos</th>';
+                               fila4_6 += '<th >variables</th>';
+                               fila5_6 += '<th >administracionCorporativo</th>';
+                               fila6_6 += '<th >comprasGas</th>';
+                               fila7_6 += '<th >comprasInterorganismos</th>';
+                               fila8_6 += '<th >jubilados</th>';
+                               fila9_6 += '<th >manoObra</th>';
+                               fila10_6 += '<th >materiales</th>';
+                               fila11_6 += '<th >otrosConceptos</th>';
+                               fila12_6 += '<th >reservaLaboral</th>';
+                               fila13_6 += '<th >serviciosCorporativos</th>';
+                               fila14_6 += '<th >serviciosGenerales</th>';
+
+                               fila1_7 += '<th >---</th>';
+                               fila2_7 += '<th >egresosTotales</th>';
+                               fila3_7 += '<th >flujosNetosEfectivo</th>';
+                               fila4_7 += '<th >flujosDescontadosEfectivo</th>';
+                               fila5_7 += '<th >flujosDescontadosInversion</th>';
+                               fila6_7 += '<th >flujosDescontadosEgresos</th>';
+                               fila7_7 += '<th >flujosDescontadosIngresos</th>';
+                               fila8_7 += '<th >flujosDescontadosCostos</th>';
+                           }
+
+                           fila1 += '<th >'+ valor.anio +'</th>';
+
+                           if(valor.pozosProduccion == null){
+                               fila2 += '<td >---</td>';
+                               fila3 += '<td >---</td>';
+                               fila4 += '<td >---</td>';
+                           } else {
+                               fila2 += '<td >'+ ((valor.pozosProduccion.pozosPerforados == null) ? 0 : valor.pozosProduccion.pozosPerforados) +'</td>';
+                               fila3 += '<td >'+ ((valor.pozosProduccion.pozosTerminados == null) ? 0 : valor.pozosProduccion.pozosTerminados) +'</td>';
+                               fila4 += '<td >'+ valor.pozosProduccion.pozosActivos +'</td>';
+                           }
+
+                           fila1_3 += '<th >'+ valor.anio +'</th>';
+
+                           if(valor.produccionDiariaPromedio == null){
+                               fila2_3 += '<td >---</td>';
+                               fila3_3 += '<td >---</td>';
+                               fila4_3 += '<td >---</td>';
+                               fila5_3 += '<td >---</td>';
+                               fila6_3 += '<td >---</td>';
+                               fila7_3 += '<td >---</td>';
+                               fila8_3 += '<td >---</td>';
+                               fila9_3 += '<td >---</td>';
+                               fila10_3 += '<td >---</td>';
+                               fila11_3 += '<td >---</td>';
+                           } else {
+                               fila2_3 += '<td >'+ ((valor.produccionDiariaPromedio.mbpce == null) ? 0 : valor.produccionDiariaPromedio.mbpce.toFixed(2) ) +'</td>';
+                               fila3_3 += '<td >'+ ((valor.produccionDiariaPromedio.aceiteTotal == null) ? 0 : valor.produccionDiariaPromedio.aceiteTotal.toFixed(2) ) +'</td>';
+                               fila4_3 += '<td >'+ ((valor.produccionDiariaPromedio.aceiteExtraPesado == null) ? 0 : valor.produccionDiariaPromedio.aceiteExtraPesado.toFixed(2) ) +'</td>';
+                               fila5_3 += '<td >'+ ((valor.produccionDiariaPromedio.aceitePesado == null) ? 0 : valor.produccionDiariaPromedio.aceitePesado.toFixed(2) ) +'</td>';
+                               fila6_3 += '<td >'+ ((valor.produccionDiariaPromedio.aceiteLigero == null) ? 0 : valor.produccionDiariaPromedio.aceiteLigero.toFixed(2) ) +'</td>';
+                               fila7_3 += '<td >'+ ((valor.produccionDiariaPromedio.aceiteSuperLigero == null) ? 0 : valor.produccionDiariaPromedio.aceiteSuperLigero.toFixed(2) ) +'</td>';
+                               fila8_3 += '<td >'+ ((valor.produccionDiariaPromedio.gasTotal == null) ? 0 : valor.produccionDiariaPromedio.gasTotal.toFixed(2) ) +'</td>';
+                               fila9_3 += '<td >'+ ((valor.produccionDiariaPromedio.gasHumedo == null) ? 0 : valor.produccionDiariaPromedio.gasHumedo.toFixed(2) ) +'</td>';
+                               fila10_3 += '<td >'+ ((valor.produccionDiariaPromedio.gasSeco == null) ? 0 : valor.produccionDiariaPromedio.gasSeco.toFixed(2) ) +'</td>';
+                               fila11_3 += '<td >'+ ((valor.produccionDiariaPromedio.condensado == null) ? 0 : valor.produccionDiariaPromedio.condensado.toFixed(2) ) +'</td>';
+                           }
+
+                           fila1_4 += '<th >'+ valor.anio +'</th>';
+
+                           if(valor.ingresos == null){
+                               fila2_4 += '<td >---</td>';
+                               fila3_4 += '<td >---</td>';
+                               fila4_4 += '<td >---</td>';
+                               fila5_4 += '<td >---</td>';
+                               fila6_4 += '<td >---</td>';
+                               fila7_4 += '<td >---</td>';
+                               fila8_4 += '<td >---</td>';
+                               fila9_4 += '<td >---</td>';
+                           } else {
+                               fila2_4 += '<td >'+ ((valor.ingresos.total == null) ? 0 : valor.ingresos.total.toFixed(2) ) +'</td>';
+                               fila3_4 += '<td >'+ ((valor.ingresos.aceiteExtraPesado == null) ? 0 : valor.ingresos.aceiteExtraPesado.toFixed(2) ) +'</td>';
+                               fila4_4 += '<td >'+ ((valor.ingresos.aceitePesado == null) ? 0 : valor.ingresos.aceitePesado.toFixed(2) ) +'</td>';
+                               fila5_4 += '<td >'+ ((valor.ingresos.aceiteLigero == null) ? 0 : valor.ingresos.aceiteLigero.toFixed(2) ) +'</td>';
+                               fila6_4 += '<td >'+ ((valor.ingresos.aceiteSuperLigero == null) ? 0 : valor.ingresos.aceiteSuperLigero.toFixed(2) ) +'</td>';
+                               fila7_4 += '<td >'+ ((valor.ingresos.gasHumedo == null) ? 0 : valor.ingresos.gasHumedo.toFixed(2) ) +'</td>';
+                               fila8_4 += '<td >'+ ((valor.ingresos.gasSeco == null) ? 0 : valor.ingresos.gasSeco.toFixed(2) ) +'</td>';
+                               fila9_4 += '<td >'+ ((valor.ingresos.condensado == null) ? 0 : valor.ingresos.condensado.toFixed(2) ) +'</td>';
+                           }
+
+                           fila1_5 += '<th >'+ valor.anio +'</th>';
+
+                           if(valor.inversiones == null){
+                               fila2_5 += '<td >---</td>';
+                               fila3_5 += '<td >---</td>';
+                               fila4_5 += '<td >---</td>';
+                               fila5_5 += '<td >---</td>';
+                               fila6_5 += '<td >---</td>';
+                               fila7_5 += '<td >---</td>';
+                               fila8_5 += '<td >---</td>';
+                               fila9_5 += '<td >---</td>';
+                               fila10_5 += '<td >---</td>';
+                               fila11_5 += '<td >---</td>';
+                               fila12_5 += '<td >---</td>';
+                               fila13_5 += '<td >---</td>';
+                               fila14_5 += '<td >---</td>';
+                               fila15_5 += '<td >---</td>';
+                           } else {
+                               fila2_5 += '<td >'+ ((valor.inversiones.total == null) ? 0 : valor.inversiones.total.toFixed(2) ) +'</td>';
+                               fila3_5 += '<td >'+ ((valor.inversiones.exploratoria == null) ? 0 : valor.inversiones.exploratoria.toFixed(2) ) +'</td>';
+                               fila4_5 += '<td >'+ ((valor.inversiones.perforacionExp == null) ? 0 : valor.inversiones.perforacionExp.toFixed(2) ) +'</td>';
+                               fila5_5 += '<td >'+ ((valor.inversiones.terminacionExp == null) ? 0 : valor.inversiones.terminacionExp.toFixed(2) ) +'</td>';
+                               fila6_5 += '<td >'+ ((valor.inversiones.infraestructuraExp == null) ? 0 : valor.inversiones.infraestructuraExp.toFixed(2) ) +'</td>';
+                               fila7_5 += '<td >'+ ((valor.inversiones.desarrolloSinOperacional == null) ? 0 : valor.inversiones.desarrolloSinOperacional.toFixed(2) ) +'</td>';
+                               fila8_5 += '<td >'+ ((valor.inversiones.perforacionDes == null) ? 0 : valor.inversiones.perforacionDes.toFixed(2) ) +'</td>';
+                               fila9_5 += '<td >'+ ((valor.inversiones.terminacionDes == null) ? 0 : valor.inversiones.terminacionDes.toFixed(2) ) +'</td>';
+                               fila10_5 += '<td >'+ ((valor.inversiones.infraestructuraDes == null) ? 0 : valor.inversiones.infraestructuraDes.toFixed(2) ) +'</td>';
+                               fila11_5 += '<td >'+ ((valor.inversiones.lineaDescarga == null) ? 0 : valor.inversiones.lineaDescarga.toFixed(2) ) +'</td>';
+                               fila12_5 += '<td >'+ ((valor.inversiones.ductos == null) ? 0 : valor.inversiones.ductos.toFixed(2) ) +'</td>';
+                               fila13_5 += '<td >'+ ((valor.inversiones.plataformaDesarrollo == null) ? 0 : valor.inversiones.plataformaDesarrollo.toFixed(2) ) +'</td>';
+                               fila14_5 += '<td >'+ ((valor.inversiones.operacionalFuturoDesarrollo == null) ? 0 : valor.inversiones.operacionalFuturoDesarrollo.toFixed(2) ) +'</td>';
+                               fila15_5 += '<td >'+ ((valor.inversiones.desarrollo == null) ? 0 : valor.inversiones.desarrollo.toFixed(2) ) +'</td>';
+                           }
+
+                           fila1_6 += '<th >'+ valor.anio +'</th>';
+
+                           if(valor.costos == null){
+                               fila2_6 += '<td >---</td>';
+                               fila3_6 += '<td >---</td>';
+                               fila4_6 += '<td >---</td>';
+                               fila5_6 += '<td >---</td>';
+                               fila6_6 += '<td >---</td>';
+                               fila7_6 += '<td >---</td>';
+                               fila8_6 += '<td >---</td>';
+                               fila9_6 += '<td >---</td>';
+                               fila10_6 += '<td >---</td>';
+                               fila11_6 += '<td >---</td>';
+                               fila12_6 += '<td >---</td>';
+                               fila13_6 += '<td >---</td>';
+                               fila14_6 += '<td >---</td>';
+                           } else {
+                               fila2_6 += '<td >'+ valor.costos.total.toFixed(2) +'</td>';
+                               fila3_6 += '<td >'+ valor.costos.fijos.toFixed(2) +'</td>';
+                               fila4_6 += '<td >'+ valor.costos.variables.toFixed(2) +'</td>';
+                               fila5_6 += '<td >'+ valor.costos.administracionCorporativo.toFixed(2) +'</td>';
+                               fila6_6 += '<td >'+ valor.costos.comprasGas.toFixed(2) +'</td>';
+                               fila7_6 += '<td >'+ valor.costos.comprasInterorganismos.toFixed(2) +'</td>';
+                               fila8_6 += '<td >'+ valor.costos.jubilados.toFixed(2) +'</td>';
+                               fila9_6 += '<td >'+ valor.costos.manoObra.toFixed(2) +'</td>';
+                               fila10_6 += '<td >'+ valor.costos.materiales.toFixed(2) +'</td>';
+                               fila11_6 += '<td >'+ valor.costos.otrosConceptos.toFixed(2) +'</td>';
+                               fila12_6 += '<td >'+ valor.costos.reservaLaboral.toFixed(2) +'</td>';
+                               fila13_6 += '<td >'+ valor.costos.serviciosCorporativos.toFixed(2) +'</td>';
+                               fila14_6 += '<td >'+ valor.costos.serviciosGenerales.toFixed(2) +'</td>';
+                           }
+
+                           fila1_7 += '<th >'+ valor.anio +'</th>';
+
+                           if(valor.flujoContable == null){
+                               fila2_7 += '<td >---</td>';
+                               fila3_7 += '<td >---</td>';
+                               fila4_7 += '<td >---</td>';
+                               fila5_7 += '<td >---</td>';
+                               fila6_7 += '<td >---</td>';
+                               fila7_7 += '<td >---</td>';
+                               fila8_7 += '<td >---</td>';
+                           } else {
+                               fila2_7 += '<td >'+ valor.flujoContable.egresosTotales.toFixed(2) +'</td>';
+                               fila3_7 += '<td >'+ valor.flujoContable.flujosNetosEfectivo.toFixed(2) +'</td>';
+                               fila4_7 += '<td >'+ valor.flujoContable.flujosDescontadosEfectivo.toFixed(2) +'</td>';
+                               fila5_7 += '<td >'+ valor.flujoContable.flujosDescontadosInversion.toFixed(2) +'</td>';
+                               fila6_7 += '<td >'+ valor.flujoContable.flujosDescontadosEgresos.toFixed(2) +'</td>';
+                               fila7_7 += '<td >'+ valor.flujoContable.flujosDescontadosIngresos.toFixed(2) +'</td>';
+                               fila8_7 += '<td >'+ valor.flujoContable.flujosDescontadosCostos.toFixed(2) +'</td>';
+                           }
+
+                       });
+
+                       fila1 += '</tr>';
+                       fila2 += '</tr>';
+                       fila3 += '</tr>';
+                       fila4 += '</tr>';
+
+                       fila1_3 += '</tr>';
+                       fila2_3 += '</tr>';
+                       fila3_3 += '</tr>';
+                       fila4_3 += '</tr>';
+                       fila5_3 += '</tr>';
+                       fila6_3 += '</tr>';
+                       fila7_3 += '</tr>';
+                       fila8_3 += '</tr>';
+                       fila9_3 += '</tr>';
+                       fila10_3 += '</tr>';
+                       fila11_3 += '</tr>';
+
+                       fila1_4 += '</tr>';
+                       fila2_4 += '</tr>';
+                       fila3_4 += '</tr>';
+                       fila4_4 += '</tr>';
+                       fila5_4 += '</tr>';
+                       fila6_4 += '</tr>';
+                       fila7_4 += '</tr>';
+                       fila8_4 += '</tr>';
+                       fila9_4 += '</tr>';
+
+                       fila1_5 += '</tr>';
+                       fila2_5 += '</tr>';
+                       fila3_5 += '</tr>';
+                       fila4_5 += '</tr>';
+                       fila5_5 += '</tr>';
+                       fila6_5 += '</tr>';
+                       fila7_5 += '</tr>';
+                       fila8_5 += '</tr>';
+                       fila9_5 += '</tr>';
+                       fila10_5 += '</tr>';
+                       fila11_5 += '</tr>';
+                       fila12_5 += '</tr>';
+                       fila13_5 += '</tr>';
+                       fila14_5 += '</tr>';
+                       fila15_5 += '</tr>';
+
+                       fila1_6 += '</tr>';
+                       fila2_6 += '</tr>';
+                       fila3_6 += '</tr>';
+                       fila4_6 += '</tr>';
+                       fila5_6 += '</tr>';
+                       fila6_6 += '</tr>';
+                       fila7_6 += '</tr>';
+                       fila8_6 += '</tr>';
+                       fila9_6 += '</tr>';
+                       fila10_6 += '</tr>';
+                       fila11_6 += '</tr>';
+                       fila12_6 += '</tr>';
+                       fila13_6 += '</tr>';
+                       fila14_6 += '</tr>';
+
+                       fila1_7 += '</tr>';
+                       fila2_7 += '</tr>';
+                       fila3_7 += '</tr>';
+                       fila4_7 += '</tr>';
+                       fila5_7 += '</tr>';
+                       fila6_7 += '</tr>';
+                       fila7_7 += '</tr>';
+                       fila8_7 += '</tr>';
+
+                       table2 += fila1 + fila2 + fila3 + fila4 + '</table>';
+
+                       table3 += fila1_3 + fila2_3 + fila3_3 + fila4_3 + fila5_3 + fila6_3 + fila7_3 + fila8_3 + fila9_3 + fila10_3 + fila11_3 + '</table>';
+
+                       table4 += fila1_4 + fila2_4 + fila3_4 + fila4_4 + fila5_4 + fila6_4 + fila7_4 + fila8_4 + fila9_4 + '</table>';
+
+                       table5 += fila1_5 + fila2_5 + fila3_5 + fila4_5 + fila5_5 + fila6_5 + fila7_5 + fila8_5 + fila9_5 + fila10_5 + fila11_5 + fila12_5 + fila13_5 + fila14_5 + fila15_5 + '</table>';
+
+                       table6 += fila1_6 + fila2_6 + fila3_6 + fila4_6 + fila5_6 + fila6_6 + fila7_6 + fila8_6 + fila9_6 + fila10_6 + fila11_6 + fila12_6 + fila13_6 + fila14_6 + '</table>';
+
+                       table7 += fila1_7 + fila2_7 + fila3_7 + fila4_7 + fila5_7 + fila6_7 + fila7_7 + fila8_7 + '</table>';
+
+                       var resultados = res.flujoContableTotal;
+                       var table8 = '<table class="table table-striped table-bordered table-sm">';
+                        table8 += '<tr><th >vpn</th><td>'+resultados.vpn.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >tir</th><td>'+resultados.tir.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >flujosDescontadosEfectivoTotal</th><td>'+resultados.flujosDescontadosEfectivoTotal.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >valorPresenteInversion</th><td>'+resultados.valorPresenteInversion.toFixed(2)<+'/td></tr>';
+                        table8 += '<tr><th >valorPresenteEgresos</th><td>'+resultados.valorPresenteEgresos.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >valorPresenteIngresos</th><td>'+resultados.valorPresenteIngresos.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >valorPresenteCostos</th><td>'+resultados.valorPresenteCostos.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >Índice de utilidad de la inversión</th><td>'+resultados.reporte708+'</td></tr>';
+                        table8 += '<tr><th >Costo de desarrollo por líquidos</th><td>'+resultados.reporte721+'</td></tr>';
+                        table8 += '<tr><th >Costo de desarrollo por gas</th><td>'+resultados.reporte722+'</td></tr>';
+                        table8 += '<tr><th >Costo de desarrollo por crudo equivalente</th><td>'+resultados.reporte723+'</td></tr>';
+                        table8 += '<tr><th >utilidadBpce</th><td>'+resultados.utilidadBpce.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >relacionCostoBeneficio</th><td>'+resultados.relacionCostoBeneficio.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >costoDescubrimiento</th><td>'+resultados.costoDescubrimiento.toFixed(2)+'</td></tr>';
+                        table8 += '<tr><th >costoOperacion</th><td>'+resultados.costoOperacion.toFixed(2)+'</td></tr>';
+                        table8 += '</table>';
+
+                       $("#pozosDiv").html(table2);
+                       $("#pdpDiv").html(table3);
+                       $("#ingresosDiv").html(table4);
+                       $("#inversionesDiv").html(table5);
+                       $("#costosDiv").html(table6);
+                       $("#flujosDiv").html(table7);
+                       $("#resultadosDiv").html(table8);
+                   },
+                  error: function(jqXHR,estado,error){
+                    $("#principal").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+                    $("#pozosDiv").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+                    $("#pdpDiv").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+                    $("#ingresosDiv").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+                    $("#inversionesDiv").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+                    $("#costosDiv").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+                    $("#flujosDiv").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+                    $("#resultadosDiv").html("Ocurrio un error al cargar la informacion ... "+estado+"    "+error);
+
+                  }
+                });
+           })
+       }
+    }
+</script>
+</body>
+</html>
